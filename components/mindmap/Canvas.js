@@ -12,9 +12,6 @@ import style from './style'
 Cytoscape.use(Popper)
 Cytoscape.use(Cxtmenu)
 
-const initialNodeWidth = 100
-const initialNodeHeight = 50
-
 function buildMenu (cy, poppers, user, setEls) {
   return function (node) {
     const menu = []
@@ -89,10 +86,6 @@ function setHandlers (cy) {
   cy.on('add', 'node', e => {
     const node = e.target
 
-    // noinspection JSNonASCIINames
-    node.style('width', `${initialNodeWidth}px`)
-    node.style('height', `${initialNodeHeight}px`)
-
     node.scratch('style', node.style())
   })
 
@@ -128,8 +121,6 @@ const Canvas = ({ elements }) => {
     cyWrapper.cy = cy
 
     cy.nodes().forEach(node => {
-      node.style('width', `${initialNodeWidth}px`)
-      node.style('height', `${initialNodeHeight}px`)
       node.scratch('style', node.style())
     })
   }

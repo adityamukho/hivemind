@@ -2,6 +2,7 @@ import { aql } from 'arangojs'
 import db from '../../../utils/arangoWrapper'
 import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
 import {rg2cy} from '../../../utils/cyHelpers'
+import {chain} from 'lodash'
 
 const MindMapAPI = async (req, res) => {
   const { token } = req.headers
@@ -15,7 +16,7 @@ const MindMapAPI = async (req, res) => {
 
     switch (req.method) {
       case 'GET':
-        const query = aql`
+        let query = aql`
           for v, e, p in 1..${Number.MAX_SAFE_INTEGER}
           any ${userId}
           graph 'mindmaps'
@@ -26,7 +27,7 @@ const MindMapAPI = async (req, res) => {
           
           return { vertices, edges }
         `
-        const cursor = await db.query(query)
+        let cursor = await db.query(query)
         const mindmap = await cursor.next()
         if (mindmap.vertices.length) {
           const meta = mindmap.vertices[0]
@@ -38,6 +39,25 @@ const MindMapAPI = async (req, res) => {
           }
           for (let i = 1; i < mindmap.edges.length; i++) {
             edges.push(mindmap.edges[i])
+          }
+
+          const userIds = chain(vertices).flatMap(v => [v.createdBy, v.lastUpdatedBy]).compact().uniq().value()
+          query = aql`
+            for u in users
+            filter u._id in ${userIds}
+            
+            return keep(u, '_id', 'displayName', 'email')
+          `
+          cursor = await db.query(query)
+          const users = await cursor.all()
+
+          for (const v of vertices) {
+            for (const field of ['createdBy', 'lastUpdatedBy']) {
+              if (v[field]) {
+                const user = users.find(u => u._id === v[field])
+                v[field] = user.displayName || user.email
+              }
+            }
           }
 
           const result = {

@@ -53,7 +53,6 @@ const PopperCard = ({el, poppers, setEls, cy}) => {
     const rootId = cy.nodes().id()
     const key = rootId.split('/')[1]
     const { data: {elements} } = await fetcher(`/api/mindmaps/${key}`, user.token)
-    console.log(elements)
     setSpinnerDisplay('d-none')
 
     removePopper(el.id(), `popper-${el.id()}`, poppers)

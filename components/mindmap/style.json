@@ -11,7 +11,9 @@
       "text-valign": "center",
       "text-halign": "center",
       "label": "data(title)",
-      "shape": "round-rectangle"
+      "shape": "round-rectangle",
+      "width": "label",
+      "padding": "5px"
     }
   },
   {

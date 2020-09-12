@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Eye } from 'react-feather'
-import { Card, CardBody, CardText, CardTitle } from 'reactstrap'
+import { Card, CardBody, CardSubtitle, CardText, CardTitle, Row, Col } from 'reactstrap'
 import { setPopper } from '../../../utils/cyHelpers'
 import CloseButton from '../CloseButton'
 
@@ -60,8 +60,16 @@ const PopperCard = ({ el, poppers, cy }) => {
           poppers={poppers}
         />
       </CardTitle>
+      <CardSubtitle>
+        <Row>
+          <Col className='mb4'>Created By: {data.createdBy}</Col>
+          {data.lastUpdatedBy ? <Col className='mb4'>Last Updated By: {data.lastUpdatedBy}</Col> : null}
+        </Row>
+        <hr/>
+      </CardSubtitle>
       <CardText tag="div">
-        {JSON.stringify(data)}
+        {data.summary ? <><Row><h5>Summary</h5></Row><Row>{data.summary}</Row></> : null}
+        {data.content ? <Row><hr/>{data.content}</Row> : null}
       </CardText>
     </CardBody>
   </Card>

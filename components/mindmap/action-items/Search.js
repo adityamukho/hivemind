@@ -9,6 +9,7 @@ import { Button, Card, CardBody, CardText, CardTitle } from 'reactstrap'
 import { removePopper, setPopper } from '../../../utils/cyHelpers'
 import GlobalContext from '../../GlobalContext'
 import CloseButton from '../CloseButton'
+import {defer} from 'lodash'
 
 function handler (cy, poppers) {
   const data = cy.nodes().map(node => pick(node.data(), 'id', 'title', 'summary'))
@@ -70,7 +71,7 @@ function handler (cy, poppers) {
         })
       }
 
-      removePopper('search', 'popper-search', poppers)
+      defer(() => removePopper('search', 'popper-search', poppers))
     }
   }
 
