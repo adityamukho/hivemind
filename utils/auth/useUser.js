@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { saveUser } from '../db'
+import { fetcher } from '../fetchWrapper'
 import '../initFirebase'
 import { mapUserData } from './mapUserData'
 import { getUserFromCookie, removeUserCookie, setUserCookie } from './userCookies'
@@ -32,7 +32,7 @@ const useUser = () => {
         const userData = mapUserData(user)
         setUserCookie(userData)
         setUser(userData)
-        saveUser(userData)
+        fetcher('/api/users', userData.token, 'POST')
       }
       else {
         removeUserCookie()
@@ -41,11 +41,10 @@ const useUser = () => {
     })
 
     const userFromCookie = getUserFromCookie()
-    if (!userFromCookie) {
-      router.push('/')
+    if (userFromCookie) {
+      setUser(userFromCookie)
       return
     }
-    setUser(userFromCookie)
 
     return () => {
       cancelAuthListener()

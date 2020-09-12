@@ -1,10 +1,15 @@
 import useSWR from 'swr'
 
-const fetcher = (url, token, method = 'GET') => fetch(url, {
-  method,
-  headers: new Headers({ 'Content-Type': 'application/json', token }),
-  credentials: 'same-origin'
-}).then((res) => res.json())
+export const fetcher = async (url, token, method = 'GET', body) => {
+  const res = await fetch(url, {
+    method,
+    headers: new Headers({ 'Content-Type': 'application/json', token }),
+    credentials: 'same-origin',
+    body
+  })
+
+  return { data: await res.json(), status: res.status, ok: res.ok }
+}
 
 const fetchWrapper = (user, url) => useSWR(
   user ? [url, user.token] : null,

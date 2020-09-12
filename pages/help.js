@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-const Help = () => {
+const Page = () => {
   return (
     <div>
       <p>
@@ -14,4 +14,4 @@ const Help = () => {
   )
 }
 
-export default Help
+export default Page

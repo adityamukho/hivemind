@@ -1,20 +1,19 @@
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
 import { useUser } from '../utils/auth/useUser'
+import AuthPrompt from '../components/auth/AuthPrompt'
 
-const Index = () => {
+const Page = () => {
   const { user } = useUser()
   const router = useRouter()
 
   useEffect(() => {
-    if (!user) {
-      router.push('/auth')
-    } else {
+    if (user) {
       router.replace('/mmaps')
     }
   }, [user])
 
-  return <p>Redirecting...</p>
+  return user ? <p>Redirecting...</p> : <AuthPrompt/>
 }
 
-export default Index
+export default Page

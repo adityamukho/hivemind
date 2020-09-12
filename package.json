@@ -2,15 +2,18 @@
   "name": "hivemind",
   "version": "1.0.0",
   "scripts": {
+    "debug": "NODE_OPTIONS='--inspect' next dev",
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
+    "arangojs": "^7.0.1",
     "bootstrap": "^4.5.2",
     "firebase": "^7.15.5",
     "firebase-admin": "^8.12.1",
     "js-cookie": "2.2.1",
+    "lodash": "^4.17.20",
     "next": "latest",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
