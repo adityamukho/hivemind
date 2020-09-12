@@ -5,7 +5,9 @@ const getFood = async (req, res) => {
   const token = req.headers.token
 
   try {
-    await verifyIdToken(token)
+    const claims = await verifyIdToken(token)
+    console.log(claims)
+
     return res.status(200).json({
       food: favoriteFoods[Math.floor(Math.random() * favoriteFoods.length)],
     })

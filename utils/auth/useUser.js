@@ -1,16 +1,10 @@
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import firebase from 'firebase/app'
-import 'firebase/auth'
-import initFirebase from '../auth/initFirebase'
-import {
-  removeUserCookie,
-  setUserCookie,
-  getUserFromCookie,
-} from './userCookies'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { saveUser } from '../db'
+import '../initFirebase'
 import { mapUserData } from './mapUserData'
-
-initFirebase()
+import { getUserFromCookie, removeUserCookie, setUserCookie } from './userCookies'
 
 const useUser = () => {
   const [user, setUser] = useState()
@@ -38,7 +32,9 @@ const useUser = () => {
         const userData = mapUserData(user)
         setUserCookie(userData)
         setUser(userData)
-      } else {
+        saveUser(userData)
+      }
+      else {
         removeUserCookie()
         setUser()
       }
