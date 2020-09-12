@@ -26,7 +26,7 @@ const MindMapsAPI = async (req, res) => {
 
       case 'POST':
         const { name } = req.body
-        let mindmap = { name, isRoot: true, title: name }
+        let mindmap = { name, isRoot: true, title: name, createdBy: userId }
         let response = await rg.post('/document/mindmaps', mindmap)
         mindmap = response.body
 

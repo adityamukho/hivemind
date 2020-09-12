@@ -83,7 +83,7 @@ function handler (cy, poppers) {
       <CardBody>
         <CardTitle tag="h5" className="mb-4">
           Search <small className="text-muted">(Jump to Node)</small>
-          <CloseButton divKey="popper-search" popperKey="search"/>
+          <CloseButton divKey="popper-search" popperKey="search" poppers={poppers}/>
         </CardTitle>
         <CardText tag="div" className="mw-100">
           <BootstrapTable

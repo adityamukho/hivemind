@@ -9,7 +9,7 @@ const MindMap = ({ data, setTitle }) => {
       setRenderAuth(true)
       setTitle(data.meta.name)
     }
-  }, [])
+  }, [data.meta.name])
 
   if (renderAuth) {
     const { default: Canvas } = require('./Canvas')

@@ -1,3 +1,5 @@
+import ReactDOM from 'react-dom'
+
 const TYPE_MAP = {
   vertex: 'nodes',
   edge: 'edges'
@@ -26,7 +28,10 @@ export function rg2cy (data) {
   return result
 }
 
-export function removePopper(popperKey, divKey, poppers) {
+export function removePopper (popperKey, divKey, poppers) {
+  const el = document.getElementById(divKey)
+  ReactDOM.unmountComponentAtNode(el)
+
   const popper = poppers[popperKey]
   if (popper) {
     if (popper.reference.removeAttribute) {
@@ -36,22 +41,21 @@ export function removePopper(popperKey, divKey, poppers) {
     delete poppers[popperKey]
   }
 
-  const el = document.getElementById(divKey)
   if (el) {
     el.remove()
   }
 }
 
-export function setPopper(id, popper, poppers) {
+export function setPopper (id, popper, poppers) {
   poppers[id] = popper
 }
 
-export function getOptions (animate = true) {
+export function getOptions (animate, fit) {
   // noinspection JSUnusedGlobalSymbols
   return {
     name: 'breadthfirst',
 
-    fit: false, // whether to fit the viewport to the graph
+    fit: fit, // whether to fit the viewport to the graph
     directed: true, // whether the tree is directed downwards (or edges can point in any direction if false)
     padding: 30, // padding on fit
     circle: false, // put depths in concentric circles if true, put depths top down if false
