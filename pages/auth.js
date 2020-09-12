@@ -1,14 +1,6 @@
+import React from 'react'
 import FirebaseAuth from '../components/auth/FirebaseAuth'
 
-const Auth = () => {
-  return (
-    <div>
-      <p>Sign in</p>
-      <div>
-        <FirebaseAuth />
-      </div>
-    </div>
-  )
-}
+const Auth = () => <FirebaseAuth/>
 
 export default Auth

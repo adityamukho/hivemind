@@ -1,61 +1,56 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import React, { Component } from 'react'
+import React, { useContext, useState } from 'react'
 import { GitHub, HelpCircle } from 'react-feather'
+import NotificationAlert from 'react-notification-alert'
 import { Col, Collapse, Container, Nav, Navbar, NavbarBrand, NavbarToggler, NavLink, Row } from 'reactstrap'
+import GlobalContext from '../GlobalContext'
+import MainNav from './nav/MainNav'
 import NavItemLogin from './nav/NavItemLogin'
 import NavItemUser from './nav/NavItemUser'
 
-class Layout extends Component {
-  constructor (props) {
-    super(props)
+const Layout = ({ title, children }) => {
+  const [isOpen, setOpen] = useState(false)
+  const { notify } = useContext(GlobalContext)
 
-    this.toggle = this.toggle.bind(this)
-    this.state = {
-      isOpen: false
-    }
+  function toggle () {
+    setOpen(!isOpen)
   }
 
-  toggle () {
-    this.setState({
-      isOpen: !this.state.isOpen
-    })
-  }
-
-  render () {
-    return (
+  return (
+    <Container fluid>
+      <Head>
+        <script type="text/javascript" src='/js/pace.min.js'></script>
+      </Head>
+      <Navbar color="inverse" light expand="md" className="border-bottom mb-2">
+        <Link href='/' passHref>
+          <NavbarBrand className="text-wrap">{title}</NavbarBrand>
+        </Link>
+        <NavbarToggler onClick={toggle}/>
+        <Collapse isOpen={isOpen} navbar>
+          <MainNav/>
+          <Nav className="ml-auto" navbar>
+            <NavItemUser/>
+            <Link href={'/help'} passHref>
+              <NavLink><HelpCircle/></NavLink>
+            </Link>
+            <NavLink href='https://github.com/adityamukho/next.js-firebase-template' target='_blank'>
+              <GitHub/>
+            </NavLink>
+            <NavItemLogin/>
+          </Nav>
+        </Collapse>
+      </Navbar>
       <Container fluid>
-        <Head>
-          <script type="text/javascript" src='/js/pace.min.js'></script>
-        </Head>
-        <Navbar color="inverse" light expand="md" className="border-bottom mb-2">
-          <Link href='/' passHref>
-            <NavbarBrand className="text-wrap">{this.props.title}</NavbarBrand>
-          </Link>
-          <NavbarToggler onClick={this.toggle}/>
-          <Collapse isOpen={this.state.isOpen} navbar>
-            <Nav className="ml-auto" navbar>
-              <NavItemUser/>
-              <Link href={'/help'} passHref>
-                <NavLink><HelpCircle/></NavLink>
-              </Link>
-              <NavLink href='https://github.com/adityamukho/next.js-firebase-template' target='_blank'>
-                <GitHub/>
-              </NavLink>
-              <NavItemLogin/>
-            </Nav>
-          </Collapse>
-        </Navbar>
-        <Container fluid>
-          <Row>
-            <Col>
-              {this.props.children}
-            </Col>
-          </Row>
-        </Container>
+        <NotificationAlert ref={notify}/>
+        <Row>
+          <Col>
+            {children}
+          </Col>
+        </Row>
       </Container>
-    )
-  }
+    </Container>
+  )
 }
 
 export default Layout

@@ -10,9 +10,6 @@ const navItems = {
     </NavItem>
   ],
   anon: [
-    <NavItem key='example'>
-      <Link href={'/example'} passHref><NavLink>Example</NavLink></Link>
-    </NavItem>
   ]
 }
 

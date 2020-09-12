@@ -1,24 +1,20 @@
-import React from 'react'
-import AuthPrompt from '../components/auth/AuthPrompt'
+import { useRouter } from 'next/router'
+import React, { useEffect } from 'react'
 import { useUser } from '../utils/auth/useUser'
-import fetchWrapper from '../utils/fetchWrapper'
 
-const MindMaps = () => {
+const Index = () => {
   const { user } = useUser()
-  const { data, error } = fetchWrapper(user, '/api/getFood')
+  const router = useRouter()
 
-  if (!user) {
-    return <AuthPrompt/>
-  }
+  useEffect(() => {
+    if (!user) {
+      router.push('/auth')
+    } else {
+      router.replace('/mmaps')
+    }
+  }, [user])
 
-  return <>
-    {error && <div>Failed to fetch food!</div>}
-    {data && !error ? (
-      <div>Your favorite food is {data.food}.</div>
-    ) : (
-      <div>Loading...</div>
-    )}
-  </>
+  return <p>Redirecting...</p>
 }
 
-export default MindMaps
+export default Index
