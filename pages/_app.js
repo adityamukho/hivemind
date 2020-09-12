@@ -10,10 +10,11 @@ export default function App ({ Component, pageProps }) {
   const notify = useRef(null)
   const cyWrapper = {cy: null}
   const poppers = {}
+  const pageTitle = 'Hivemind'
 
-  return <GlobalContext.Provider value={{ notify, cyWrapper, poppers }}>
+  return <GlobalContext.Provider value={{ notify, cyWrapper, poppers, pageTitle }}>
     <Layout title={process.env.NEXT_PUBLIC_APP_NAME}>
-      <Component {...pageProps} />
+      <Component {...pageProps}/>
     </Layout>
   </GlobalContext.Provider>
 

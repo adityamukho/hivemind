@@ -9,9 +9,13 @@ import MainNav from './nav/MainNav'
 import NavItemLogin from './nav/NavItemLogin'
 import NavItemUser from './nav/NavItemUser'
 
+const ForwardedNavbarBrand = React.forwardRef(
+  (props, ref) => <NavbarBrand href={ref} {...props}/>
+  )
+
 const Layout = ({ title, children }) => {
   const [isOpen, setOpen] = useState(false)
-  const { notify } = useContext(GlobalContext)
+  const { notify, pageTitle } = useContext(GlobalContext)
 
   function toggle () {
     setOpen(!isOpen)
@@ -20,11 +24,12 @@ const Layout = ({ title, children }) => {
   return (
     <Container fluid>
       <Head>
-        <script type="text/javascript" src='/js/pace.min.js'></script>
+        <script type="text/javascript" src='/js/pace.min.js'/>
+        <title>{pageTitle}</title>
       </Head>
       <Navbar color="inverse" light expand="md" className="border-bottom mb-2">
         <Link href='/' passHref>
-          <NavbarBrand className="text-wrap">{title}</NavbarBrand>
+          <ForwardedNavbarBrand className="text-wrap">{title}</ForwardedNavbarBrand>
         </Link>
         <NavbarToggler onClick={toggle}/>
         <Collapse isOpen={isOpen} navbar>

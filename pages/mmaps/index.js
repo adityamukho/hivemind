@@ -38,7 +38,7 @@ const Page = () => {
     }
 
     const output = [
-      <Row>
+      <Row key='title'>
         <Col xs="auto"><h3>Your Mind Maps</h3></Col>
         <Col xs="auto">
           <Button color='primary' size='sm' id='create'><Plus/> Create</Button>
@@ -47,7 +47,7 @@ const Page = () => {
             <PopoverBody>
               <Form onSubmit={handleSubmit} inline>
                 <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                  <Input type="text" name="name" id="name" placeholder="Type a name and hit ⏎"
+                  <Input type="text" name="name" id="name" placeholder="Enter a name and hit ⏎"
                          value={name} onChange={handleChange}/>
                 </FormGroup>
                 <FormGroup className={spinnerDisplay}><Spinner/></FormGroup>
@@ -59,7 +59,7 @@ const Page = () => {
     ]
 
     output.push(
-      <Row>
+      <Row key='content'>
         <Col>
           {(data && !error) ? <MindMaps data={data.data}/> : <Spinner/>}
         </Col>

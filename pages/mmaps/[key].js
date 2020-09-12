@@ -12,7 +12,7 @@ const Page = () => {
   const router = useRouter()
   const { user } = useUser()
   const { key } = router.query
-  const { data, error } = fetchWrapper(user, `/api/mindmaps/${key}`)
+  const { data, error } = fetchWrapper(user && key ? user : null, `/api/mindmaps/${key}`)
   const { notify } = useContext(GlobalContext)
   const [title, setTitle] = useState(key)
 
@@ -29,14 +29,14 @@ const Page = () => {
     }
 
     const output = [
-      <Row>
+      <Row key='title'>
         <Col xs="auto"><h3>Mind Map - {title}</h3></Col>
       </Row>
     ]
 
     if (data && !error) {
       output.push(
-        <Row>
+        <Row key='content'>
           <Col>
             {data.ok ? <MindMap data={data.data} setTitle={setTitle}/> : <Error statusCode={data.status}/>}
           </Col>
@@ -45,7 +45,7 @@ const Page = () => {
     }
     else {
       output.push(
-        <Row>
+        <Row key='content'>
           <Col>
             <Spinner/>
           </Col>

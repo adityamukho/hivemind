@@ -20,6 +20,7 @@ const NodesAPI = async (req, res) => {
         const link = {
           _from: parentId,
           _to: node._id,
+          createdBy: userId
         }
         await rg.post('/document/links', link)
 
