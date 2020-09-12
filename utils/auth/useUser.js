@@ -1,7 +1,6 @@
 import firebase from 'firebase/app'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { fetcher } from '../fetchWrapper'
 import '../initFirebase'
 import { mapUserData } from './mapUserData'
 import { getUserFromCookie, removeUserCookie, setUserCookie } from './userCookies'
@@ -32,7 +31,6 @@ const useUser = () => {
         const userData = mapUserData(user)
         setUserCookie(userData)
         setUser(userData)
-        fetcher('/api/users', userData.token, 'POST')
       }
       else {
         removeUserCookie()

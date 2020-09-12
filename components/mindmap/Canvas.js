@@ -1,47 +1,144 @@
-import CytoscapeComponent from "react-cytoscapejs"
-import React, { useContext, useState } from 'react'
+import Cytoscape from 'cytoscape'
+import Cxtmenu from 'cytoscape-cxtmenu'
+import Popper from 'cytoscape-popper'
+import React, { useContext, useEffect, useState } from 'react'
+import CytoscapeComponent from 'react-cytoscapejs'
+import { getOptions } from '../../utils/cyHelpers'
 import GlobalContext from '../GlobalContext'
-import style from "./style"
+import { view } from './menu-items'
+import style from './style'
 
-function getOptions(animate = true) {
-  // noinspection JSUnusedGlobalSymbols
-  return {
-    name: "breadthfirst",
+Cytoscape.use(Popper)
+Cytoscape.use(Cxtmenu)
 
-    fit: animate, // whether to fit the viewport to the graph
-    directed: true, // whether the tree is directed downwards (or edges can point in any direction if false)
-    padding: 30, // padding on fit
-    circle: false, // put depths in concentric circles if true, put depths top down if false
-    grid: false, // whether to create an even grid into which the DAG is placed (circle:false only)
-    spacingFactor: 1.75, // positive spacing factor, larger => more space between nodes (N.B. n/a if causes overlap)
-    avoidOverlap: true, // prevents node overlap, may overflow boundingBox if not enough space
-    nodeDimensionsIncludeLabels: true, // Excludes the label when calculating node bounding boxes for the layout
-    // algorithm
-    maximal: true, // whether to shift nodes down their natural BFS depths in order to avoid upwards edges (DAGS
-    // only)
-    animate, // whether to transition the node positions
-    animationDuration: 500, // duration of animation in ms if enabled
-    animateFilter: function() {
-      return true;
-    }, // a function that determines whether the node should be animated.  All nodes animated by default on animate
-    // enabled.  Non-animated nodes are positioned immediately when the layout starts
-    transform: function(node, position) {
-      return position;
-    } // transform a given node position. Useful for changing flow direction in discrete layouts
-  };
+const initialNodeWidth = 100
+const initialNodeHeight = 50
+
+function buildMenu (cy, poppers) {
+  return function (node) {
+    const menu = []
+
+    view(menu, poppers)
+    if (!node.data().id.startsWith('mindmaps')) {
+      // del(menu, this, sessionID);
+    }
+    // edit(menu, this, sessionID);
+    // add(menu, this, sessionID);
+
+    return menu
+  }
 }
 
-const Canvas = ({elements}) => {
+function configurePlugins (cy, poppers) {
+  const minRadius = Math.min(cy.width(), cy.height()) / 8
+  const cxtMenu = {
+    menuRadius: minRadius + 50, // the radius of the circular menu in pixels
+    selector: 'node', // elements matching this Cytoscape.js selector will trigger cxtmenus
+    commands: buildMenu(cy, poppers), // function( ele ){ return [ /*...*/ ] }, // a function that returns
+    // commands or a promise of commands
+    fillColor: 'rgba(0, 0, 0, 0.75)', // the background colour of the menu
+    activeFillColor: 'rgba(100, 100, 100, 0.5)', // the colour used to indicate the selected command
+    activePadding: 10, // additional size in pixels for the active command
+    indicatorSize: 16, // the size in pixels of the pointer to the active command
+    separatorWidth: 3, // the empty spacing in pixels between successive commands
+    spotlightPadding: 4, // extra spacing in pixels between the element and the spotlight
+    minSpotlightRadius: minRadius - 40, // the minimum radius in pixels of the spotlight
+    maxSpotlightRadius: minRadius - 20, // the maximum radius in pixels of the spotlight
+    openMenuEvents: 'tap', // space-separated cytoscape events that will open the menu; only
+    // `cxttapstart` and/or `taphold` work here
+    itemColor: 'white', // the colour of text in the command's content
+    itemTextShadowColor: 'transparent', // the text shadow colour of the command's content
+    // zIndex: 9999, // the z-index of the ui div
+    atMouse: false // draw menu at mouse position
+  }
+
+  // noinspection JSUnresolvedFunction
+  cy.cxtmenu(cxtMenu)
+}
+
+function setHandlers (cy) {
+  cy.on('mouseover', 'node', function () {
+    document.getElementById('cy').style.cursor = 'pointer'
+  })
+
+  cy.on('mouseout', 'node', function () {
+    document.getElementById('cy').style.cursor = 'default'
+  })
+
+  cy.on('select mouseover', 'edge', e => {
+    e.target.style({
+      width: 4,
+      'line-color': '#007bff',
+      'target-arrow-color': '#007bff'
+    })
+  })
+
+  cy.on('unselect mouseout', 'edge', e => {
+    const edge = e.target
+
+    if (!edge.selected()) {
+      edge.style({
+        width: 2,
+        'line-color': '#ccc',
+        'target-arrow-color': '#ccc'
+      })
+    }
+  })
+
+  cy.on('add', 'node', e => {
+    const node = e.target
+
+    // noinspection JSNonASCIINames
+    node.style('width', `${initialNodeWidth}px`)
+    node.style('height', `${initialNodeHeight}px`)
+
+    node.scratch('style', node.style())
+  })
+
+  cy.on('mouseover select', 'node', e => {
+    e.target.style('background-color', '#007bff')
+  })
+
+  cy.on('mouseout unselect', 'node', e => {
+    const node = e.target
+
+    if (!node.selected()) {
+      node.style(
+        'background-color',
+        node.scratch('style')['background-color']
+      )
+    }
+  })
+}
+
+const Canvas = ({ elements }) => {
   const [cy, setCy] = useState()
-  const { cyComp } = useContext(GlobalContext)
+  const { cyWrapper, poppers } = useContext(GlobalContext)
   const options = getOptions()
+
+  function initCy(cy) {
+    setCy(cy)
+    cyWrapper.cy = cy
+
+    cy.nodes().forEach(node => {
+      node.style('width', `${initialNodeWidth}px`)
+      node.style('height', `${initialNodeHeight}px`)
+      node.scratch('style', node.style())
+    })
+  }
+
+  useEffect(() => {
+    if (cy) {
+      configurePlugins(cy, poppers)
+      setHandlers(cy)
+    }
+  }, [cy])
 
   return <div className="border border-secondary rounded w-100" id="cy-container">
     <div className="m-1" id="cy">
       <CytoscapeComponent
-        ref={cyComp}
-        cy={setCy}
-        style={{ width: "100%", height: "100%" }}
+        cy={initCy}
+        style={{ width: '100%', height: '100%' }}
         stylesheet={style}
         layout={options}
         elements={CytoscapeComponent.normalizeElements(elements)}

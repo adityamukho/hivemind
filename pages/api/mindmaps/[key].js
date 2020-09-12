@@ -33,10 +33,10 @@ const MindMapAPI = async (req, res) => {
           const access = mindmap.edges[0]
           const vertices = [], edges = []
 
-          for (let i = 1; i < mindmap.vertices.length; i++) {
+          for (let i = 0; i < mindmap.vertices.length; i++) {
             vertices.push(mindmap.vertices[i])
           }
-          for (let i = 2; i < mindmap.edges.length; i++) {
+          for (let i = 1; i < mindmap.edges.length; i++) {
             edges.push(mindmap.edges[i])
           }
 

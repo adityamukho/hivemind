@@ -6,22 +6,12 @@
     }
   },
   {
-    "selector": "node.data",
+    "selector": "node",
     "style": {
       "text-valign": "center",
-      "text-halign": "left"
-    }
-  },
-  {
-    "selector": "node[name]",
-    "style": {
-      "label": "data(name)"
-    }
-  },
-  {
-    "selector": "node[isRoot]",
-    "style": {
-      "label": "root"
+      "text-halign": "center",
+      "label": "data(title)",
+      "shape": "round-rectangle"
     }
   },
   {

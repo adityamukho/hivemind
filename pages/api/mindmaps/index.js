@@ -26,7 +26,7 @@ const MindMapsAPI = async (req, res) => {
 
       case 'POST':
         const { name } = req.body
-        let mindmap = { name }
+        let mindmap = { name, isRoot: true, title: name }
         let response = await rg.post('/document/mindmaps', mindmap)
         mindmap = response.body
 
@@ -36,16 +36,6 @@ const MindMapsAPI = async (req, res) => {
           access: 'admin'
         }
         await rg.post('/document/access', access)
-
-        let rootNode = {isRoot: true, label: name}
-        response = await rg.post('/document/nodes', rootNode)
-        rootNode = response.body
-
-        const link = {
-          _from: mindmap._id,
-          _to: rootNode._id
-        }
-        await rg.post('/document/links', link)
 
         return res.status(201).json({ message: 'Mindmap created.' })
     }
