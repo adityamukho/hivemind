@@ -1,6 +1,7 @@
 import { aql } from 'arangojs'
 import db from '../../../utils/arangoWrapper'
 import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
+import {rg2cy} from '../../../utils/cyHelpers'
 
 const MindMapAPI = async (req, res) => {
   const { token } = req.headers
@@ -21,12 +22,40 @@ const MindMapAPI = async (req, res) => {
           
           filter p.vertices[1]._id == ${id}
           
-          return { v, e }
+          collect aggregate vertices = unique(v), edges = unique(e)
+          
+          return { vertices, edges }
         `
         const cursor = await db.query(query)
-        const mindmap = await cursor.all()
-        if (mindmap.length) {
-          return res.status(200).json(mindmap)
+        const mindmap = await cursor.next()
+        if (mindmap.vertices.length) {
+          const meta = mindmap.vertices[0]
+          const access = mindmap.edges[0]
+          const vertices = [], edges = []
+
+          for (let i = 1; i < mindmap.vertices.length; i++) {
+            vertices.push(mindmap.vertices[i])
+          }
+          for (let i = 2; i < mindmap.edges.length; i++) {
+            edges.push(mindmap.edges[i])
+          }
+
+          const result = {
+            meta,
+            access,
+            elements: rg2cy([
+              {
+                type: 'vertex',
+                nodes: vertices
+              },
+              {
+                type: 'edge',
+                nodes: edges
+              }
+            ])
+          }
+
+          return res.status(200).json(result)
         }
 
         return res.status(404).json({ message: 'Not Found.' })

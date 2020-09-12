@@ -1,0 +1,39 @@
+[
+  {
+    "selector": "*",
+    "style": {
+      "color": "#fff"
+    }
+  },
+  {
+    "selector": "node.data",
+    "style": {
+      "text-valign": "center",
+      "text-halign": "left"
+    }
+  },
+  {
+    "selector": "node[name]",
+    "style": {
+      "label": "data(name)"
+    }
+  },
+  {
+    "selector": "node[isRoot]",
+    "style": {
+      "label": "root"
+    }
+  },
+  {
+    "selector": "edge",
+    "style": {
+      "width": 2,
+      "line-color": "#ccc",
+      "text-rotation": "autorotate",
+      "text-margin-y": "-10px",
+      "curve-style": "straight",
+      "target-arrow-color": "#ccc",
+      "target-arrow-shape": "vee"
+    }
+  }
+]

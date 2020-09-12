@@ -1,12 +1,22 @@
-const { get } = require('lodash')
+import React, { useEffect, useState } from 'react'
 
 const MindMap = ({ data, setTitle }) => {
-  const name = get(data, [0, 'v', 'name'])
-  if (name) {
-    setTitle(name)
+  const [renderAuth, setRenderAuth] = useState(false)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setRenderAuth(true)
+    }
+  }, [])
+
+  setTitle(data.meta.name)
+
+  if (renderAuth) {
+    const { default: Canvas } = require('./Canvas')
+
+    return <Canvas elements={data.elements}/>
   }
 
-  return JSON.stringify(data)
+  return null
 }
 
 export default MindMap
