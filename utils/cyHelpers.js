@@ -1,28 +1,50 @@
+import { invert } from 'lodash'
 import ReactDOM from 'react-dom'
 
-const TYPE_MAP = {
+const RG2CY_TYPE_MAP = {
   vertex: 'nodes',
   edge: 'edges'
 }
-const FIELD_MAP = {
+const RG2CY_FIELD_MAP = {
   _id: 'id',
   _from: 'source',
   _to: 'target'
 }
+const CY2RG_FIELD_MAP = invert(RG2CY_FIELD_MAP)
 
 export function rg2cy (data) {
   const result = {}
 
   for (const el of data) {
-    const key = TYPE_MAP[el.type]
+    const key = RG2CY_TYPE_MAP[el.type]
     result[key] = []
     for (const node of el.nodes) {
       const item = {}
       for (const k in node) {
-        item[FIELD_MAP[k] || k] = node[k]
+        item[RG2CY_FIELD_MAP[k] || k] = node[k]
       }
       result[key].push({ data: item })
     }
+  }
+
+  return result
+}
+
+export function cy2rg (data) {
+  const result = {}
+
+  for (const el of data) {
+    const [coll] = el.id.split('/')
+    if (!result[coll]) {
+      result[coll] = []
+    }
+
+    const item = {}
+    for (const k in el) {
+      item[CY2RG_FIELD_MAP[k] || k] = el[k]
+    }
+
+    result[coll].push(item)
   }
 
   return result
@@ -54,13 +76,12 @@ export function getOptions (animate, fit) {
   // noinspection JSUnusedGlobalSymbols
   return {
     name: 'breadthfirst',
-
     fit: fit, // whether to fit the viewport to the graph
     directed: true, // whether the tree is directed downwards (or edges can point in any direction if false)
-    padding: 30, // padding on fit
+    padding: 10, // padding on fit
     circle: false, // put depths in concentric circles if true, put depths top down if false
     grid: false, // whether to create an even grid into which the DAG is placed (circle:false only)
-    spacingFactor: 1.75, // positive spacing factor, larger => more space between nodes (N.B. n/a if causes overlap)
+    spacingFactor: 1.0, // positive spacing factor, larger => more space between nodes (N.B. n/a if causes overlap)
     avoidOverlap: true, // prevents node overlap, may overflow boundingBox if not enough space
     nodeDimensionsIncludeLabels: true, // Excludes the label when calculating node bounding boxes for the layout
     // algorithm

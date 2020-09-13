@@ -8,7 +8,7 @@ import { removePopper, setPopper } from '../../../utils/cyHelpers'
 import { fetcher } from '../../../utils/fetchWrapper'
 import CloseButton from '../CloseButton'
 
-export default function add (menu, poppers, user, setEls, cy) {
+export default function add (menu, poppers, setEls, cy) {
   const add = document.createElement('span')
   ReactDOM.render(<Plus/>, add)
   menu.push({
@@ -76,11 +76,11 @@ const PopperCard = ({ el, poppers, setEls, cy }) => {
       const { elements } = result
       setEls(CytoscapeComponent.normalizeElements(elements))
 
-      options.message = 'Added Node!'
+      options.message = 'Added node!'
       options.type = 'success'
     }
     else {
-      options.message = `Failed to add Node! - ${result}`
+      options.message = `Failed to add node! - ${JSON.stringify(result)}`
       options.type = 'danger'
     }
 
@@ -110,7 +110,7 @@ const PopperCard = ({ el, poppers, setEls, cy }) => {
         <Form onSubmit={handleSubmit} inline>
           <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
             <Input type="text" name="title" id="title" placeholder="Type a title and hit ⏎" value={title}
-                   onChange={handleChange} required maxLength="20" autoComplete="off" innerRef={inputRef}/>
+                   onChange={handleChange} required maxLength="50" autoComplete="off" innerRef={inputRef}/>
           </FormGroup>
           <FormGroup className={spinnerDisplay}><Spinner/></FormGroup>
         </Form>

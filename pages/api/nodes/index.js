@@ -1,5 +1,32 @@
+import { map } from 'lodash'
 import { rg } from '../../../utils/arangoWrapper'
 import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
+
+function createNodeBracepath (nKeys) {
+  const pathSegments = map(nKeys, (keys, coll) => {
+    let pathSegment = `${coll}/`
+
+    if (keys.length > 1) {
+      pathSegment += `{${keys.join(',')}}`
+    }
+    else {
+      pathSegment += keys[0]
+    }
+
+    return pathSegment
+  })
+
+  let path = '/n/'
+
+  if (pathSegments.length > 1) {
+    path += `{${pathSegments.join(',')}}`
+  }
+  else if (pathSegments.length === 1) {
+    path += pathSegments[0]
+  }
+
+  return path
+}
 
 const NodesAPI = async (req, res) => {
   const { token } = req.headers
@@ -53,6 +80,26 @@ const NodesAPI = async (req, res) => {
           })
 
         return res.status(response.statusCode).json(response.body)
+
+      case 'DELETE':
+        const data = req.body
+        const nKeys = {}
+
+        for (const coll in data) {
+          const nodes = data[coll]
+          nKeys[coll] = []
+          nKeys[coll].push(...map(nodes, '_key'))
+
+          response = await rg.delete(`/document/${coll}`, nodes, { ignoreRevs: false, silent: true })
+          if (response.statusCode !== 200) {
+            const path = createNodeBracepath(nKeys)
+            await rg.post('/document/_restore', { path }, { silent: true })
+
+            break
+          }
+        }
+
+        return res.status(200).json({ message: 'Nodes deleted.' })
     }
   }
   catch (error) {

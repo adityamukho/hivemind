@@ -46,14 +46,14 @@ const Page = () => {
       }
 
       if (ok) {
-        options.message = 'Added Mindmap!'
+        options.message = 'Added mindmap!'
         options.type = 'success'
         setName('')
         mutate(['/api/mindmaps', user.token])
         setPopoverOpen(false)
       }
       else {
-        options.message = `Failed to update Node! - ${result}`
+        options.message = `Failed to add mindmap! - ${JSON.stringify(result)}`
         options.type = 'danger'
       }
 

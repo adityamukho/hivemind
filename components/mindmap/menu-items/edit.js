@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { Edit3, Save } from 'react-feather'
-import { Button, Card, CardBody, CardText, CardTitle, Form, FormGroup, Input, Label, Spinner, Row, Col } from 'reactstrap'
+import {
+  Button, Card, CardBody, CardText, CardTitle, Col, Form, FormGroup, Input, Label, Row, Spinner
+} from 'reactstrap'
 import { useUser } from '../../../utils/auth/useUser'
 import { removePopper, setPopper } from '../../../utils/cyHelpers'
 import { fetcher } from '../../../utils/fetchWrapper'
@@ -73,11 +75,11 @@ const PopperCard = ({ el, poppers }) => {
         content
       })
 
-      options.message = 'Updated Node!'
+      options.message = 'Updated node!'
       options.type = 'success'
     }
     else {
-      options.message = `Failed to update Node! - ${result}`
+      options.message = `Failed to update node! - ${JSON.stringify(result)}`
       options.type = 'danger'
     }
 
@@ -109,7 +111,7 @@ const PopperCard = ({ el, poppers }) => {
         <Form onSubmit={handleSubmit}>
           <FormGroup>
             <Label for="title">Title</Label>
-            <Input type="text" name="title" id="title" value={title} required maxLength="20"
+            <Input type="text" name="title" id="title" value={title} required maxLength="50"
                    autoComplete="off" onChange={getChangeHandler(setTitle)} innerRef={inputRef}/>
           </FormGroup>
           <FormGroup>
@@ -122,10 +124,10 @@ const PopperCard = ({ el, poppers }) => {
             <Input type="textarea" name="content" id="content" value={content}
                    onChange={getChangeHandler(setContent)}/>
           </FormGroup>
-            <Row form>
-              <Col md={3}><FormGroup><Button color="primary"><Save/> Save</Button></FormGroup></Col>
-              <Col md={2}><FormGroup><Spinner className={spinnerDisplay}/></FormGroup></Col>
-            </Row>
+          <Row form>
+            <Col xs={"auto"}><FormGroup><Button color="primary"><Save/> Save</Button></FormGroup></Col>
+            <Col xs={"auto"}><FormGroup><Spinner className={spinnerDisplay}/></FormGroup></Col>
+          </Row>
         </Form>
       </CardText>
     </CardBody>
