@@ -1,6 +1,9 @@
 # Hivemind
 A collaborative, version-controlled mindmap. built for the [FOSS 2020 Hackathon](https://fossunited.org/hackathon) organized by FOSS United.
 
+## Demo
+https://hivemind.vercel.app/
+
 ## Vision
 Hivemind was envisioned to have the following features:
 
