@@ -1,9 +1,8 @@
-import React, { useContext, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Plus } from 'react-feather'
 import { Button, Col, Form, FormGroup, Input, Popover, PopoverBody, PopoverHeader, Row, Spinner } from 'reactstrap'
 import { mutate } from 'swr'
 import AuthPrompt from '../../components/auth/AuthPrompt'
-import GlobalContext from '../../components/GlobalContext'
 import MindMaps from '../../components/mindmap/MindMaps'
 import { useUser } from '../../utils/auth/useUser'
 import fetchWrapper, { fetcher } from '../../utils/fetchWrapper'
@@ -11,7 +10,6 @@ import fetchWrapper, { fetcher } from '../../utils/fetchWrapper'
 const Page = () => {
   const { user } = useUser()
   const { data, error } = fetchWrapper(user, '/api/mindmaps')
-  const { notify } = useContext(GlobalContext)
   const inputRef = useRef(null)
   const [name, setName] = useState('')
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
@@ -26,7 +24,7 @@ const Page = () => {
   }
 
   if (user) {
-    if (error && notify.current) {
+    if (error && window.notify) {
       const options = {
         place: 'tr',
         message: 'Failed to fetch mind maps!',
@@ -34,23 +32,40 @@ const Page = () => {
         autoDismiss: 7
       }
 
-      notify.current.notificationAlert(options)
+      window.notify(options)
     }
 
     const handleChange = (event) => setName(event.target.value)
     const handleSubmit = async (event) => {
       event.preventDefault()
       setSpinnerDisplay('d-block')
-      await fetcher('/api/mindmaps', user.token, 'POST', JSON.stringify({ name }))
-      await mutate(['/api/mindmaps', user.token])
-      setName('')
+      const { data: result, ok } = await fetcher('/api/mindmaps', user.token, 'POST', JSON.stringify({ name }))
+      const options = {
+        place: 'tr',
+        autoDismiss: 7
+      }
+
+      if (ok) {
+        options.message = 'Added Mindmap!'
+        options.type = 'success'
+        setName('')
+        mutate(['/api/mindmaps', user.token])
+        setPopoverOpen(false)
+      }
+      else {
+        options.message = `Failed to update Node! - ${result}`
+        options.type = 'danger'
+      }
+
       setSpinnerDisplay('d-none')
-      setPopoverOpen(false)
+      if (window.notify) {
+        window.notify(options)
+      }
     }
 
     const output = [
       <Row key='title'>
-        <Col xs="auto"><h3>Your Mind Maps</h3></Col>
+        <Col xs="auto"><h3>My Mind Maps</h3></Col>
         <Col xs="auto">
           <Button color='primary' size='sm' id='create'><Plus/> Create</Button>
           <Popover placement="bottom" target="create" isOpen={popoverOpen} toggle={toggle}>

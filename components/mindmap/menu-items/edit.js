@@ -1,8 +1,10 @@
-import React, {useState, useRef, useEffect} from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { Edit3, Save } from 'react-feather'
-import { Card, CardBody, CardText, CardTitle, Form, FormGroup, Input, Label, Button, Spinner } from 'reactstrap'
+import { Button, Card, CardBody, CardText, CardTitle, Form, FormGroup, Input, Label, Spinner, Row, Col } from 'reactstrap'
+import { useUser } from '../../../utils/auth/useUser'
 import { removePopper, setPopper } from '../../../utils/cyHelpers'
+import { fetcher } from '../../../utils/fetchWrapper'
 import CloseButton from '../CloseButton'
 
 export default function edit (menu, poppers) {
@@ -34,6 +36,7 @@ export default function edit (menu, poppers) {
 
 const PopperCard = ({ el, poppers }) => {
   const data = el.data()
+  const { user } = useUser()
   const [title, setTitle] = useState(data.title)
   const [summary, setSummary] = useState(data.summary || '')
   const [content, setContent] = useState(data.content || '')
@@ -49,8 +52,38 @@ const PopperCard = ({ el, poppers }) => {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setSpinnerDisplay('d-block')
+    const { data: result, ok } = await fetcher('/api/nodes', user.token, 'PATCH', JSON.stringify({
+      title,
+      summary,
+      content,
+      _id: data.id,
+      _rev: data._rev
+    }))
 
+    const options = {
+      place: 'tr',
+      autoDismiss: 7
+    }
 
+    if (ok) {
+      el.data({
+        _rev: result._rev,
+        title,
+        summary,
+        content
+      })
+
+      options.message = 'Updated Node!'
+      options.type = 'success'
+    }
+    else {
+      options.message = `Failed to update Node! - ${result}`
+      options.type = 'danger'
+    }
+
+    if (window.notify) {
+      window.notify(options)
+    }
     setSpinnerDisplay('d-none')
 
     removePopper(el.id(), `popper-${el.id()}`, poppers)
@@ -89,9 +122,10 @@ const PopperCard = ({ el, poppers }) => {
             <Input type="textarea" name="content" id="content" value={content}
                    onChange={getChangeHandler(setContent)}/>
           </FormGroup>
-          <FormGroup>
-            <Button color="primary"><Save/> Save</Button>&nbsp;<Spinner className={spinnerDisplay}/>
-          </FormGroup>
+            <Row form>
+              <Col md={3}><FormGroup><Button color="primary"><Save/> Save</Button></FormGroup></Col>
+              <Col md={2}><FormGroup><Spinner className={spinnerDisplay}/></FormGroup></Col>
+            </Row>
         </Form>
       </CardText>
     </CardBody>

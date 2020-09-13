@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import CytoscapeComponent from 'react-cytoscapejs'
 import ReactDOM from 'react-dom'
 import { Plus } from 'react-feather'
@@ -36,7 +36,7 @@ export default function add (menu, poppers, user, setEls, cy) {
   })
 }
 
-const PopperCard = ({el, poppers, setEls, cy}) => {
+const PopperCard = ({ el, poppers, setEls, cy }) => {
   const { user } = useUser()
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
   const [title, setTitle] = useState('')
@@ -55,15 +55,40 @@ const PopperCard = ({el, poppers, setEls, cy}) => {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setSpinnerDisplay('d-block')
-    await fetcher(`/api/nodes?parentId=${el.id()}`, user.token, 'POST', JSON.stringify({ title }))
+    const { data: result, ok } = await fetcher(`/api/nodes?parentId=${el.id()}`, user.token, 'POST',
+      JSON.stringify({ title }))
+      .then(({ data, ok, status }) => {
+        if (ok) {
+          const rootId = cy.nodes().id()
+          const key = rootId.split('/')[1]
 
-    const rootId = cy.nodes().id()
-    const key = rootId.split('/')[1]
-    const { data: {elements} } = await fetcher(`/api/mindmaps/${key}`, user.token)
+          return fetcher(`/api/mindmaps/${key}`, user.token)
+        }
+
+        return { data, ok, status }
+      })
+    const options = {
+      place: 'tr',
+      autoDismiss: 7
+    }
+
+    if (ok) {
+      const { elements } = result
+      setEls(CytoscapeComponent.normalizeElements(elements))
+
+      options.message = 'Added Node!'
+      options.type = 'success'
+    }
+    else {
+      options.message = `Failed to add Node! - ${result}`
+      options.type = 'danger'
+    }
+
+    if (window.notify) {
+      window.notify(options)
+    }
     setSpinnerDisplay('d-none')
-
     removePopper(el.id(), `popper-${el.id()}`, poppers)
-    setEls(CytoscapeComponent.normalizeElements(elements))
   }
 
   return <Card className="border-dark">

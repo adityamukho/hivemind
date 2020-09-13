@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, forwardRef, useCallback } from 'react'
 import { GitHub, HelpCircle } from 'react-feather'
 import NotificationAlert from 'react-notification-alert'
 import { Col, Collapse, Container, Nav, Navbar, NavbarBrand, NavbarToggler, NavLink, Row } from 'reactstrap'
@@ -9,13 +9,20 @@ import MainNav from './nav/MainNav'
 import NavItemLogin from './nav/NavItemLogin'
 import NavItemUser from './nav/NavItemUser'
 
-const ForwardedNavbarBrand = React.forwardRef(
-  (props, ref) => <NavbarBrand href={ref} {...props}/>
-  )
+const ForwardedNavbarBrand = forwardRef((props, ref) => <NavbarBrand href={ref} {...props}/>)
 
 const Layout = ({ title, children }) => {
   const [isOpen, setOpen] = useState(false)
-  const { notify, pageTitle } = useContext(GlobalContext)
+  const { pageVars } = useContext(GlobalContext)
+  const notifyRef = useCallback((node) => {
+    if (typeof window !== 'undefined') {
+      if (node) {
+        window.notify = node.notificationAlert.bind(node)
+      } else {
+        window.notify = null
+      }
+    }
+  }, [])
 
   function toggle () {
     setOpen(!isOpen)
@@ -25,7 +32,7 @@ const Layout = ({ title, children }) => {
     <Container fluid>
       <Head>
         <script type="text/javascript" src='/js/pace.min.js'/>
-        <title>{pageTitle}</title>
+        <title>{pageVars.title}</title>
       </Head>
       <Navbar color="inverse" light expand="md" className="border-bottom mb-2">
         <Link href='/' passHref>
@@ -47,7 +54,7 @@ const Layout = ({ title, children }) => {
         </Collapse>
       </Navbar>
       <Container fluid>
-        <NotificationAlert ref={notify}/>
+        <NotificationAlert ref={notifyRef}/>
         <Row>
           <Col>
             {children}

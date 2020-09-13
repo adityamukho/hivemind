@@ -28,16 +28,17 @@ const NodesAPI = async (req, res) => {
           response = await rg.post('/document/links', link, { silent: true })
           message = response.statusCode === 201 ? 'Node created.' : response.body
 
-        } else {
+        }
+        else {
           message = response.body
         }
 
         return res.status(response.statusCode).json({ message })
 
       case 'PATCH':
-        const { summary, content, _rev, _key } = req.body
+        const { summary, content, _rev, _id } = req.body
         node = {
-          _key,
+          _id,
           title,
           summary,
           content,
@@ -45,10 +46,13 @@ const NodesAPI = async (req, res) => {
           lastUpdatedBy: userId
         }
 
-        response = await rg.patch('/document/nodes', node, { silent: true, keepNull: false, ignoreRevs: false })
-        message = response.statusCode === 200 ? 'Node updated.' : response.body
+        response = await rg.patch('/document/nodes', node,
+          {
+            keepNull: false,
+            ignoreRevs: false
+          })
 
-        return res.status(response.statusCode).json({ message })
+        return res.status(response.statusCode).json(response.body)
     }
   }
   catch (error) {

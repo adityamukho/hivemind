@@ -1,9 +1,8 @@
 import Error from 'next/error'
 import { useRouter } from 'next/router'
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { Col, Row, Spinner } from 'reactstrap'
 import AuthPrompt from '../../components/auth/AuthPrompt'
-import GlobalContext from '../../components/GlobalContext'
 import MindMap from '../../components/mindmap/MindMap'
 import { useUser } from '../../utils/auth/useUser'
 import fetchWrapper from '../../utils/fetchWrapper'
@@ -13,11 +12,10 @@ const Page = () => {
   const { user } = useUser()
   const { key } = router.query
   const { data, error } = fetchWrapper(user && key ? user : null, `/api/mindmaps/${key}`)
-  const { notify } = useContext(GlobalContext)
   const [title, setTitle] = useState(key)
 
   if (user) {
-    if (error && notify.current) {
+    if (error && window.notify) {
       const options = {
         place: 'tr',
         message: 'Failed to fetch mind map!',
@@ -25,7 +23,7 @@ const Page = () => {
         autoDismiss: 7
       }
 
-      notify.current.notificationAlert(options)
+      window.notify(options)
     }
 
     const output = [

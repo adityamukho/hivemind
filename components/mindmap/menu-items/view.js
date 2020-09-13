@@ -69,7 +69,7 @@ const PopperCard = ({ el, poppers, cy }) => {
       </CardSubtitle>
       <CardText tag="div">
         {data.summary ? <><Row><h5>Summary</h5></Row><Row>{data.summary}</Row></> : null}
-        {data.content ? <Row><hr/>{data.content}</Row> : null}
+        {data.content ? <><hr/><Row>{data.content}</Row></> : null}
       </CardText>
     </CardBody>
   </Card>
