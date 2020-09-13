@@ -50,6 +50,25 @@ const MindMapsAPI = async (req, res) => {
         }
 
         return res.status(response.statusCode).json({ message })
+
+      case 'PATCH':
+        const { summary, content, _rev, _id, title } = req.body
+        mindmap = {
+          _id,
+          title,
+          summary,
+          content,
+          _rev,
+          lastUpdatedBy: userId
+        }
+
+        response = await rg.patch('/document/mindmaps', mindmap,
+          {
+            keepNull: false,
+            ignoreRevs: false
+          })
+
+        return res.status(response.statusCode).json(response.body)
     }
   }
   catch (error) {

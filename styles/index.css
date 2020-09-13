@@ -77,3 +77,19 @@
     max-height: 70vh;
     overflow: auto;
 }
+
+.vis-item.created, .vis-item.restored {
+    background-color: limegreen;
+}
+
+.vis-item.updated {
+    background-color: deepskyblue;
+}
+
+.vis-item.deleted {
+    background-color: red;
+}
+
+.vis-item:hover {
+    cursor: pointer;
+}

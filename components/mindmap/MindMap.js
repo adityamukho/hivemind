@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Row, Col } from 'reactstrap'
 import { Redraw, Search } from "./action-items"
+import Timeline from './Timeline'
 
 const MindMap = ({ data, setTitle }) => {
   const [renderAuth, setRenderAuth] = useState(false)
@@ -21,9 +22,14 @@ const MindMap = ({ data, setTitle }) => {
           <Search/>
         </Col>
       </Row>
-      <Row>
+      <Row className="my-1">
         <Col>
           <Canvas {...data}/>
+        </Col>
+      </Row>
+      <Row className="my-1">
+        <Col>
+          <Timeline mkey={data.meta._key}/>
         </Col>
       </Row>
     </>

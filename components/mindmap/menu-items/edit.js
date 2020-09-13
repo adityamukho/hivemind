@@ -38,6 +38,7 @@ export default function edit (menu, poppers) {
 
 const PopperCard = ({ el, poppers }) => {
   const data = el.data()
+  const [coll] = data.id.split('/')
   const { user } = useUser()
   const [title, setTitle] = useState(data.title)
   const [summary, setSummary] = useState(data.summary || '')
@@ -54,7 +55,7 @@ const PopperCard = ({ el, poppers }) => {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setSpinnerDisplay('d-block')
-    const { data: result, ok } = await fetcher('/api/nodes', user.token, 'PATCH', JSON.stringify({
+    const { data: result, ok } = await fetcher(`/api/${coll}`, user.token, 'PATCH', JSON.stringify({
       title,
       summary,
       content,

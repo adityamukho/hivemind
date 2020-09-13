@@ -67,7 +67,7 @@ const Page = () => {
       <Row key='title'>
         <Col xs="auto"><h3>My Mind Maps</h3></Col>
         <Col xs="auto">
-          <Button color='primary' size='sm' id='create'><Plus/> Create</Button>
+          <Button color='success' size='sm' id='create'><Plus/> Create</Button>
           <Popover placement="bottom" target="create" isOpen={popoverOpen} toggle={toggle}>
             <PopoverHeader>Create Mind Map</PopoverHeader>
             <PopoverBody>
