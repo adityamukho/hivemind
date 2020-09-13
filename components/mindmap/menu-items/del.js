@@ -1,13 +1,14 @@
+import { pick } from 'lodash'
 import React, { useState } from 'react'
 import CytoscapeComponent from 'react-cytoscapejs'
 import ReactDOM from 'react-dom'
 import { Trash2, XCircle } from 'react-feather'
 import { Button, Card, CardBody, CardText, CardTitle, Col, Form, FormGroup, Row, Spinner } from 'reactstrap'
-import { fetcher } from '../../../utils/fetchWrapper'
+import { mutate } from 'swr'
 import { useUser } from '../../../utils/auth/useUser'
-import { removePopper, setPopper, cy2rg } from '../../../utils/cyHelpers'
+import { cy2rg, removePopper, setPopper } from '../../../utils/cyHelpers'
+import { fetcher } from '../../../utils/fetchWrapper'
 import CloseButton from '../CloseButton'
-import {pick} from 'lodash'
 
 export default function del(menu, poppers, setEls, cy) {
   const del = document.createElement('span')
@@ -44,6 +45,7 @@ const PopperCard = ({ el, poppers, cy, setEls }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    const rootId = cy.nodes().id()
     setSpinnerDisplay('d-block')
 
     const coll = cy.collection().union(el).union(el.successors()).union(el.incomers('edge'))
@@ -51,7 +53,6 @@ const PopperCard = ({ el, poppers, cy, setEls }) => {
     const { data: result, ok } = await fetcher('/api/nodes', user.token, 'DELETE', JSON.stringify(data))
       .then(({ data, ok, status }) => {
         if (ok) {
-          const rootId = cy.nodes().id()
           const key = rootId.split('/')[1]
 
           return fetcher(`/api/mindmaps/${key}`, user.token)
@@ -67,6 +68,7 @@ const PopperCard = ({ el, poppers, cy, setEls }) => {
     if (ok) {
       const { elements } = result
       setEls(CytoscapeComponent.normalizeElements(elements))
+      mutate([`/api/${rootId}/timeline`, user.token])
 
       options.message = 'Deleted node(s)!'
       options.type = 'success'

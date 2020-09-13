@@ -4,12 +4,13 @@ import { Edit3, Save } from 'react-feather'
 import {
   Button, Card, CardBody, CardText, CardTitle, Col, Form, FormGroup, Input, Label, Row, Spinner
 } from 'reactstrap'
+import { mutate } from 'swr'
 import { useUser } from '../../../utils/auth/useUser'
 import { removePopper, setPopper } from '../../../utils/cyHelpers'
 import { fetcher } from '../../../utils/fetchWrapper'
 import CloseButton from '../CloseButton'
 
-export default function edit (menu, poppers) {
+export default function edit (menu, poppers, cy) {
   const edit = document.createElement('span')
   ReactDOM.render(<Edit3/>, edit)
   menu.push({
@@ -21,7 +22,7 @@ export default function edit (menu, poppers) {
         el.popper({
           content: () => {
             const popperCard = document.createElement('div')
-            ReactDOM.render(<PopperCard poppers={poppers} el={el}/>, popperCard)
+            ReactDOM.render(<PopperCard poppers={poppers} el={el} cy={cy}/>, popperCard)
 
             document.getElementsByTagName('body')[0].appendChild(popperCard)
             popperCard.setAttribute('id', `popper-${el.id()}`)
@@ -36,7 +37,7 @@ export default function edit (menu, poppers) {
   })
 }
 
-const PopperCard = ({ el, poppers }) => {
+const PopperCard = ({ el, poppers, cy }) => {
   const data = el.data()
   const [coll] = data.id.split('/')
   const { user } = useUser()
@@ -75,6 +76,7 @@ const PopperCard = ({ el, poppers }) => {
         summary,
         content
       })
+      mutate([`/api/${cy.nodes().id()}/timeline`, user.token])
 
       options.message = 'Updated node!'
       options.type = 'success'
@@ -126,8 +128,8 @@ const PopperCard = ({ el, poppers }) => {
                    onChange={getChangeHandler(setContent)}/>
           </FormGroup>
           <Row form>
-            <Col xs={"auto"}><FormGroup><Button color="primary"><Save/> Save</Button></FormGroup></Col>
-            <Col xs={"auto"}><FormGroup><Spinner className={spinnerDisplay}/></FormGroup></Col>
+            <Col xs={'auto'}><FormGroup><Button color="primary"><Save/> Save</Button></FormGroup></Col>
+            <Col xs={'auto'}><FormGroup><Spinner className={spinnerDisplay}/></FormGroup></Col>
           </Row>
         </Form>
       </CardText>

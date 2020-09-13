@@ -40,7 +40,6 @@ const Timeline = ({ data }) => {
   const options = {
     width: '100%',
     height: '120px',
-    margin: '2px',
     type: 'box',
     stack: false,
     horizontalScroll: false,
@@ -63,6 +62,17 @@ const Timeline = ({ data }) => {
       items,
       options
     )
+
+    timeline.on('doubleClick', (properties) => {
+      const { item, isCluster } = properties
+
+      if (item === null) {
+        timeline.fit()
+      }
+      else if (!isCluster) {
+        timeline.focus(item)
+      }
+    })
 
     return () => timeline.destroy()
   }, [data.length])

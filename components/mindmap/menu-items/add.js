@@ -3,6 +3,7 @@ import CytoscapeComponent from 'react-cytoscapejs'
 import ReactDOM from 'react-dom'
 import { Plus } from 'react-feather'
 import { Card, CardBody, CardText, CardTitle, Form, FormGroup, Input, Spinner } from 'reactstrap'
+import { mutate } from 'swr'
 import { useUser } from '../../../utils/auth/useUser'
 import { removePopper, setPopper } from '../../../utils/cyHelpers'
 import { fetcher } from '../../../utils/fetchWrapper'
@@ -54,12 +55,12 @@ const PopperCard = ({ el, poppers, setEls, cy }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    const rootId = cy.nodes().id()
     setSpinnerDisplay('d-block')
     const { data: result, ok } = await fetcher(`/api/nodes?parentId=${el.id()}`, user.token, 'POST',
       JSON.stringify({ title }))
       .then(({ data, ok, status }) => {
         if (ok) {
-          const rootId = cy.nodes().id()
           const key = rootId.split('/')[1]
 
           return fetcher(`/api/mindmaps/${key}`, user.token)
@@ -75,6 +76,7 @@ const PopperCard = ({ el, poppers, setEls, cy }) => {
     if (ok) {
       const { elements } = result
       setEls(CytoscapeComponent.normalizeElements(elements))
+      mutate([`/api/${rootId}/timeline`, user.token])
 
       options.message = 'Added node!'
       options.type = 'success'

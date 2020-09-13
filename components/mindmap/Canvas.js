@@ -22,7 +22,7 @@ function buildMenu (cy, poppers, setEls, access) {
       if (!node.data().isRoot) {
         del(menu, poppers, setEls, cy)
       }
-      edit(menu, poppers)
+      edit(menu, poppers, cy)
     }
 
     return menu
