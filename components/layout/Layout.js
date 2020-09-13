@@ -39,7 +39,7 @@ const Layout = ({ title, children }) => {
             <Link href={'/help'} passHref>
               <NavLink><HelpCircle/></NavLink>
             </Link>
-            <NavLink href='https://github.com/adityamukho/next.js-firebase-template' target='_blank'>
+            <NavLink href='https://github.com/adityamukho/hivemind' target='_blank'>
               <GitHub/>
             </NavLink>
             <NavItemLogin/>

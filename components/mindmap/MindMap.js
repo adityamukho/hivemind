@@ -23,7 +23,7 @@ const MindMap = ({ data, setTitle }) => {
       </Row>
       <Row>
         <Col>
-          <Canvas elements={data.elements}/>
+          <Canvas {...data}/>
         </Col>
       </Row>
     </>

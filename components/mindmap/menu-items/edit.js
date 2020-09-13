@@ -1,111 +1,92 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { Edit3, Save } from "react-feather";
-import {
-  Card,
-  CardBody,
-  CardLink,
-  CardText,
-  CardTitle,
-  Col,
-  Form,
-  FormGroup,
-  Input,
-  Label
-} from "reactstrap";
-import CloseButton from "../../../components/CloseButton";
-import { edit as editNode } from "../../../lib/api-client";
-import { getTableProps, removePopper, setPopper } from "../../../lib/utils";
+import React, {useState} from 'react'
+import ReactDOM from 'react-dom'
+import { Edit3, Save } from 'react-feather'
+import { Card, CardBody, CardText, CardTitle, Form, FormGroup, Input, Label, Button, Spinner } from 'reactstrap'
+import { removePopper, setPopper } from '../../../utils/cyHelpers'
+import CloseButton from '../CloseButton'
 
-export default (menu, canvas, sessionID) => {
-  const edit = document.createElement("span");
-  ReactDOM.render(<Edit3 />, edit);
+export default function edit (menu, poppers) {
+  const edit = document.createElement('span')
+  ReactDOM.render(<Edit3/>, edit)
   menu.push({
-    fillColor: "rgba(255, 165, 0, 0.75)",
+    fillColor: 'rgba(255, 165, 0, 0.75)',
     content: edit.outerHTML,
-    select: function(el) {
+    select: function (el) {
       setPopper(
         el.id(),
         el.popper({
           content: () => {
-            const { objClass, body, content } = getTableProps(el);
+            const popperCard = document.createElement('div')
+            ReactDOM.render(<PopperCard poppers={poppers} el={el}/>, popperCard)
 
-            const popperCard = document.createElement("div");
-            ReactDOM.render(
-              <Card className="border-dark">
-                <CardBody>
-                  <CardTitle
-                    tag="h5"
-                    className="mw-100 mb-4"
-                    style={{ minWidth: "50vw" }}
-                  >
-                    Edit {body}&nbsp;
-                    <span>
-                      <small className="text-muted">({objClass})</small>
-                    </span>
-                    <CloseButton
-                      divKey={`popper-${el.id()}`}
-                      popperKey={el.id()}
-                    />
-                    <CardLink
-                      href="#"
-                      className="btn btn-primary float-right"
-                      id="add"
-                      onClick={async () => {
-                        const data = Object.assign({}, el.data());
+            document.getElementsByTagName('body')[0].appendChild(popperCard)
+            popperCard.setAttribute('id', `popper-${el.id()}`)
 
-                        for (const c of content) {
-                          data[c.field] = c.value;
-                        }
-                        data._id = data.id;
-                        delete data.id;
-
-                        removePopper(el.id(), `popper-${el.id()}`);
-
-                        await editNode(sessionID, data);
-                        canvas.setElements();
-                      }}
-                    >
-                      <Save /> Save
-                    </CardLink>
-                  </CardTitle>
-                  <CardText tag="div">
-                    <Form>
-                      {content.map(c => (
-                        <FormGroup key={c.field} row>
-                          <Label for={`${el.id()}-${c.field}`} sm={4} size="sm">
-                            {c.field}
-                          </Label>
-                          <Col sm={8}>
-                            <Input
-                              type="text"
-                              name={c.field}
-                              id={`${el.id()}-${c.field}`}
-                              defaultValue={c.value}
-                              required={true}
-                              bsSize="sm"
-                              onChange={e => {
-                                c.value = e.target.value;
-                              }}
-                            />
-                          </Col>
-                        </FormGroup>
-                      ))}
-                    </Form>
-                  </CardText>
-                </CardBody>
-              </Card>,
-              popperCard
-            );
-
-            document.getElementsByTagName("body")[0].appendChild(popperCard);
-            popperCard.setAttribute("id", `popper-${el.id()}`);
-
-            return popperCard;
+            return popperCard
           }
-        })
-      );
+        }),
+        poppers
+      )
     },
     enabled: true
-  });
-};
+  })
+}
+
+const PopperCard = ({ el, poppers }) => {
+  const data = el.data()
+  const [title, setTitle] = useState(data.title)
+  const [summary, setSummary] = useState(data.summary || '')
+  const [content, setContent] = useState(data.content || '')
+  const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setSpinnerDisplay('d-block')
+
+
+    setSpinnerDisplay('d-none')
+
+    removePopper(el.id(), `popper-${el.id()}`, poppers)
+  }
+
+  const getChangeHandler = setter => event => setter(event.target.value)
+
+  return <Card className="border-dark">
+    <CardBody>
+      <CardTitle
+        tag="h5"
+        className="mw-100 mb-4"
+        style={{ minWidth: '50vw' }}
+      >
+        Edit {data.title}
+        <CloseButton
+          divKey={`popper-${el.id()}`}
+          popperKey={el.id()}
+          poppers={poppers}
+        />
+      </CardTitle>
+      <CardText tag="div">
+        <Form onSubmit={handleSubmit}>
+          <FormGroup>
+            <Label for="title">Title</Label>
+            <Input type="text" name="title" id="title" value={title} required maxLength="20"
+                   autoComplete="off" onChange={getChangeHandler(setTitle)}/>
+          </FormGroup>
+          <FormGroup>
+            <Label for="summary">Summary</Label>
+            <Input type="text" name="summary" id="summary" value={summary} maxLength="100"
+                   autoComplete="off" onChange={getChangeHandler(setSummary)}/>
+          </FormGroup>
+          <FormGroup>
+            <Label for="summary">Content</Label>
+            <Input type="textarea" name="content" id="content" value={content}
+                   onChange={getChangeHandler(setContent)}/>
+          </FormGroup>
+          <FormGroup>
+            <Button color="primary"><Save/> Save</Button>&nbsp;<Spinner className={spinnerDisplay}/>
+          </FormGroup>
+        </Form>
+      </CardText>
+    </CardBody>
+  </Card>
+}

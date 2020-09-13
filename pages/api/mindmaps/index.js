@@ -9,6 +9,7 @@ const MindMapsAPI = async (req, res) => {
     const claims = await verifyIdToken(token)
     const key = claims.uid
     const userId = `users/${key}`
+    let mindmap, response, message
 
     switch (req.method) {
       case 'GET':
@@ -26,23 +27,29 @@ const MindMapsAPI = async (req, res) => {
 
       case 'POST':
         const { name } = req.body
-        let mindmap = {
+        mindmap = {
           name,
           isRoot: true,
           title: name,
           createdBy: userId
         }
-        let response = await rg.post('/document/mindmaps', mindmap)
-        mindmap = response.body
+        response = await rg.post('/document/mindmaps', mindmap)
 
-        const access = {
-          _from: `users/${key}`,
-          _to: mindmap._id,
-          access: 'admin'
+        if (response.statusCode === 201) {
+          mindmap = response.body
+
+          const access = {
+            _from: `users/${key}`,
+            _to: mindmap._id,
+            access: 'admin'
+          }
+          response = await rg.post('/document/access', access, { silent: true })
+          message = response.statusCode === 201 ? 'Mindmap created.' : response.body
+        } else {
+          message = response.body
         }
-        await rg.post('/document/access', access)
 
-        return res.status(201).json({ message: 'Mindmap created.' })
+        return res.status(response.statusCode).json({ message })
     }
   }
   catch (error) {
