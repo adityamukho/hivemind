@@ -15,7 +15,7 @@ export default function add (menu, poppers, user, setEls, cy) {
     fillColor: 'rgba(0, 200, 0, 0.75)',
     content: add.outerHTML,
     contentStyle: {},
-    select: async function (el) {
+    select: function (el) {
       setPopper(
         el.id(),
         el.popper({
@@ -77,8 +77,8 @@ const PopperCard = ({el, poppers, setEls, cy}) => {
       <CardText tag="div" className="mw-100">
         <Form onSubmit={handleSubmit} inline>
           <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-            <Input type="text" name="title" id="title" placeholder="Enter a title and hit ⏎"
-                   value={title} onChange={handleChange}/>
+            <Input type="text" name="title" id="title" placeholder="Type a title and hit ⏎" value={title}
+                   onChange={handleChange} required maxLength="20" autoComplete="off"/>
           </FormGroup>
           <FormGroup className={spinnerDisplay}><Spinner/></FormGroup>
         </Form>

@@ -1,6 +1,6 @@
 import add from "./add";
 // import del from "./del";
-// import edit from "./edit";
+import edit from "./edit";
 import view from "./view";
 
-export { view, add };
+export { view, add, edit };

@@ -8,23 +8,47 @@ const NodesAPI = async (req, res) => {
     const claims = await verifyIdToken(token)
     const key = claims.uid
     const userId = `users/${key}`
+    const { title } = req.body
+    let node, response, message
 
     switch (req.method) {
       case 'POST':
-        const { title } = req.body
         const { parentId } = req.query
-        let node = { title, createdBy: userId }
-        let response = await rg.post('/document/nodes', node)
-        node = response.body
+        node = { title, createdBy: userId }
+        response = await rg.post('/document/nodes', node)
 
-        const link = {
-          _from: parentId,
-          _to: node._id,
-          createdBy: userId
+        if (response.statusCode === 201) {
+          node = response.body
+
+          const link = {
+            _from: parentId,
+            _to: node._id,
+            createdBy: userId
+          }
+          response = await rg.post('/document/links', link, { silent: true })
+          message = response.statusCode === 201 ? 'Node created.' : response.body
+
+        } else {
+          message = response.body
         }
-        await rg.post('/document/links', link)
 
-        return res.status(201).json({ message: 'Node created.' })
+        return res.status(response.statusCode).json({ message })
+
+      case 'PATCH':
+        const { summary, content, _rev, _key } = req.body
+        node = {
+          _key,
+          title,
+          summary,
+          content,
+          _rev,
+          lastUpdatedBy: userId
+        }
+
+        response = await rg.patch('/document/nodes', node, { silent: true, keepNull: false, ignoreRevs: false })
+        message = response.statusCode === 200 ? 'Node updated.' : response.body
+
+        return res.status(response.statusCode).json({ message })
     }
   }
   catch (error) {

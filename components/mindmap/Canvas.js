@@ -6,33 +6,37 @@ import CytoscapeComponent from 'react-cytoscapejs'
 import { useUser } from '../../utils/auth/useUser'
 import { getOptions } from '../../utils/cyHelpers'
 import GlobalContext from '../GlobalContext'
-import { view, add } from './menu-items'
+import { add, edit, view } from './menu-items'
 import style from './style'
 
 Cytoscape.use(Popper)
 Cytoscape.use(Cxtmenu)
 
-function buildMenu (cy, poppers, user, setEls) {
+function buildMenu (cy, poppers, user, setEls, access) {
   return function (node) {
     const menu = []
 
     view(menu, poppers, cy)
-    if (!node.data().isRoot) {
-      // del(menu, this, sessionID);
+
+    if (['admin', 'write'].includes(access.access)) {
+      add(menu, poppers, user, setEls, cy)
+      if (!node.data().isRoot) {
+        // del(menu, this, sessionID);
+      }
+      edit(menu, poppers)
     }
-    // edit(menu, this, sessionID);
-    add(menu, poppers, user, setEls, cy)
 
     return menu
   }
 }
 
-function configurePlugins (cy, poppers, user, setEls) {
+function configurePlugins (cy, poppers, user, setEls, access) {
   const minRadius = Math.min(cy.width(), cy.height()) / 8
   const cxtMenu = {
     menuRadius: minRadius + 50, // the radius of the circular menu in pixels
     selector: 'node', // elements matching this Cytoscape.js selector will trigger cxtmenus
-    commands: buildMenu(cy, poppers, user, setEls), // function( ele ){ return [ /*...*/ ] }, // a function that returns
+    commands: buildMenu(cy, poppers, user, setEls, access), // function( ele ){ return [ /*...*/ ] }, // a function
+                                                            // that returns
     // commands or a promise of commands
     fillColor: 'rgba(0, 0, 0, 0.75)', // the background colour of the menu
     activeFillColor: 'rgba(100, 100, 100, 0.5)', // the colour used to indicate the selected command
@@ -105,7 +109,7 @@ function setHandlers (cy) {
   })
 }
 
-const Canvas = ({ elements }) => {
+const Canvas = ({ elements, access }) => {
   const { user } = useUser()
   const [cy, setCy] = useState()
   const [els, setEls] = useState(CytoscapeComponent.normalizeElements(elements))
@@ -116,7 +120,7 @@ const Canvas = ({ elements }) => {
   const fit = nodes.length > 1 && animate
   const options = getOptions(animate, fit)
 
-  function initCy(cy) {
+  function initCy (cy) {
     setCy(cy)
     cyWrapper.cy = cy
 
@@ -127,7 +131,7 @@ const Canvas = ({ elements }) => {
 
   useEffect(() => {
     if (cy) {
-      configurePlugins(cy, poppers, user, setEls)
+      configurePlugins(cy, poppers, user, setEls, access)
       setHandlers(cy)
     }
   }, [cy])
