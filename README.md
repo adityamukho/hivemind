@@ -1,5 +1,5 @@
 # Hivemind
-A collaborative, version-controlled mindmap. built for the [FOSS 2020 Hackathon](https://fossunited.org/hackathon) organized by FOSS United.
+A collaborative, version-controlled mindmap. Built during the [FOSS 2020 Hackathon](https://fossunited.org/hackathon) organized by FOSS United.
 
 Hivemind is intended to let users collaboratively create and edit shared mind maps. All changes are automatically revision-controlled, and users can time-travel to any point in the past to look at historic versions of their work.
 
