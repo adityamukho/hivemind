@@ -10,7 +10,7 @@ function cyReset (cy) {
   const animate = cy.nodes().length <= 50
   if (animate) {
     const nodes = cy.nodes()
-    const fit = nodes.length > 1 && nodes.length < 17
+    const fit = nodes.length > 1
     cy.layout(getOptions(animate, fit)).run()
   }
 }

@@ -115,7 +115,7 @@ const Canvas = ({ elements, access }) => {
 
   const nodes = els.filter(el => !el.data.id.startsWith('links'))
   const animate = nodes.length <= 50
-  const fit = nodes.length > 1 && nodes.length < 17
+  const fit = nodes.length > 1
   const options = getOptions(animate, fit)
 
   function initCy (cy) {

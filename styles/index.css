@@ -78,8 +78,12 @@
     overflow: auto;
 }
 
-.vis-item.created, .vis-item.restored {
+.vis-item.created {
     background-color: limegreen;
+}
+
+.vis-item.restored {
+    background-color: yellow;
 }
 
 .vis-item.updated {
