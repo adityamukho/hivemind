@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import ReactDOM from 'react-dom'
 import { Edit3, Save } from 'react-feather'
 import { Card, CardBody, CardText, CardTitle, Form, FormGroup, Input, Label, Button, Spinner } from 'reactstrap'
@@ -38,6 +38,13 @@ const PopperCard = ({ el, poppers }) => {
   const [summary, setSummary] = useState(data.summary || '')
   const [content, setContent] = useState(data.content || '')
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [inputRef.current])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -70,7 +77,7 @@ const PopperCard = ({ el, poppers }) => {
           <FormGroup>
             <Label for="title">Title</Label>
             <Input type="text" name="title" id="title" value={title} required maxLength="20"
-                   autoComplete="off" onChange={getChangeHandler(setTitle)}/>
+                   autoComplete="off" onChange={getChangeHandler(setTitle)} innerRef={inputRef}/>
           </FormGroup>
           <FormGroup>
             <Label for="summary">Summary</Label>

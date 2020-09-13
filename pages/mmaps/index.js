@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import { Plus } from 'react-feather'
 import { Button, Col, Form, FormGroup, Input, Popover, PopoverBody, PopoverHeader, Row, Spinner } from 'reactstrap'
 import { mutate } from 'swr'
@@ -12,11 +12,18 @@ const Page = () => {
   const { user } = useUser()
   const { data, error } = fetchWrapper(user, '/api/mindmaps')
   const { notify } = useContext(GlobalContext)
+  const inputRef = useRef(null)
   const [name, setName] = useState('')
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
   const [popoverOpen, setPopoverOpen] = useState(false)
 
-  const toggle = () => setPopoverOpen(!popoverOpen)
+  const toggle = () => {
+    setPopoverOpen(!popoverOpen)
+
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }
 
   if (user) {
     if (error && notify.current) {
@@ -52,7 +59,8 @@ const Page = () => {
               <Form onSubmit={handleSubmit} inline>
                 <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
                   <Input type="text" name="name" id="name" placeholder="Type a name and hit ⏎" value={name}
-                         onChange={handleChange} required maxLength="20" autoComplete="off"/>
+                         onChange={handleChange} required maxLength="20" autoComplete="off"
+                         innerRef={inputRef}/>
                 </FormGroup>
                 <FormGroup className={spinnerDisplay}><Spinner/></FormGroup>
               </Form>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import CytoscapeComponent from 'react-cytoscapejs'
 import ReactDOM from 'react-dom'
 import { Plus } from 'react-feather'
@@ -40,6 +40,13 @@ const PopperCard = ({el, poppers, setEls, cy}) => {
   const { user } = useUser()
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
   const [title, setTitle] = useState('')
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [inputRef.current])
 
   const handleChange = (event) => {
     setTitle(event.target.value)
@@ -78,7 +85,7 @@ const PopperCard = ({el, poppers, setEls, cy}) => {
         <Form onSubmit={handleSubmit} inline>
           <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
             <Input type="text" name="title" id="title" placeholder="Type a title and hit ⏎" value={title}
-                   onChange={handleChange} required maxLength="20" autoComplete="off"/>
+                   onChange={handleChange} required maxLength="20" autoComplete="off" innerRef={inputRef}/>
           </FormGroup>
           <FormGroup className={spinnerDisplay}><Spinner/></FormGroup>
         </Form>
