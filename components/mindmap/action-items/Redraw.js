@@ -5,8 +5,6 @@ import { getOptions } from '../../../utils/cyHelpers'
 import GlobalContext from '../../GlobalContext'
 
 function cyReset (cy) {
-  cy.reset()
-
   const animate = cy.nodes().length <= 50
   if (animate) {
     const nodes = cy.nodes()

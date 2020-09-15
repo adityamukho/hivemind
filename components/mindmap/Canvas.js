@@ -1,6 +1,7 @@
 import Cytoscape from 'cytoscape'
 import Cxtmenu from 'cytoscape-cxtmenu'
 import Popper from 'cytoscape-popper'
+import dagre from 'cytoscape-dagre'
 import React, { useContext, useEffect, useState } from 'react'
 import CytoscapeComponent from 'react-cytoscapejs'
 import { getOptions } from '../../utils/cyHelpers'
@@ -10,6 +11,7 @@ import style from './style'
 
 Cytoscape.use(Popper)
 Cytoscape.use(Cxtmenu)
+Cytoscape.use(dagre)
 
 function buildMenu (cy, poppers, setEls, access) {
   return function (node) {
@@ -35,7 +37,7 @@ function configurePlugins (cy, poppers, setEls, access) {
     menuRadius: minRadius + 50, // the radius of the circular menu in pixels
     selector: 'node', // elements matching this Cytoscape.js selector will trigger cxtmenus
     commands: buildMenu(cy, poppers, setEls, access), // function( ele ){ return [ /*...*/ ] }, // a function
-                                                            // that returns
+    // that returns
     // commands or a promise of commands
     fillColor: 'rgba(0, 0, 0, 0.75)', // the background colour of the menu
     activeFillColor: 'rgba(100, 100, 100, 0.5)', // the colour used to indicate the selected command
