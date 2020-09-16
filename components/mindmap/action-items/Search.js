@@ -4,6 +4,7 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import filterFactory, { textFilter, numberFilter } from 'react-bootstrap-table2-filter'
 import { Search } from 'react-feather'
 import { Button, Card, CardBody, CardText, Popover, PopoverBody, PopoverHeader } from 'reactstrap'
+import { getPath } from '../../../utils/cyHelpers'
 import GlobalContext from '../../GlobalContext'
 
 export default function search () {
@@ -24,16 +25,7 @@ export default function search () {
     setData(cy.nodes(':visible')
       .map(node => {
         const data = node.data()
-        let path
-
-        const els = cy.elements()
-        const root = els[0]
-
-        path = els.aStar({
-          root: root,
-          goal: node,
-          directed: true
-        }).path.nodes().map(node => node.data().title)
+        const path = getPath(node)
         const item = pick(data, 'id', 'title')
         item.path = path.join(' ⟶ ')
         item.depth = path.length - 1

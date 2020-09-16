@@ -81,21 +81,25 @@ export function getOptions (animate, fit) {
     edgeSep: undefined, // the separation between adjacent edges in the same rank
     rankSep: 100, // the separation between each rank in the layout
     rankDir: undefined, // 'TB' for top to bottom flow, 'LR' for left to right,
-    ranker: undefined, // Type of algorithm to assign a rank to each node in the input graph. Possible values:
-                       // 'network-simplex', 'tight-tree' or 'longest-path'
-    minLen: function () { return 1 }, // number of ranks to keep between the source and target of the edge
-    edgeWeight: function () { return 1 }, // higher weight edges are generally made shorter and straighter than
-                                               // lower weight edges
+    ranker: undefined, // Type of algorithm to assign a rank to each node in the input graph.
+                       // Possible values: 'network-simplex', 'tight-tree' or 'longest-path'
+    minLen: function () { return 1 }, // number of ranks to keep between the source and target of
+                                      // the edge
+    edgeWeight: function () { return 1 }, // higher weight edges are generally made shorter and
+                                          // straighter than
+    // lower weight edges
 
     // general layout options
     fit: fit, // whether to fit to viewport
     padding: 10, // fit padding
-    spacingFactor: undefined, // Applies a multiplicative factor (>0) to expand or compress the overall area that the
-                              // nodes take up
-    nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the space used by a node
+    spacingFactor: undefined, // Applies a multiplicative factor (>0) to expand or compress the
+                              // overall area that the nodes take up
+    nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the
+                                        // space used by a node
     animate: animate, // whether to transition the node positions
-    animateFilter: function () { return true }, // whether to animate specific nodes when animation is on;
-                                                        // non-animated nodes immediately go to their final positions
+    animateFilter: function () { return true }, // whether to animate specific nodes when animation
+                                                // is on;
+    // non-animated nodes immediately go to their final positions
     animationDuration: 500, // duration of animation in ms if enabled
     animationEasing: 'ease', // easing of animation if enabled
     boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
@@ -114,11 +118,11 @@ export function getOptions (animate, fit) {
   }
 }
 
-export function getDependents(el) {
+export function getDependents (el) {
   return el.union(el.successors()).union(el.incomers('edge'))
 }
 
-export function runLayout(cy) {
+export function runLayout (cy) {
   const nodes = cy.nodes(':visible')
   const animate = shouldAnimate(nodes)
   if (animate) {
@@ -127,10 +131,29 @@ export function runLayout(cy) {
   }
 }
 
-export function shouldAnimate(nodes) {
+export function shouldAnimate (nodes) {
   return nodes.length <= 50
 }
 
-export function shouldFit(nodes) {
+export function shouldFit (nodes) {
   return nodes.length > 1
+}
+
+export function getPath (el) {
+  let path = el.scratch('path')
+
+  if (!path) {
+    const els = el.cy().elements()
+    const root = els[0]
+
+    path = els.aStar({
+      root: root,
+      goal: el,
+      directed: true
+    }).path.nodes().map(node => node.data().title)
+
+    el.scratch('path', path)
+  }
+
+  return path
 }

@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Eye } from 'react-feather'
 import { Card, CardBody, CardSubtitle, CardText, CardTitle, Row, Col } from 'reactstrap'
-import { setPopper } from '../../../utils/cyHelpers'
+import { getPath, setPopper } from '../../../utils/cyHelpers'
 import CloseButton from '../CloseButton'
 
 export default function view (menu, poppers) {
@@ -18,7 +18,7 @@ export default function view (menu, poppers) {
           content: () => {
             const popperCard = document.createElement('div')
 
-            document.getElementsByTagName('body')[0].appendChild(popperCard)
+            document.body.appendChild(popperCard)
             popperCard.setAttribute('id', `popper-${el.id()}`)
             ReactDOM.render(<PopperCard poppers={poppers} el={el}/>, popperCard)
 
@@ -37,14 +37,7 @@ const PopperCard = ({ el, poppers }) => {
   let path
 
   if (!data.isRoot) {
-    const els = el.cy().elements()
-    const root = els[0]
-
-    path = els.aStar({
-      root: root,
-      goal: el,
-      directed: true
-    }).path.nodes().map(node => node.data().title).join(' ⟶ ')
+    path = getPath(el).join(' ⟶ ')
   }
 
   return <Card className="border-dark">

@@ -6,7 +6,9 @@ import GlobalContext from '../../GlobalContext'
 
 function handler (cyWrapper) {
   const {cy, viewApi} = cyWrapper
-  viewApi.show(cy.elements())
+  const els = cy.elements()
+  viewApi.show(els)
+  els.removeStyle()
   runLayout(cy)
 }
 

@@ -24,7 +24,7 @@ export default function add (menu, poppers, setEls) {
             const popperCard = document.createElement('div')
             ReactDOM.render(<PopperCard setEls={setEls} el={el} poppers={poppers}/>, popperCard)
 
-            document.getElementsByTagName('body')[0].appendChild(popperCard)
+            document.body.appendChild(popperCard)
             popperCard.setAttribute('id', `popper-${el.id()}`)
 
             return popperCard

@@ -7,7 +7,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import CytoscapeComponent from 'react-cytoscapejs'
 import { getOptions, shouldAnimate, shouldFit } from '../../utils/cyHelpers'
 import GlobalContext from '../GlobalContext'
-import { add, del, edit, view, hide } from './menu-items'
+import { add, del, edit, view, hide, reveal } from './menu-items'
 import style from './style'
 import {defer} from 'lodash'
 
@@ -23,6 +23,9 @@ function buildMenu (poppers, setEls, access, viewApi) {
     view(menu, poppers)
     if (!node.data('isRoot')) {
       hide(menu, viewApi)
+    }
+    if (node.scratch('showReveal')) {
+      reveal(menu, viewApi)
     }
 
     if (['admin', 'write'].includes(access.access)) {

@@ -25,7 +25,7 @@ export default function del(menu, poppers, setEls) {
             const popperCard = document.createElement('div')
             ReactDOM.render(<PopperCard el={el} poppers={poppers} setEls={setEls}/>, popperCard)
 
-            document.getElementsByTagName('body')[0].appendChild(popperCard)
+            document.body.appendChild(popperCard)
             popperCard.setAttribute('id', `popper-${el.id()}`)
 
             return popperCard
