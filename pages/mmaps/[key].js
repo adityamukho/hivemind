@@ -29,7 +29,7 @@ const Page = () => {
 
     const output = [
       <Row key='title'>
-        <Col xs="auto"><h3>Mind Map - {title}</h3></Col>
+        <Col xs="auto"><h3>{title}</h3></Col>
         <Col xs="auto">
           <ShowAll/>
           <Fit/>
