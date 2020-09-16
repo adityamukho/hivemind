@@ -72,7 +72,7 @@ export function setPopper (id, popper, poppers) {
   poppers[id] = popper
 }
 
-export function getOptions (animate, fit) {
+export function getOptions (fit) {
   // noinspection JSUnusedGlobalSymbols
   return {
     name: 'dagre',
@@ -96,7 +96,7 @@ export function getOptions (animate, fit) {
                               // overall area that the nodes take up
     nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the
                                         // space used by a node
-    animate: animate, // whether to transition the node positions
+    animate: true, // whether to transition the node positions
     animateFilter: function () { return true }, // whether to animate specific nodes when animation
                                                 // is on;
     // non-animated nodes immediately go to their final positions
@@ -124,15 +124,8 @@ export function getDependents (el) {
 
 export function runLayout (cy) {
   const nodes = cy.nodes(':visible')
-  const animate = shouldAnimate(nodes)
-  if (animate) {
-    const fit = shouldFit(nodes)
-    cy.layout(getOptions(animate, fit)).run()
-  }
-}
-
-export function shouldAnimate (nodes) {
-  return nodes.length <= 50
+  const fit = shouldFit(nodes)
+  cy.layout(getOptions(fit)).run()
 }
 
 export function shouldFit (nodes) {

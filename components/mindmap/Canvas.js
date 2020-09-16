@@ -5,7 +5,7 @@ import dagre from 'cytoscape-dagre'
 import viewUtilities from 'cytoscape-view-utilities'
 import React, { useContext, useEffect, useState } from 'react'
 import CytoscapeComponent from 'react-cytoscapejs'
-import { getOptions, shouldAnimate, shouldFit } from '../../utils/cyHelpers'
+import { getOptions, shouldFit } from '../../utils/cyHelpers'
 import GlobalContext from '../GlobalContext'
 import { add, del, edit, view, hide, reveal } from './menu-items'
 import style from './style'
@@ -51,8 +51,8 @@ function configurePlugins (cyWrapper, poppers, setEls, access) {
       { node: { 'border-color': '#04f06a',  'border-width': 3 }, edge: {'line-color': '#04f06a', 'source-arrow-color': '#04f06a', 'target-arrow-color': '#04f06a', 'width' : 3} },
     ],
     selectStyles: {
-      node: {'border-color': 'black', 'border-width': 3, 'background-color': 'lightgrey'},
-      edge: {'line-color': 'black', 'source-arrow-color': 'black', 'target-arrow-color': 'black', 'width' : 3}
+      node: {'border-color': 'white', 'border-width': 3, 'background-color': 'lightgrey'},
+      edge: {'line-color': 'white', 'source-arrow-color': 'white', 'target-arrow-color': 'white', 'width' : 3}
     },
     setVisibilityOnHide: false, // whether to set visibility on hide/show
     setDisplayOnHide: true, // whether to set display on hide/show
@@ -104,7 +104,7 @@ function setHandlers (cyWrapper) {
     document.getElementById('cy').style.cursor = 'default'
   })
 
-  cy.on('select mouseover', 'edge', e => {
+  cy.on('mouseover', 'edge', e => {
     e.target.style({
       width: 4,
       'line-color': '#007bff',
@@ -130,12 +130,14 @@ function setHandlers (cyWrapper) {
     node.scratch('style', node.style())
   })
 
-  cy.on('mouseover select', 'node', e => {
+  cy.on('mouseover', 'node', e => {
     e.target.style('background-color', '#007bff')
   })
 
-  cy.on('mouseout unselect', 'node', e => {
+  cy.on('unselect mouseout', 'node', e => {
     const node = e.target
+
+    viewApi.removeHighlights(node)
 
     if (!node.selected()) {
       node.style(
@@ -152,9 +154,8 @@ const Canvas = ({ elements, access }) => {
   const { cyWrapper, poppers } = useContext(GlobalContext)
 
   const nodes = els.filter(el => !el.data.id.startsWith('links'))
-  const animate = shouldAnimate(nodes)
   const fit = shouldFit(nodes)
-  const options = getOptions(animate, fit)
+  const options = getOptions(fit)
 
   function initCy (cy) {
     setCy(cy)

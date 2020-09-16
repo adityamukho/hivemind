@@ -9,6 +9,7 @@ function handler (cyWrapper) {
   const els = cy.elements()
   viewApi.show(els)
   els.removeStyle()
+  els.scratch('showReveal', false)
   runLayout(cy)
 }
 

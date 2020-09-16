@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Eye, ArrowDownRight } from 'react-feather'
-import { getDependents } from '../../../utils/cyHelpers'
+import { getDependents, runLayout } from '../../../utils/cyHelpers'
 
 export default function view (menu, viewApi) {
   const reveal = document.createElement('span')
@@ -14,6 +14,7 @@ export default function view (menu, viewApi) {
       viewApi.show(coll)
       coll.removeStyle()
       el.scratch('showReveal', false)
+      runLayout(el.cy())
     },
     enabled: true
   })

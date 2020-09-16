@@ -20,7 +20,7 @@ export default function view (menu, viewApi) {
           ' black gray',
         'background-gradient-stop-positions': '0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%',
         'background-gradient-direction': 'to-bottom-right',
-        'border-width': 4,
+        'border-width': 3,
         'border-color': 'gray'
       })
       parent.scratch('showReveal', true)

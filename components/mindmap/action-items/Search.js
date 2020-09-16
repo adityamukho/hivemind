@@ -12,7 +12,7 @@ export default function search () {
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [data, setData] = useState([])
   const [offset, setOffset] = useState()
-  const { cy } = cyWrapper
+  const { cy, viewApi } = cyWrapper
 
   const toggle = () => {
     const { cy } = cyWrapper
@@ -63,43 +63,9 @@ export default function search () {
     bgColor: '#00BFFF',
     onSelect: row => {
       const node = cy.$id(row.id)
-      const renderedPosition = node.renderedPosition()
-      const viewportCenterX = cy.width() / 2
-      const viewportCenterY = cy.height() / 2
-      const relativeRenderedPosition = {
-        x: viewportCenterX - renderedPosition.x,
-        y: viewportCenterY - renderedPosition.y
-      }
-      const zoomFactor = Math.min(viewportCenterX / node.width(),
-        viewportCenterY / node.height()) / 2
-
-      if (cy.nodes().length <= 50) {
-        cy.animate({
-          panBy: relativeRenderedPosition,
-          duration: 500
-        }).delay(100, () => {
-          cy.animate({
-            zoom: {
-              level: zoomFactor,
-              renderedPosition: {
-                x: viewportCenterX,
-                y: viewportCenterY
-              }
-            },
-            duration: 500
-          })
-        })
-      }
-      else {
-        cy.panBy(relativeRenderedPosition)
-        cy.zoom({
-          level: zoomFactor,
-          renderedPosition: {
-            x: viewportCenterX,
-            y: viewportCenterY
-          }
-        })
-      }
+      viewApi.zoomToSelected(node)
+      viewApi.removeHighlights(cy.elements())
+      viewApi.highlight(node)
 
       toggle()
     }
