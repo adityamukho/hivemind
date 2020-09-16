@@ -9,7 +9,7 @@ import { removePopper, setPopper } from '../../../utils/cyHelpers'
 import { fetcher } from '../../../utils/fetchWrapper'
 import CloseButton from '../CloseButton'
 
-export default function add (menu, poppers, setEls, cy) {
+export default function add (menu, poppers, setEls) {
   const add = document.createElement('span')
   ReactDOM.render(<Plus/>, add)
   menu.push({
@@ -22,7 +22,7 @@ export default function add (menu, poppers, setEls, cy) {
         el.popper({
           content: () => {
             const popperCard = document.createElement('div')
-            ReactDOM.render(<PopperCard setEls={setEls} el={el} poppers={poppers} cy={cy}/>, popperCard)
+            ReactDOM.render(<PopperCard setEls={setEls} el={el} poppers={poppers}/>, popperCard)
 
             document.getElementsByTagName('body')[0].appendChild(popperCard)
             popperCard.setAttribute('id', `popper-${el.id()}`)
@@ -37,7 +37,7 @@ export default function add (menu, poppers, setEls, cy) {
   })
 }
 
-const PopperCard = ({ el, poppers, setEls, cy }) => {
+const PopperCard = ({ el, poppers, setEls}) => {
   const { user } = useUser()
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
   const [title, setTitle] = useState('')
@@ -55,7 +55,7 @@ const PopperCard = ({ el, poppers, setEls, cy }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    const rootId = cy.nodes().id()
+    const rootId = el.cy().nodes().id()
     setSpinnerDisplay('d-block')
     const { data: result, ok } = await fetcher(`/api/nodes?parentId=${el.id()}`, user.token, 'POST',
       JSON.stringify({ title }))
@@ -101,7 +101,7 @@ const PopperCard = ({ el, poppers, setEls, cy }) => {
         style={{ minWidth: '50vw' }}
       >
         Add Child Node{' '}
-        <small className="text-muted">(of {el.data().title})</small>
+        <small className="text-muted">(of {el.data('title')})</small>
         <CloseButton
           divKey={`popper-${el.id()}`}
           popperKey={el.id()}

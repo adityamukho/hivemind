@@ -6,11 +6,11 @@ import { Trash2, XCircle } from 'react-feather'
 import { Button, Card, CardBody, CardText, CardTitle, Col, Form, FormGroup, Row, Spinner } from 'reactstrap'
 import { mutate } from 'swr'
 import { useUser } from '../../../utils/auth/useUser'
-import { cy2rg, removePopper, setPopper } from '../../../utils/cyHelpers'
+import { cy2rg, getDependents, removePopper, setPopper } from '../../../utils/cyHelpers'
 import { fetcher } from '../../../utils/fetchWrapper'
 import CloseButton from '../CloseButton'
 
-export default function del(menu, poppers, setEls, cy) {
+export default function del(menu, poppers, setEls) {
   const del = document.createElement('span')
   ReactDOM.render(<Trash2/>, del)
   menu.push({
@@ -23,7 +23,7 @@ export default function del(menu, poppers, setEls, cy) {
         el.popper({
           content: () => {
             const popperCard = document.createElement('div')
-            ReactDOM.render(<PopperCard el={el} poppers={poppers} cy={cy} setEls={setEls}/>, popperCard)
+            ReactDOM.render(<PopperCard el={el} poppers={poppers} setEls={setEls}/>, popperCard)
 
             document.getElementsByTagName('body')[0].appendChild(popperCard)
             popperCard.setAttribute('id', `popper-${el.id()}`)
@@ -38,17 +38,17 @@ export default function del(menu, poppers, setEls, cy) {
   })
 }
 
-const PopperCard = ({ el, poppers, cy, setEls }) => {
+const PopperCard = ({ el, poppers, setEls }) => {
   const data = el.data()
   const { user } = useUser()
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    const rootId = cy.nodes().id()
+    const rootId = el.cy().nodes().id()
     setSpinnerDisplay('d-block')
 
-    const coll = cy.collection().union(el).union(el.successors()).union(el.incomers('edge'))
+    const coll = getDependents(el)
     const data = cy2rg(coll.map(el => pick(el.data(), 'id', '_rev', '_key')))
     const { data: result, ok } = await fetcher('/api/nodes', user.token, 'DELETE', JSON.stringify(data))
       .then(({ data, ok, status }) => {

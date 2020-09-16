@@ -77,9 +77,9 @@ export function getOptions (animate, fit) {
   return {
     name: 'dagre',
     // dagre algo options, uses default value on undefined
-    nodeSep: undefined, // the separation between adjacent nodes in the same rank
+    nodeSep: 20, // the separation between adjacent nodes in the same rank
     edgeSep: undefined, // the separation between adjacent edges in the same rank
-    rankSep: undefined, // the separation between each rank in the layout
+    rankSep: 100, // the separation between each rank in the layout
     rankDir: undefined, // 'TB' for top to bottom flow, 'LR' for left to right,
     ranker: undefined, // Type of algorithm to assign a rank to each node in the input graph. Possible values:
                        // 'network-simplex', 'tight-tree' or 'longest-path'
@@ -89,7 +89,7 @@ export function getOptions (animate, fit) {
 
     // general layout options
     fit: fit, // whether to fit to viewport
-    padding: 30, // fit padding
+    padding: 10, // fit padding
     spacingFactor: undefined, // Applies a multiplicative factor (>0) to expand or compress the overall area that the
                               // nodes take up
     nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the space used by a node
@@ -100,15 +100,37 @@ export function getOptions (animate, fit) {
     animationEasing: 'ease', // easing of animation if enabled
     boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
     transform: function (node, pos) {
-      if (node.degree()) {
-        return pos
-      }
-      const cy = node.cy()
-      cy.reset()
+      if (!node.neighborhood().filter(':visible').length) {
+        const cy = node.cy()
+        cy.reset()
 
-      return { x: cy.width() / 2, y: cy.height() / 2 }
+        return { x: cy.width() / 2, y: cy.height() / 2 }
+      }
+
+      return pos
     }, // a function that applies a transform to the final node position
     ready: function () {}, // on layoutready
     stop: function () {} // on layoutstop
   }
+}
+
+export function getDependents(el) {
+  return el.union(el.successors()).union(el.incomers('edge'))
+}
+
+export function runLayout(cy) {
+  const nodes = cy.nodes(':visible')
+  const animate = shouldAnimate(nodes)
+  if (animate) {
+    const fit = shouldFit(nodes)
+    cy.layout(getOptions(animate, fit)).run()
+  }
+}
+
+export function shouldAnimate(nodes) {
+  return nodes.length <= 50
+}
+
+export function shouldFit(nodes) {
+  return nodes.length > 1
 }

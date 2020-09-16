@@ -2597,6 +2597,11 @@ cytoscape-popper@^1.0.7:
   dependencies:
     popper.js "^1.0.0"
 
+cytoscape-view-utilities@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/cytoscape-view-utilities/-/cytoscape-view-utilities-4.1.0.tgz#c600d77602a349f5ce46f5e52ca817c173a9209b"
+  integrity sha512-wGR54TQU9OVo5eqel4mIUUhhOLEt8Gi2Sf1XBK5ALLsyYzdVj2gUFZ+Dm1NXThHnVZZW6WjLTtGSeg+OmWWwww==
+
 cytoscape@^3.15.2, cytoscape@^3.2.19:
   version "3.15.2"
   resolved "https://registry.yarnpkg.com/cytoscape/-/cytoscape-3.15.2.tgz#a26bb3053471babfe0178e740672cd99a46b28de"

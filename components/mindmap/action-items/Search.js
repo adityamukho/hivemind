@@ -11,7 +11,8 @@ import GlobalContext from '../../GlobalContext'
 import CloseButton from '../CloseButton'
 import {defer} from 'lodash'
 
-function handler (cy, poppers) {
+function handler (cyWrapper, poppers) {
+  const {cy, viewApi} = cyWrapper
   const data = cy.nodes().map(node => pick(node.data(), 'id', 'title', 'summary'))
   const columns = [
     {
@@ -34,6 +35,8 @@ function handler (cy, poppers) {
     bgColor: '#00BFFF',
     onSelect: row => {
       const node = cy.$id(row.id)
+      viewApi.show(node.predecessors().union(node))
+
       const renderedPosition = node.renderedPosition()
       const viewportCenterX = cy.width() / 2
       const viewportCenterY = cy.height() / 2
@@ -124,8 +127,8 @@ function handler (cy, poppers) {
 export default function search () {
   const { cyWrapper, poppers } = useContext(GlobalContext)
 
-  return <Button className="ml-1" outline color="info" id="search"
-                 onClick={() => handler(cyWrapper.cy, poppers)}>
-    <Search size={16}/> Search
+  return <Button className="ml-1" outline color="secondary" id="search"
+                 onClick={() => handler(cyWrapper, poppers)}>
+    <Search size={16}/>
   </Button>
 }

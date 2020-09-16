@@ -6,6 +6,7 @@ import AuthPrompt from '../../components/auth/AuthPrompt'
 import MindMap from '../../components/mindmap/MindMap'
 import { useUser } from '../../utils/auth/useUser'
 import fetchWrapper from '../../utils/fetchWrapper'
+import {Fit, ShowAll, Search} from '../../components/mindmap/action-items'
 
 const Page = () => {
   const router = useRouter()
@@ -29,6 +30,11 @@ const Page = () => {
     const output = [
       <Row key='title'>
         <Col xs="auto"><h3>Mind Map - {title}</h3></Col>
+        <Col xs="auto">
+          <ShowAll/>
+          <Fit/>
+          <Search/>
+        </Col>
       </Row>
     ]
 

@@ -16,6 +16,7 @@
     "cytoscape-cxtmenu": "RecallGraph/cytoscape.js-cxtmenu#master",
     "cytoscape-dagre": "^2.2.2",
     "cytoscape-popper": "^1.0.7",
+    "cytoscape-view-utilities": "^4.1.0",
     "firebase": "^7.15.5",
     "firebase-admin": "^8.12.1",
     "js-cookie": "2.2.1",

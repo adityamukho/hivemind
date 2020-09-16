@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { Row, Col } from 'reactstrap'
-import { Redraw, Search } from "./action-items"
 import Timeline from './Timeline'
 
 const MindMap = ({ data, setTitle }) => {
@@ -16,12 +15,6 @@ const MindMap = ({ data, setTitle }) => {
     const { default: Canvas } = require('./Canvas')
 
     return <>
-      <Row className="my-1">
-        <Col>
-          <Redraw/>
-          <Search/>
-        </Col>
-      </Row>
       <Row className="my-1">
         <Col>
           <Canvas {...data}/>

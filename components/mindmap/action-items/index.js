@@ -1,4 +1,5 @@
-import Redraw from "./Redraw";
-import Search from "./Search";
+import ShowAll from './ShowAll'
+import Search from './Search'
+import Fit from './Fit'
 
-export { Redraw, Search };
+export { ShowAll, Search, Fit }
