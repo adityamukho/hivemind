@@ -1,41 +1,75 @@
 import Cytoscape from 'cytoscape'
 import Cxtmenu from 'cytoscape-cxtmenu'
 import Popper from 'cytoscape-popper'
+import dagre from 'cytoscape-dagre'
+import viewUtilities from 'cytoscape-view-utilities'
 import React, { useContext, useEffect, useState } from 'react'
 import CytoscapeComponent from 'react-cytoscapejs'
-import { getOptions } from '../../utils/cyHelpers'
+import { getOptions, shouldFit } from '../../utils/cyHelpers'
 import GlobalContext from '../GlobalContext'
-import { add, del, edit, view } from './menu-items'
+import { add, del, edit, view, hide, reveal } from './menu-items'
 import style from './style'
+import {defer} from 'lodash'
 
 Cytoscape.use(Popper)
 Cytoscape.use(Cxtmenu)
+Cytoscape.use(dagre)
+viewUtilities(Cytoscape)
 
-function buildMenu (cy, poppers, setEls, access) {
+function buildMenu (poppers, setEls, access, viewApi) {
   return function (node) {
     const menu = []
 
-    view(menu, poppers, cy)
+    view(menu, poppers)
+    if (!node.data('isRoot')) {
+      hide(menu, viewApi)
+    }
+    if (node.scratch('showReveal')) {
+      reveal(menu, viewApi)
+    }
 
     if (['admin', 'write'].includes(access.access)) {
-      add(menu, poppers, setEls, cy)
-      if (!node.data().isRoot) {
-        del(menu, poppers, setEls, cy)
+      add(menu, poppers, setEls)
+      if (!node.data('isRoot')) {
+        del(menu, poppers, setEls)
       }
-      edit(menu, poppers, cy)
+      edit(menu, poppers)
     }
 
     return menu
   }
 }
 
-function configurePlugins (cy, poppers, setEls, access) {
+// noinspection JSUnresolvedFunction
+function configurePlugins (cyWrapper, poppers, setEls, access) {
+  const cy = cyWrapper.cy
   const minRadius = Math.min(cy.width(), cy.height()) / 8
+
+  const viewOpts = {
+    highlightStyles: [
+      { node: { 'border-color': '#0b9bcd',  'border-width': 3 }, edge: {'line-color': '#0b9bcd', 'source-arrow-color': '#0b9bcd', 'target-arrow-color': '#0b9bcd', 'width' : 3} },
+      { node: { 'border-color': '#04f06a',  'border-width': 3 }, edge: {'line-color': '#04f06a', 'source-arrow-color': '#04f06a', 'target-arrow-color': '#04f06a', 'width' : 3} },
+    ],
+    selectStyles: {
+      node: {'border-color': 'white', 'border-width': 3, 'background-color': 'lightgrey'},
+      edge: {'line-color': 'white', 'source-arrow-color': 'white', 'target-arrow-color': 'white', 'width' : 3}
+    },
+    setVisibilityOnHide: false, // whether to set visibility on hide/show
+    setDisplayOnHide: true, // whether to set display on hide/show
+    zoomAnimationDuration: 500, //default duration for zoom animation speed
+    neighbor: function(node){
+      return node.successors();
+    },
+    neighborSelectTime: 500
+  }
+  cyWrapper.viewApi = cy.viewUtilities(viewOpts)
+
+
   const cxtMenu = {
     menuRadius: minRadius + 50, // the radius of the circular menu in pixels
     selector: 'node', // elements matching this Cytoscape.js selector will trigger cxtmenus
-    commands: buildMenu(cy, poppers, setEls, access), // function( ele ){ return [ /*...*/ ] }, // a function
-                                                            // that returns
+    commands: buildMenu(poppers, setEls, access, cyWrapper.viewApi), // function( ele ){ return [ /*...*/ ] }, // a function
+    // that returns
     // commands or a promise of commands
     fillColor: 'rgba(0, 0, 0, 0.75)', // the background colour of the menu
     activeFillColor: 'rgba(100, 100, 100, 0.5)', // the colour used to indicate the selected command
@@ -52,21 +86,25 @@ function configurePlugins (cy, poppers, setEls, access) {
     // zIndex: 9999, // the z-index of the ui div
     atMouse: false // draw menu at mouse position
   }
-
-  // noinspection JSUnresolvedFunction
   cy.cxtmenu(cxtMenu)
 }
 
-function setHandlers (cy) {
-  cy.on('mouseover', 'node', function () {
+function setHandlers (cyWrapper) {
+  const { cy, viewApi } = cyWrapper
+
+  cy.on('boxend', () => {
+    defer(() => viewApi.zoomToSelected(cy.$(':selected')))
+  })
+
+  cy.on('mouseover', 'node', () => {
     document.getElementById('cy').style.cursor = 'pointer'
   })
 
-  cy.on('mouseout', 'node', function () {
+  cy.on('mouseout', 'node', () => {
     document.getElementById('cy').style.cursor = 'default'
   })
 
-  cy.on('select mouseover', 'edge', e => {
+  cy.on('mouseover', 'edge', e => {
     e.target.style({
       width: 4,
       'line-color': '#007bff',
@@ -92,12 +130,14 @@ function setHandlers (cy) {
     node.scratch('style', node.style())
   })
 
-  cy.on('mouseover select', 'node', e => {
+  cy.on('mouseover', 'node', e => {
     e.target.style('background-color', '#007bff')
   })
 
-  cy.on('mouseout unselect', 'node', e => {
+  cy.on('unselect mouseout', 'node', e => {
     const node = e.target
+
+    viewApi.removeHighlights(node)
 
     if (!node.selected()) {
       node.style(
@@ -114,9 +154,8 @@ const Canvas = ({ elements, access }) => {
   const { cyWrapper, poppers } = useContext(GlobalContext)
 
   const nodes = els.filter(el => !el.data.id.startsWith('links'))
-  const animate = nodes.length <= 50
-  const fit = nodes.length > 1
-  const options = getOptions(animate, fit)
+  const fit = shouldFit(nodes)
+  const options = getOptions(fit)
 
   function initCy (cy) {
     setCy(cy)
@@ -129,8 +168,8 @@ const Canvas = ({ elements, access }) => {
 
   useEffect(() => {
     if (cy) {
-      configurePlugins(cy, poppers, setEls, access)
-      setHandlers(cy)
+      configurePlugins(cyWrapper, poppers, setEls, access)
+      setHandlers(cyWrapper)
     }
   }, [cy])
 

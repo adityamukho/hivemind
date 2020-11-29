@@ -2,10 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Eye } from 'react-feather'
 import { Card, CardBody, CardSubtitle, CardText, CardTitle, Row, Col } from 'reactstrap'
-import { setPopper } from '../../../utils/cyHelpers'
+import { getPath, setPopper } from '../../../utils/cyHelpers'
 import CloseButton from '../CloseButton'
 
-export default function view (menu, poppers, cy) {
+export default function view (menu, poppers) {
   const view = document.createElement('span')
   ReactDOM.render(<Eye/>, view)
   menu.push({
@@ -18,9 +18,9 @@ export default function view (menu, poppers, cy) {
           content: () => {
             const popperCard = document.createElement('div')
 
-            document.getElementsByTagName('body')[0].appendChild(popperCard)
+            document.body.appendChild(popperCard)
             popperCard.setAttribute('id', `popper-${el.id()}`)
-            ReactDOM.render(<PopperCard poppers={poppers} el={el} cy={cy}/>, popperCard)
+            ReactDOM.render(<PopperCard poppers={poppers} el={el}/>, popperCard)
 
             return popperCard
           }
@@ -32,19 +32,12 @@ export default function view (menu, poppers, cy) {
   })
 }
 
-const PopperCard = ({ el, poppers, cy }) => {
+const PopperCard = ({ el, poppers }) => {
   const data = el.data()
   let path
 
   if (!data.isRoot) {
-    const els = cy.elements()
-    const root = els[0]
-
-    path = els.aStar({
-      root: root,
-      goal: el,
-      directed: true
-    }).path.nodes().map(node => node.data().title).join(' ⟶ ')
+    path = getPath(el).join(' ⟶ ')
   }
 
   return <Card className="border-dark">

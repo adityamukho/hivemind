@@ -2583,12 +2583,24 @@ cytoscape-cxtmenu@RecallGraph/cytoscape.js-cxtmenu#master:
   version "3.1.1"
   resolved "https://codeload.github.com/RecallGraph/cytoscape.js-cxtmenu/tar.gz/437e4c15792ed53e27b8949281363e975bca6cc1"
 
+cytoscape-dagre@^2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/cytoscape-dagre/-/cytoscape-dagre-2.2.2.tgz#5f32a85c0ba835f167efee531df9e89ac58ff411"
+  integrity sha512-zsg36qNwua/L2stJSWkcbSDcvW3E6VZf6KRe6aLnQJxuXuz89tMqI5EVYVKEcNBgzTEzFMFv0PE3T0nD4m6VDw==
+  dependencies:
+    dagre "^0.8.2"
+
 cytoscape-popper@^1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/cytoscape-popper/-/cytoscape-popper-1.0.7.tgz#8154ff507d0cc1a17952f00643e71fc1f8ea9fae"
   integrity sha512-b/vfoBL2u9GU+J7eceGT9cZ4hctn/ZzV7PXq4w6fk+45qQuOHtlhpP3WxGKpBXNqENhk7Dk0BwlIYROjYQmidQ==
   dependencies:
     popper.js "^1.0.0"
+
+cytoscape-view-utilities@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/cytoscape-view-utilities/-/cytoscape-view-utilities-4.1.0.tgz#c600d77602a349f5ce46f5e52ca817c173a9209b"
+  integrity sha512-wGR54TQU9OVo5eqel4mIUUhhOLEt8Gi2Sf1XBK5ALLsyYzdVj2gUFZ+Dm1NXThHnVZZW6WjLTtGSeg+OmWWwww==
 
 cytoscape@^3.15.2, cytoscape@^3.2.19:
   version "3.15.2"
@@ -2605,6 +2617,14 @@ d@1, d@^1.0.1:
   dependencies:
     es5-ext "^0.10.50"
     type "^1.0.1"
+
+dagre@^0.8.2:
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/dagre/-/dagre-0.8.5.tgz#ba30b0055dac12b6c1fcc247817442777d06afee"
+  integrity sha512-/aTqmnRta7x7MCCpExk7HQL2O4owCT2h8NT//9I1OQ9vt29Pa0BzSAkR5lwFUcQ7491yVi/3CXU9jQ5o0Mn2Sw==
+  dependencies:
+    graphlib "^2.1.8"
+    lodash "^4.17.15"
 
 data-uri-to-buffer@3.0.0:
   version "3.0.0"
@@ -3503,6 +3523,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.2.2
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
 
+graphlib@^2.1.8:
+  version "2.1.8"
+  resolved "https://registry.yarnpkg.com/graphlib/-/graphlib-2.1.8.tgz#5761d414737870084c92ec7b5dbcb0592c9d35da"
+  integrity sha512-jcLLfkpoVGmH7/InMC/1hIvOPSUh38oJtGhvrOFGzioE1DZ+0YW16RgmOJhHiuWTvGiJQ9Z1Ik43JvkRPRvE+A==
+  dependencies:
+    lodash "^4.17.15"
+
 gtoken@^4.1.0:
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/gtoken/-/gtoken-4.1.4.tgz#925ff1e7df3aaada06611d30ea2d2abf60fcd6a7"
@@ -4286,7 +4313,7 @@ lodash.sortby@^4.7.0:
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
   integrity sha1-7dFMgk4sycHgsKG0K7UhBRakJDg=
 
-lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.19, lodash@^4.17.20:
+lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20:
   version "4.17.20"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==

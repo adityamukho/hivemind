@@ -10,7 +10,7 @@ import { removePopper, setPopper } from '../../../utils/cyHelpers'
 import { fetcher } from '../../../utils/fetchWrapper'
 import CloseButton from '../CloseButton'
 
-export default function edit (menu, poppers, cy) {
+export default function edit (menu, poppers) {
   const edit = document.createElement('span')
   ReactDOM.render(<Edit3/>, edit)
   menu.push({
@@ -22,9 +22,9 @@ export default function edit (menu, poppers, cy) {
         el.popper({
           content: () => {
             const popperCard = document.createElement('div')
-            ReactDOM.render(<PopperCard poppers={poppers} el={el} cy={cy}/>, popperCard)
+            ReactDOM.render(<PopperCard poppers={poppers} el={el}/>, popperCard)
 
-            document.getElementsByTagName('body')[0].appendChild(popperCard)
+            document.body.appendChild(popperCard)
             popperCard.setAttribute('id', `popper-${el.id()}`)
 
             return popperCard
@@ -37,7 +37,7 @@ export default function edit (menu, poppers, cy) {
   })
 }
 
-const PopperCard = ({ el, poppers, cy }) => {
+const PopperCard = ({ el, poppers }) => {
   const data = el.data()
   const [coll] = data.id.split('/')
   const { user } = useUser()
@@ -76,7 +76,7 @@ const PopperCard = ({ el, poppers, cy }) => {
         summary,
         content
       })
-      mutate([`/api/${cy.nodes().id()}/timeline`, user.token])
+      mutate([`/api/${el.cy().nodes().id()}/timeline`, user.token])
 
       options.message = 'Updated node!'
       options.type = 'success'
