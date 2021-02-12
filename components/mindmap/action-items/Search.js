@@ -76,7 +76,7 @@ export default function search () {
       <Search size={16}/>
     </Button>
     <Popover target="search" isOpen={popoverOpen} toggle={toggle}
-             boundariesElement={'search'} placement={'top-start'} offset={offset}>
+             boundariesElement={'search'} placement={'bottom-start'} offset={offset}>
       <PopoverHeader>Search <small className="text-muted">(Jump to Node)</small></PopoverHeader>
       <PopoverBody>
         <Card
