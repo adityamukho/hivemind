@@ -1,6 +1,9 @@
 import { map } from 'lodash'
-import { rg } from '../../../utils/arangoWrapper'
+import db, { rg } from '../../../utils/arangoWrapper'
 import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
+import { hasWriteAccess, hasDeleteAccess } from '../../../utils/auth/access'
+import { pick } from 'lodash'
+import { aql } from 'arangojs'
 
 function createNodeBracepath (nKeys) {
   const pathSegments = map(nKeys, (keys, coll) => {
@@ -36,70 +39,131 @@ const NodesAPI = async (req, res) => {
     const key = claims.uid
     const userId = `users/${key}`
     const { title } = req.body
-    let node, response, message
 
+    let node, response, message
     switch (req.method) {
       case 'POST':
         const { parentId } = req.query
-        node = { title, createdBy: userId }
-        response = await rg.post('/document/nodes', node)
 
-        if (response.statusCode === 201) {
-          node = response.body
+        if (await hasWriteAccess(parentId, userId)) {
+          node = { title, createdBy: userId }
+          response = await rg.post('/document/nodes', node)
 
-          const link = {
-            _from: parentId,
-            _to: node._id,
-            createdBy: userId
+          if (response.statusCode === 201) {
+            node = response.body
+
+            const link = {
+              _from: parentId,
+              _to: node._id,
+              createdBy: userId
+            }
+            response = await rg.post('/document/links', link, { silent: true })
+            message = response.statusCode === 201 ? 'Node created.' : response.body
+
           }
-          response = await rg.post('/document/links', link, { silent: true })
-          message = response.statusCode === 201 ? 'Node created.' : response.body
+          else {
+            message = response.body
+          }
 
+          return res.status(response.statusCode).json({ message })
         }
         else {
-          message = response.body
+          return res.status(401).json({ message: 'Access Denied.' })
         }
-
-        return res.status(response.statusCode).json({ message })
 
       case 'PATCH':
-        const { summary, content, _rev, _id } = req.body
-        node = {
-          _id,
-          title,
-          summary,
-          content,
-          _rev,
-          lastUpdatedBy: userId
+        if (await hasWriteAccess(req.body._id, userId)) {
+          node = pick(req.body, 'summary', 'content', '_rev', '_id')
+          node.lastUpdatedBy = userId
+
+          response = await rg.patch('/document/nodes', node,
+            {
+              keepNull: false,
+              ignoreRevs: false
+            })
+
+          return res.status(response.statusCode).json(response.body)
         }
-
-        response = await rg.patch('/document/nodes', node,
-          {
-            keepNull: false,
-            ignoreRevs: false
-          })
-
-        return res.status(response.statusCode).json(response.body)
+        else {
+          return res.status(401).json({ message: 'Access Denied.' })
+        }
 
       case 'DELETE':
-        const data = req.body
-        const nKeys = {}
+        if (await hasDeleteAccess(req.body._id, userId)) {
+          let query = aql`
+            return merge(
+              let nodes = flatten(
+                for v, e in 1..${Number.MAX_SAFE_INTEGER}
+                outbound ${req.body._id}
+                graph 'mindmaps'
+                
+                return (
+                    for node in [v, e]
+                    
+                    return keep(node, '_id', '_key', '_rev')
+                )
+              )
+              
+              for node in nodes
+              let idParts = parse_identifier(node)
+              collect coll = idParts.collection aggregate n = unique(node)
+              
+              return {[coll]: n}
+            )
+          `
+          let cursor = await db.query(query)
+          const data = await cursor.next()
 
-        for (const coll in data) {
-          const nodes = data[coll]
-          nKeys[coll] = []
-          nKeys[coll].push(...map(nodes, '_key'))
-
-          response = await rg.delete(`/document/${coll}`, nodes, { ignoreRevs: false, silent: true })
-          if (response.statusCode !== 200) {
-            const path = createNodeBracepath(nKeys)
-            await rg.post('/document/_restore', { path }, { silent: true })
-
-            break
+          let coll = req.body._id.split('/')[0]
+          if (!data[coll]) {
+            data[coll] = []
           }
-        }
+          data[coll].unshift(pick(req.body, '_id', '_key', '_rev'))
 
-        return res.status(200).json({ message: 'Nodes deleted.' })
+          query = aql`
+            for v, e, p in 1
+            inbound ${req.body._id}
+            graph 'mindmaps'
+            
+            filter !p.vertices[0].isRoot
+            
+            return keep(e, '_id', '_key', '_rev')
+          `
+          cursor = await db.query(query)
+          if (cursor.hasNext) {
+            const incoming = await cursor.next()
+
+            coll = incoming._id.split('/')[0]
+            if (!data[coll]) {
+              data[coll] = []
+            }
+            data[coll].unshift(incoming)
+          }
+
+          const nKeys = {}
+          for (const coll in data) {
+            const nodes = data[coll]
+            nKeys[coll] = []
+            nKeys[coll].push(...map(nodes, '_key'))
+
+            response = await rg.delete(`/document/${coll}`, nodes, {
+              ignoreRevs: false,
+              silent: true
+            })
+
+            if (response.statusCode !== 200) {
+              const path = createNodeBracepath(nKeys)
+              await rg.post('/document/_restore', { path }, { silent: true })
+
+              break
+            }
+          }
+
+          return res.status(200).json({ message: 'Nodes deleted.' })
+        }
+        else {
+          return res.status(401).json({ message: 'Access Denied.' })
+        }
     }
   }
   catch (error) {

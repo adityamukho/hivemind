@@ -6,7 +6,7 @@ import { Trash2, XCircle } from 'react-feather'
 import { Button, Card, CardBody, CardText, CardTitle, Col, Form, FormGroup, Row, Spinner } from 'reactstrap'
 import { mutate } from 'swr'
 import { useUser } from '../../../utils/auth/useUser'
-import { cy2rg, getDependents, removePopper, setPopper } from '../../../utils/cyHelpers'
+import { cy2rg, removePopper, setPopper } from '../../../utils/cyHelpers'
 import { fetcher } from '../../../utils/fetchWrapper'
 import CloseButton from '../CloseButton'
 
@@ -48,8 +48,9 @@ const PopperCard = ({ el, poppers, setEls }) => {
     const rootId = el.cy().nodes().id()
     setSpinnerDisplay('d-block')
 
-    const coll = getDependents(el)
-    const data = cy2rg(coll.map(el => pick(el.data(), 'id', '_rev', '_key')))
+    // const coll = getDependents(el)
+    // const data = cy2rg(coll.map(el => pick(el.data(), 'id', '_rev', '_key')))
+    const data = cy2rg([pick(el.data(), 'id', '_rev', '_key')]).nodes[0]
     const { data: result, ok } = await fetcher('/api/nodes', user.token, 'DELETE', JSON.stringify(data))
       .then(({ data, ok, status }) => {
         if (ok) {

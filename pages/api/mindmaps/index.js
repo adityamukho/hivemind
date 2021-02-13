@@ -1,6 +1,8 @@
 import { aql } from 'arangojs'
 import db, { rg } from '../../../utils/arangoWrapper'
 import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
+import { isNil, chain } from 'lodash'
+import { hasWriteAccess } from '../../../utils/auth/access'
 
 const MindMapsAPI = async (req, res) => {
   const { token } = req.headers
@@ -45,30 +47,33 @@ const MindMapsAPI = async (req, res) => {
           }
           response = await rg.post('/document/access', access, { silent: true })
           message = response.statusCode === 201 ? 'Mindmap created.' : response.body
-        } else {
+        }
+        else {
           message = response.body
         }
 
         return res.status(response.statusCode).json({ message })
 
       case 'PATCH':
-        const { summary, content, _rev, _id, title } = req.body
-        mindmap = {
-          _id,
-          title,
-          summary,
-          content,
-          _rev,
-          lastUpdatedBy: userId
+        if (await hasWriteAccess(req.body._id, userId)) {
+          mindmap = chain(req.body)
+            .pick('summary', 'content', '_rev', '_id', 'title', 'name')
+            .omitBy(
+              isNil)
+            .value()
+          mindmap.lastUpdatedBy = userId
+
+          response = await rg.patch('/document/mindmaps', mindmap,
+            {
+              keepNull: false,
+              ignoreRevs: false
+            })
+
+          return res.status(response.statusCode).json(response.body)
         }
-
-        response = await rg.patch('/document/mindmaps', mindmap,
-          {
-            keepNull: false,
-            ignoreRevs: false
-          })
-
-        return res.status(response.statusCode).json(response.body)
+        else {
+          return res.status(401).json({ message: 'Access Denied.' })
+        }
     }
   }
   catch (error) {
