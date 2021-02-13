@@ -25,12 +25,12 @@ export async function hasWriteAccess(nid, userId) {
   const [coll] = nid.split('/')
   const roles = []
 
-  if (['mindmaps', 'access', 'nodes', 'links'].includes(coll)) {
-    roles.push('admin')
+  if (['mindmaps', 'nodes'].includes(coll)) {
+    roles.push('admin', 'write')
   }
 
-  if (['mindmaps', 'nodes', 'links'].includes(coll)) {
-    roles.push('write')
+  if (!roles.length) {
+    return false
   }
 
   return await hasPath(nid, userId, roles)
@@ -40,12 +40,27 @@ export async function hasDeleteAccess(nid, userId) {
   const [coll] = nid.split('/')
   const roles = []
 
-  if (['mindmaps', 'access', 'nodes', 'links'].includes(coll)) {
+  if (['mindmaps', 'nodes'].includes(coll)) {
     roles.push('admin')
   }
 
-  if (['nodes', 'links'].includes(coll)) {
+  if (['nodes'].includes(coll)) {
     roles.push('write')
+  }
+
+  if (!roles.length) {
+    return false
+  }
+
+  return await hasPath(nid, userId, roles)
+}
+
+export async function hasReadAccess(nid, userId) {
+  const [coll] = nid.split('/')
+  const roles = []
+
+  if (['mindmaps', 'nodes'].includes(coll)) {
+    roles.push('admin', 'write', 'read')
   }
 
   if (!roles.length) {
