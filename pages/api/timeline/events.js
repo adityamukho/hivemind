@@ -46,7 +46,7 @@ const EventsAPI = async (req, res) => {
     switch (req.method) {
       case 'GET':
         const mid = `mindmaps/${key}`
-e
+
         if (await hasReadAccess(mid, userId)) {
           const svSuffix = `mindmaps.${key}`
           const svid = `${svPrefix}/${svSuffix}`
