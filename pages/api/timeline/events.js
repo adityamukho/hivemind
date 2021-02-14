@@ -1,7 +1,7 @@
 import { aql } from 'arangojs'
-import { hasReadAccess } from '../../../../utils/auth/access'
-import db, { rg } from '../../../../utils/arangoWrapper'
-import { verifyIdToken } from '../../../../utils/auth/firebaseAdmin'
+import { hasReadAccess } from '../../../utils/auth/access'
+import db, { rg } from '../../../utils/arangoWrapper'
+import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
 
 const skeletonGraph = `${process.env.ARANGO_SVC_MOUNT_POINT}_skeleton`
 const svPrefix = `${skeletonGraph}_vertices`
@@ -33,7 +33,7 @@ function createNodeBracepath (nodeGroups) {
   return path
 }
 
-const TimelineAPI = async (req, res) => {
+const EventsAPI = async (req, res) => {
   const { token } = req.headers
 
   try {
@@ -46,7 +46,7 @@ const TimelineAPI = async (req, res) => {
     switch (req.method) {
       case 'GET':
         const mid = `mindmaps/${key}`
-
+e
         if (await hasReadAccess(mid, userId)) {
           const svSuffix = `mindmaps.${key}`
           const svid = `${svPrefix}/${svSuffix}`
@@ -77,7 +77,6 @@ const TimelineAPI = async (req, res) => {
         else {
           return res.status(401).json({ message: 'Access Denied.' })
         }
-
     }
   }
   catch (error) {
@@ -87,4 +86,4 @@ const TimelineAPI = async (req, res) => {
   }
 }
 
-export default TimelineAPI
+export default EventsAPI

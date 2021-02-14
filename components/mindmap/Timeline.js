@@ -9,7 +9,7 @@ import { get } from 'lodash'
 
 export default function timeline ({ mkey }) {
   const { user } = useUser()
-  const { data, error } = fetchWrapper(user ? user : null, `/api/mindmaps/${mkey}/timeline`)
+  const { data, error } = fetchWrapper(user ? user : null, `/api/timeline/events?key=${mkey}`)
 
   if (error && window.notify) {
     const options = {
