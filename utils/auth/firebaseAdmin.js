@@ -11,7 +11,6 @@ export const verifyIdToken = (token) => {
         // https://stackoverflow.com/a/41044630/1332513
         privateKey: firebasePrivateKey.replace(/\\n/g, '\n'),
       }),
-      databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
     })
   }
 
