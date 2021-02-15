@@ -1,12 +1,6 @@
 import cookies from 'js-cookie'
 
-export const getUserFromCookie = () => {
-  const cookie = cookies.get('auth')
-  if (!cookie) {
-    return
-  }
-  return JSON.parse(cookie)
-}
+export const getUserFromCookie = () => cookies.getJSON('auth')
 
 export const setUserCookie = (user) => {
   cookies.set('auth', user, {
