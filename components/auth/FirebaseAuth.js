@@ -1,9 +1,8 @@
 /* globals window */
+import React from 'react'
 import firebase from 'firebase/app'
 import { useEffect, useState } from 'react'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
-import { mapUserData } from '../../utils/auth/mapUserData'
-import { setUserCookie } from '../../utils/auth/userCookies'
 import '../../utils/initFirebase'
 
 const firebaseAuthConfig = {
@@ -13,7 +12,7 @@ const firebaseAuthConfig = {
   signInOptions: [
     {
       provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-      requireDisplayName: false
+      requireDisplayName: true
     },
     {
       provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
@@ -26,13 +25,7 @@ const firebaseAuthConfig = {
     firebase.auth.GithubAuthProvider.PROVIDER_ID
   ],
   signInSuccessUrl: '/',
-  credentialHelper: 'none',
-  callbacks: {
-    signInSuccessWithAuthResult: async ({ user }) => {
-      const userData = mapUserData(user)
-      setUserCookie(userData)
-    }
-  }
+  credentialHelper: 'none'
 }
 
 const FirebaseAuth = () => {

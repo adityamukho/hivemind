@@ -15,8 +15,6 @@ const NavItemLogin = () => {
     </NavItem>
   }
 
-  console.log(user)
-
   return <NavItem>
     <NavLink href={'#'} onClick={() => logout()}>({user.email}) Logout <LogOut/></NavLink>
   </NavItem>
