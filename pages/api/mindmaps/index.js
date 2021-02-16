@@ -58,8 +58,7 @@ const MindMapsAPI = async (req, res) => {
         if (await hasWriteAccess(req.body._id, userId)) {
           mindmap = chain(req.body)
             .pick('summary', 'content', '_rev', '_id', 'title', 'name')
-            .omitBy(
-              isNil)
+            .omitBy(isNil)
             .value()
           mindmap.lastUpdatedBy = userId
 

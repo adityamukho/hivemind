@@ -38,12 +38,12 @@ const NodesAPI = async (req, res) => {
     const claims = await verifyIdToken(token)
     const key = claims.uid
     const userId = `users/${key}`
-    const { title } = req.body
 
     let node, response, message
     switch (req.method) {
       case 'POST':
         const { parentId } = req.query
+        const { title } = req.body
 
         if (await hasWriteAccess(parentId, userId)) {
           node = { title, createdBy: userId }
@@ -73,7 +73,7 @@ const NodesAPI = async (req, res) => {
 
       case 'PATCH':
         if (await hasWriteAccess(req.body._id, userId)) {
-          node = pick(req.body, 'summary', 'content', '_rev', '_id')
+          node = pick(req.body, 'title', 'summary', 'content', '_rev', '_id')
           node.lastUpdatedBy = userId
 
           response = await rg.patch('/document/nodes', node,
