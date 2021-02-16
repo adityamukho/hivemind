@@ -69,7 +69,7 @@ const PopperCard = ({ el, poppers, setEls }) => {
     if (ok) {
       const { elements } = result
       setEls(CytoscapeComponent.normalizeElements(elements))
-      mutate([`/api/${rootId}/timeline`, user.token])
+      mutate([`/api/timeline/events?key=${rootId}`, user.token])
 
       options.message = 'Deleted node(s)!'
       options.type = 'success'
