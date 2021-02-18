@@ -10,7 +10,7 @@ const navItems = {
     </NavItem>
   ],
   anon: [],
-  unknown: [<Spinner/>]
+  unknown: [<Spinner key={'loading'}/>]
 }
 
 const MainNav = () => {
