@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
+import { Spinner } from 'reactstrap'
 import { useUser } from '../utils/auth/useUser'
 import AuthPrompt from '../components/auth/AuthPrompt'
 
@@ -13,7 +14,7 @@ const Page = () => {
     }
   }, [user])
 
-  return user ? <p>Redirecting...</p> : <AuthPrompt/>
+  return (typeof user === 'undefined') ? <Spinner/> : (user ? <p>Redirecting...</p> : <AuthPrompt/>)
 }
 
 export default Page

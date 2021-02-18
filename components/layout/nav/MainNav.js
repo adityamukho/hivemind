@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import React from 'react'
-import { NavItem, NavLink, Nav } from 'reactstrap'
+import { NavItem, NavLink, Nav, Spinner } from 'reactstrap'
 import { useUser } from '../../../utils/auth/useUser'
 
 const navItems = {
@@ -9,18 +9,19 @@ const navItems = {
       <Link href={'/mmaps'} passHref><NavLink>Mind Maps</NavLink></Link>
     </NavItem>
   ],
-  anon: [
-  ]
+  anon: [],
+  unknown: [<Spinner/>]
 }
 
 const MainNav = () => {
   const { user } = useUser()
 
-  if (user) {
-    return <Nav className="mr-auto" navbar>{navItems.anon.concat(navItems.auth)}</Nav>
-  }
-
-  return <Nav className="mr-auto" navbar>{navItems.anon}</Nav>
+  return (typeof user === 'undefined') ?
+    <Nav className="mr-auto" navbar>{navItems.unknown}</Nav> :
+    (user ?
+        <Nav className="mr-auto" navbar>{navItems.anon.concat(navItems.auth)}</Nav> :
+        <Nav className="mr-auto" navbar>{navItems.anon}</Nav>
+    )
 }
 
 export default MainNav

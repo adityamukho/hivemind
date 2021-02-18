@@ -15,18 +15,22 @@ const Page = () => {
   const { data, error } = fetchWrapper(user && key ? user : null, `/api/mindmaps/${key}`)
   const [title, setTitle] = useState(key)
 
-  if (user) {
-    if (error && window.notify) {
-      const options = {
-        place: 'tr',
-        message: 'Failed to fetch mind map!',
-        type: 'danger',
-        autoDismiss: 7
-      }
+  if ((typeof user === 'undefined')) {
+    return <Spinner/>
+  }
 
-      window.notify(options)
+  if (error && window.notify) {
+    const options = {
+      place: 'tr',
+      message: 'Failed to fetch mind map!',
+      type: 'danger',
+      autoDismiss: 7
     }
 
+    window.notify(options)
+  }
+
+  if (user) {
     const output = [
       <Row key='title'>
         <Col xs="auto"><h3>{title}</h3></Col>

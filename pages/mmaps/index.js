@@ -23,18 +23,22 @@ const Page = () => {
     }
   }
 
-  if (user) {
-    if (error && window.notify) {
-      const options = {
-        place: 'tr',
-        message: 'Failed to fetch mind maps!',
-        type: 'danger',
-        autoDismiss: 7
-      }
+  if ((typeof user === 'undefined')) {
+    return <Spinner/>
+  }
 
-      window.notify(options)
+  if (error && window.notify) {
+    const options = {
+      place: 'tr',
+      message: 'Failed to fetch mind maps!',
+      type: 'danger',
+      autoDismiss: 7
     }
 
+    window.notify(options)
+  }
+
+  if (user) {
     const handleChange = (event) => setName(event.target.value)
     const handleSubmit = async (event) => {
       event.preventDefault()

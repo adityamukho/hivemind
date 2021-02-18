@@ -9,9 +9,9 @@ import 'vis-timeline/dist/vis-timeline-graph2d.min.css'
 import 'jsdifflib/index.css'
 
 export default function App ({ Component, pageProps }) {
-  const cyWrapper = {cy: null}
+  const cyWrapper = { cy: null }
   const poppers = {}
-  const pageVars = {title: 'Hivemind'}
+  const pageVars = { title: 'Hivemind' }
 
   return <GlobalContext.Provider value={{ cyWrapper, poppers, pageVars }}>
     <Layout title={process.env.NEXT_PUBLIC_APP_NAME}>
