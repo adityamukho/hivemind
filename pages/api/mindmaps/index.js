@@ -47,6 +47,8 @@ const MindMapsAPI = async (req, res) => {
           }
           response = await rg.post('/document/access', access, { silent: true })
           message = response.statusCode === 201 ? 'Mindmap created.' : response.body
+
+          // TODO: Purge the mindmap if access couldn't be created.
         }
         else {
           message = response.body

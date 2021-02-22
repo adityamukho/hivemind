@@ -60,6 +60,7 @@ const NodesAPI = async (req, res) => {
             response = await rg.post('/document/links', link, { silent: true })
             message = response.statusCode === 201 ? 'Node created.' : response.body
 
+            // TODO: Purge the node if link couldn't be created.
           }
           else {
             message = response.body

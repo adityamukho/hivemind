@@ -1,11 +1,9 @@
+import { get } from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
-import {
-  Popover, PopoverHeader, Spinner, Card, CardBody, CardText, PopoverBody
-} from 'reactstrap'
+import { Card, CardBody, CardText, Popover, PopoverBody, PopoverHeader, Spinner } from 'reactstrap'
 import { Timeline as VisTimeline } from 'vis-timeline'
 import { useUser } from '../../utils/auth/useUser'
-import fetchWrapper, { fetcher } from '../../utils/fetchWrapper'
-import { get } from 'lodash'
+import fetchWrapper from '../../utils/fetchWrapper'
 
 export default function timeline ({ mkey }) {
   const { user } = useUser()
@@ -136,7 +134,7 @@ const Timeline = ({ data }) => {
         >
           <CardBody>
             <CardText tag="div" className="mw-100">
-              <EventDetail event={data[target]}/>
+              {data[target] ? <EventDetail event={data[target]}/> : null}
             </CardText>
           </CardBody>
         </Card>
@@ -145,13 +143,45 @@ const Timeline = ({ data }) => {
   </div>
 }
 
+function getDiffURL (event) {
+  return `/api/timeline/diff?eid=${event._id}&nid=${event.meta.id}&timestamp=${event.ctime}&event=${event.event}`
+}
+
 const EventDetail = ({ event }) => {
   const { user } = useUser()
+  const { data, error } = fetchWrapper(user, getDiffURL(event))
 
-  if (!event) {
-    return null
+  if (error && window.notify) {
+    const options = {
+      place: 'tr',
+      message: 'Failed to fetch event details!',
+      type: 'danger',
+      autoDismiss: 7
+    }
+
+    window.notify(options)
+  }
+
+  if (data && !error) {
+    if (data.ok) {
+      return JSON.stringify(data.data, null, 2)
+      // switch (event.event) {
+      //   case 'restored':
+      //   case 'created':
+      //     return 'left: blank, right: node'
+      //
+      //   case 'deleted':
+      //     return 'left: node, right: blank'
+      //
+      //   default:
+      //     return JSON.stringify(event, null, 2)
+      // }
+    }
+    else {
+      return null
+    }
   }
   else {
-    return JSON.stringify(event, null, 2)
+    return <Spinner/>
   }
 }
