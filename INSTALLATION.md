@@ -18,7 +18,7 @@ Run the scripts in the `db-setup` folder using the command below. These are idem
 1. Create a project at the [Firebase console](https://console.firebase.google.com/).
 1. Get your account credentials from the Firebase console at _Project settings > Service accounts_, where you can click on _Generate new private key_ and download the credentials as a json file. It will contain keys such as `project_id`, `client_email` and `client_id`. Set them as environment variables in the `.env.local` file at the root of this project.
 1. Go to **Develop**, click on **Authentication** and in the **Sign-in method** tab enable authentication for the app.
-1. In the `.firebaserc` file at the root of this project, update the API project ID for the `default` key.
+1. In the `.firebaserc` file at the root of this project, update the project ID for the `default` key.
 
 ### Uploading Firebase Cloud Functions
 1. Install the Firebase CLI tool: `npm install -g firebase-tools`
