@@ -8,5 +8,5 @@ const db = new Database({
   precaptureStackTraces: true
 })
 
-export default db
-export const rg = db.route(process.env.ARANGO_SVC_MOUNT_POINT)
+exports.db = db
+exports.rg = db.route(process.env.ARANGO_SVC_MOUNT_POINT)

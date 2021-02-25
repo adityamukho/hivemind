@@ -1,8 +1,9 @@
 import { aql } from 'arangojs'
-import db from '../../../../utils/arangoWrapper'
 import { verifyIdToken } from '../../../../utils/auth/firebaseAdmin'
-import {rg2cy} from '../../../../utils/cyHelpers'
-import {chain} from 'lodash'
+import { rg2cy } from '../../../../utils/cyHelpers'
+import { chain } from 'lodash'
+
+const { db } = require('../../../../utils/arangoWrapper')
 
 const MindMapAPI = async (req, res) => {
   const { token } = req.headers
@@ -41,7 +42,11 @@ const MindMapAPI = async (req, res) => {
             edges.push(mindmap.edges[i])
           }
 
-          const userIds = chain(vertices).flatMap(v => [v.createdBy, v.lastUpdatedBy]).compact().uniq().value()
+          const userIds = chain(vertices)
+            .flatMap(v => [v.createdBy, v.lastUpdatedBy])
+            .compact()
+            .uniq()
+            .value()
           query = aql`
             for u in users
             filter u._id in ${userIds}

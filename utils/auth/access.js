@@ -1,5 +1,6 @@
-import db from '../arangoWrapper'
 import { aql } from 'arangojs'
+
+const { db } = require('../arangoWrapper')
 
 const skeletonGraph = `${process.env.ARANGO_SVC_MOUNT_POINT}_skeleton`
 const skeletonVertices = `${process.env.ARANGO_SVC_MOUNT_POINT}_skeleton_vertices`
@@ -20,10 +21,10 @@ async function hasPath (nid, userId, roles) {
 }
 
 async function hasHistoricPath (nid, userId, roles) {
-  const svid = `${skeletonVertices}/${nid.replace('/', '.')}`
-  const evid = `${skeletonVertices}/${userId.replace('/', '.')}`
+  const svid = `${skeletonVertices}/${userId.replace('/', '.')}`
+  const evid = `${skeletonVertices}/${nid.replace('/', '.')}`
   const query = aql`
-    for v, e in inbound shortest_path
+    for v, e in outbound shortest_path
     ${svid} to ${evid}
     graph ${skeletonGraph}
     

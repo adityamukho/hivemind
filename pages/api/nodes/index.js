@@ -1,35 +1,11 @@
 import { map } from 'lodash'
-import db, { rg } from '../../../utils/arangoWrapper'
 import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
 import { hasWriteAccess, hasDeleteAccess } from '../../../utils/auth/access'
 import { pick } from 'lodash'
 import { aql } from 'arangojs'
+import { createNodeBracePath, recordCompoundEvent } from '../../../utils/rgHelpers'
 
-function createNodeBracepath (nKeys) {
-  const pathSegments = map(nKeys, (keys, coll) => {
-    let pathSegment = `${coll}/`
-
-    if (keys.length > 1) {
-      pathSegment += `{${keys.join(',')}}`
-    }
-    else {
-      pathSegment += keys[0]
-    }
-
-    return pathSegment
-  })
-
-  let path = '/n/'
-
-  if (pathSegments.length > 1) {
-    path += `{${pathSegments.join(',')}}`
-  }
-  else if (pathSegments.length === 1) {
-    path += pathSegments[0]
-  }
-
-  return path
-}
+const { db, rg } = require('../../../utils/arangoWrapper')
 
 const NodesAPI = async (req, res) => {
   const { token } = req.headers
@@ -38,6 +14,7 @@ const NodesAPI = async (req, res) => {
     const claims = await verifyIdToken(token)
     const key = claims.uid
     const userId = `users/${key}`
+    const nodeMetas = []
 
     let node, response, message
     switch (req.method) {
@@ -51,14 +28,23 @@ const NodesAPI = async (req, res) => {
 
           if (response.statusCode === 201) {
             node = response.body
+            nodeMetas.push(node)
 
             const link = {
               _from: parentId,
               _to: node._id,
               createdBy: userId
             }
-            response = await rg.post('/document/links', link, { silent: true })
-            message = response.statusCode === 201 ? 'Node created.' : response.body
+            response = await rg.post('/document/links', link)
+            if (response.statusCode === 201) {
+              message = 'Node created.'
+              nodeMetas.push(response.body)
+
+              await recordCompoundEvent('created', userId, nodeMetas)
+            }
+            else {
+              message = response.body
+            }
 
             // TODO: Purge the node if link couldn't be created.
           }
@@ -82,6 +68,8 @@ const NodesAPI = async (req, res) => {
               keepNull: false,
               ignoreRevs: false
             })
+
+          await recordCompoundEvent('updated', userId, [response.body])
 
           return res.status(response.statusCode).json(response.body)
         }
@@ -148,15 +136,17 @@ const NodesAPI = async (req, res) => {
             nKeys[coll].push(...map(nodes, '_key'))
 
             response = await rg.delete(`/document/${coll}`, nodes, {
-              ignoreRevs: false,
-              silent: true
+              ignoreRevs: false
             })
 
             if (response.statusCode !== 200) {
-              const path = createNodeBracepath(nKeys)
+              const path = createNodeBracePath(nKeys)
               await rg.post('/document/_restore', { path }, { silent: true })
 
               break
+            }
+            else {
+              await recordCompoundEvent('deleted', userId, response.body)
             }
           }
 

@@ -1,8 +1,10 @@
 import { aql } from 'arangojs'
-import db, { rg } from '../../../utils/arangoWrapper'
+import { recordCompoundEvent } from '../../../utils/rgHelpers'
 import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
 import { isNil, chain } from 'lodash'
 import { hasWriteAccess } from '../../../utils/auth/access'
+
+const { db, rg } = require('../../../utils/arangoWrapper')
 
 const MindMapsAPI = async (req, res) => {
   const { token } = req.headers
@@ -11,6 +13,8 @@ const MindMapsAPI = async (req, res) => {
     const claims = await verifyIdToken(token)
     const key = claims.uid
     const userId = `users/${key}`
+    const nodeMetas = []
+
     let mindmap, response, message
 
     switch (req.method) {
@@ -39,14 +43,23 @@ const MindMapsAPI = async (req, res) => {
 
         if (response.statusCode === 201) {
           mindmap = response.body
+          nodeMetas.push(mindmap)
 
           const access = {
             _from: `users/${key}`,
             _to: mindmap._id,
             access: 'admin'
           }
-          response = await rg.post('/document/access', access, { silent: true })
-          message = response.statusCode === 201 ? 'Mindmap created.' : response.body
+          response = await rg.post('/document/access', access)
+          if (response.statusCode === 201) {
+            message = 'Mindmap created.'
+            nodeMetas.push(response.body)
+
+            await recordCompoundEvent('created', userId, nodeMetas)
+          }
+          else {
+            message = response.body
+          }
 
           // TODO: Purge the mindmap if access couldn't be created.
         }
@@ -69,6 +82,8 @@ const MindMapsAPI = async (req, res) => {
               keepNull: false,
               ignoreRevs: false
             })
+
+          await recordCompoundEvent('updated', userId, [response.body])
 
           return res.status(response.statusCode).json(response.body)
         }
