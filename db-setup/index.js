@@ -1,6 +1,4 @@
-const tasks = []
-tasks.push(require('./001'))
-tasks.push(require('./002'))
-tasks.push(require('./003'))
+const tasks = ['./001', './002', './003']
 
-Promise.all(tasks).then(() => console.log('Finished DB setup.'))
+tasks.reduce((prev, current) => prev.then(() => require(current)), Promise.resolve())
+  .then(() => console.log('Finished DB setup.'))

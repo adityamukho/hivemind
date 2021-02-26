@@ -16,7 +16,6 @@ async function getReversedDiff (eid) {
 }
 
 async function getReversedDiffs (eids) {
-  console.log(eids)
   const query = aql`
     for e in ${commands}
     filter e._to in ${eids}
@@ -25,8 +24,6 @@ async function getReversedDiffs (eids) {
   `
   const cursor = await db.query(query)
   const cmds = await cursor.all()
-
-  console.log(cmds)
 
   return cmds.map(inverse)
 }
