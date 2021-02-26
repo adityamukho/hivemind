@@ -133,23 +133,13 @@ function insertDeleteEvents (path, mid) {
 
             const save1 = compoundEvents.save(cEvent).then(() => console.log(
               `Inserted 1 compound events for event: deleted, mid: ${mid}`))
-
-            let save2
-            if (flatEvents.length) {
-              save2 = delSubTree()
-            } else {
-              save2 = Promise.resolve()
-            }
+            const save2 = flatEvents.length ? delSubTree() : Promise.resolve()
 
             return Promise.all([save1, save2])
           })
       }
 
-      if (flatEvents.length) {
-        return delSubTree()
-      } else {
-        return Promise.resolve()
-      }
+      return flatEvents.length ? delSubTree() : Promise.resolve()
     })
 }
 
