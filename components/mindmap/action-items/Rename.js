@@ -11,11 +11,9 @@ export default function Rename({ name, mindmapkey, nameChangedCallBack }) {
 
     let [nameState, setName] = useState(name)
     const handleSubmit = async (event) => {
-        console.log("submit", event, nameState)
         event.preventDefault()
         const result = await fetcher(`/api/mindmaps/${mindmapkey}`, user.token, 'POST',
             JSON.stringify({ name: nameState }))
-        console.log({result})
         if (nameChangedCallBack) {
             nameChangedCallBack(nameState)
         }
