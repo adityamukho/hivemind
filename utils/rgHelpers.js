@@ -1,6 +1,6 @@
 const { last, map } = require('lodash')
 const { db, rg } = require('./arangoWrapper')
-const { aql } =  require('arangojs')
+const { aql } = require('arangojs')
 
 const compoundEvents = db.collection('compound_events')
 const skeletonGraph = `${process.env.ARANGO_SVC_MOUNT_POINT}_skeleton`
@@ -33,10 +33,11 @@ function createNodeBracePath (nKeys) {
   return path
 }
 
-async function recordCompoundEvent (event, userId, nodeMetas, { since, until } = {}) {
+async function recordCompoundEvent (event, userId, nodeMetas) {
   if (nodeMetas.length) {
     const svid = `${skeletonVertices}/${userId.replace('/', '.')}`
-    const evid = `${skeletonVertices}/${nodeMetas[0]._id.replace('/', '.')}`
+    const vertexMeta = nodeMetas.find(meta => ['mindmaps', 'nodes'].includes(meta._id.split('/')[0]))
+    const evid = `${skeletonVertices}/${vertexMeta._id.replace('/', '.')}`
     const query = aql`
       for v, e in outbound shortest_path
       ${svid} to ${evid}
@@ -70,9 +71,9 @@ async function recordCompoundEvent (event, userId, nodeMetas, { since, until } =
       }
 
       const path = createNodeBracePath(nKeys)
-      const response = await rg.post('/event/log',
-        { path, postFilter: `fromPairs(${JSON.stringify(revs)})[meta.id].includes(meta.rev)` },
-        { since, until, sort: 'asc' })
+      const postFilter = `event === '${event}' && fromPairs(${JSON.stringify(
+        revs)})[meta.id].includes(meta.rev)`
+      const response = await rg.post('/event/log', { path, postFilter }, { sort: 'asc' })
       const events = response.body
 
       const compoundEvent = {
@@ -87,7 +88,7 @@ async function recordCompoundEvent (event, userId, nodeMetas, { since, until } =
       return await compoundEvents.save(compoundEvent)
     }
     else {
-      return Promise.reject('Could not link nodes to mindmap.')
+      return 'Could not link nodes to mindmap.'
     }
   }
 

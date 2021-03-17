@@ -48,8 +48,6 @@ const PopperCard = ({ el, poppers, setEls }) => {
     const rootId = el.cy().nodes().id()
     setSpinnerDisplay('d-block')
 
-    // const coll = getDependents(el)
-    // const data = cy2rg(coll.map(el => pick(el.data(), 'id', '_rev', '_key')))
     const data = cy2rg([pick(el.data(), 'id', '_rev', '_key')]).nodes[0]
     const { data: result, ok } = await fetcher('/api/nodes', user.token, 'DELETE', JSON.stringify(data))
       .then(({ data, ok, status }) => {

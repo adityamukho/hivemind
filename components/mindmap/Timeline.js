@@ -25,17 +25,18 @@ export default function timeline ({ mkey }) {
   }
 
   if (data && !error) {
-    return data.ok ? <TimelineModal data={data.data}/> : null
+    return data.ok ? <Timeline data={data.data}/> : null
   }
   else {
     return <Spinner/>
   }
 }
 
-const TimelineModal = ({ data }) => {
+const Timeline = ({ data }) => {
   const timelineRef = useRef(null)
   const [modal, setModal] = useState(false)
   const [target, setTarget] = useState('timeline')
+  const [node, setNode] = useState(<Spinner/>);
 
   const toggle = () => setModal(!modal)
 
@@ -96,6 +97,7 @@ const TimelineModal = ({ data }) => {
       const { what, isCluster, item } = properties
 
       if (what === 'item' && !isCluster) {
+        setNode(<Spinner/>)
         setTarget(item)
         setModal(true)
         console.log(data[item])
@@ -111,12 +113,12 @@ const TimelineModal = ({ data }) => {
 
   return <div className={'border border-secondary rounded'}>
     <div id={'timeline'} ref={timelineRef} className={'m-1'}/>
-    <Modal isOpen={modal} toggle={toggle} style={{ minWidth: '70vw' }} fade={false}>
+    <Modal isOpen={modal} toggle={toggle} fade={false} centered={true} size={'lg'} scrollable={true}>
       <ModalHeader toggle={toggle}>
-        Event: {get(data, [target, 'event'], 'NA')}
+        <b>{node}</b> | {get(data, [target, 'event'], 'NA')} {new Date(get(data, [target, 'ctime'], Date.now() * 1000) / 1000).toLocaleString()}
       </ModalHeader>
       <ModalBody>
-        {data[target] ? <EventDetail event={data[target]}/> : null}
+        {data[target] ? <EventDetail event={data[target]} setNode={setNode}/> : null}
       </ModalBody>
       <ModalFooter>
         <Button className="ml-1" outline color="secondary" id="view">

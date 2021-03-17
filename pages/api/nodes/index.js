@@ -130,6 +130,7 @@ const NodesAPI = async (req, res) => {
           }
 
           const nKeys = {}
+          let failed = false
           for (const coll in data) {
             const nodes = data[coll]
             nKeys[coll] = []
@@ -139,18 +140,25 @@ const NodesAPI = async (req, res) => {
               ignoreRevs: false
             })
 
-            if (response.statusCode !== 200) {
+            if (response.statusCode === 200) {
+              nodeMetas.push(...response.body)
+            }
+            else {
               const path = createNodeBracePath(nKeys)
               await rg.post('/document/_restore', { path }, { silent: true })
+              failed = true
 
               break
             }
-            else {
-              await recordCompoundEvent('deleted', userId, response.body)
-            }
           }
 
-          return res.status(200).json({ message: 'Nodes deleted.' })
+          if (failed) {
+            return res.status(500).json({ message: 'Failed to delete nodes.' })
+          } else {
+            await recordCompoundEvent('deleted', userId, nodeMetas)
+
+            return res.status(200).json({ message: 'Nodes deleted.' })
+          }
         }
         else {
           return res.status(401).json({ message: 'Access Denied.' })
