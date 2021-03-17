@@ -1,9 +1,13 @@
 import { get } from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
-import { Card, CardBody, CardText, Popover, PopoverBody, PopoverHeader, Spinner } from 'reactstrap'
+import { Eye, Tag } from 'react-feather'
+import {
+  Button, Modal, ModalBody, ModalFooter, ModalHeader, Spinner
+} from 'reactstrap'
 import { Timeline as VisTimeline } from 'vis-timeline'
 import { useUser } from '../../utils/auth/useUser'
 import fetchWrapper from '../../utils/fetchWrapper'
+import EventDetail from './EventDetail'
 
 export default function timeline ({ mkey }) {
   const { user } = useUser()
@@ -21,39 +25,19 @@ export default function timeline ({ mkey }) {
   }
 
   if (data && !error) {
-    return data.ok ? <Timeline data={data.data}/> : null
+    return data.ok ? <TimelineModal data={data.data}/> : null
   }
   else {
     return <Spinner/>
   }
 }
 
-const Timeline = ({ data }) => {
+const TimelineModal = ({ data }) => {
   const timelineRef = useRef(null)
-  const [popoverOpen, setPopoverOpen] = useState(false)
+  const [modal, setModal] = useState(false)
   const [target, setTarget] = useState('timeline')
-  const [offset, setoffset] = useState(0)
 
-  const toggle = () => {
-    if (target === 'timeline') {
-      setPopoverOpen(false)
-    }
-    else {
-      setPopoverOpen(!popoverOpen)
-
-      // Popover state will toggle on next tick. So if we want a code block to run for the to-be
-      // open state, we must check for popoverOpen === false!
-      if (!popoverOpen) {
-        const timeline = timelineRef.current
-        const targetRef = document.querySelector(`[data-id="${target}"]`)
-        const boundingRect = targetRef.getBoundingClientRect()
-        const mid = boundingRect.x + boundingRect.width / 2
-        const offset = timeline.getBoundingClientRect().x - mid
-
-        setoffset(offset)
-      }
-    }
-  }
+  const toggle = () => setModal(!modal)
 
   const items = data.map((event, idx) => ({
     id: idx,
@@ -113,9 +97,11 @@ const Timeline = ({ data }) => {
 
       if (what === 'item' && !isCluster) {
         setTarget(item)
+        setModal(true)
         console.log(data[item])
       }
       else {
+        setModal(false)
         setTarget('timeline')
       }
     }))
@@ -125,64 +111,21 @@ const Timeline = ({ data }) => {
 
   return <div className={'border border-secondary rounded'}>
     <div id={'timeline'} ref={timelineRef} className={'m-1'}/>
-    <Popover target="timeline" isOpen={popoverOpen} toggle={toggle} offset={offset}
-             boundariesElement={'timeline'} placement={'top-start'}>
-      <PopoverHeader>Event: {get(data, [target, 'event'], 'NA')}</PopoverHeader>
-      <PopoverBody>
-        <Card
-          className="border-dark"
-          style={{ minWidth: '50vw', maxWidth: '90vw' }}
-        >
-          <CardBody>
-            <CardText tag="div" className="mw-100">
-              {data[target] ? <EventDetail event={data[target]}/> : null}
-            </CardText>
-          </CardBody>
-        </Card>
-      </PopoverBody>
-    </Popover>
+    <Modal isOpen={modal} toggle={toggle} style={{ minWidth: '70vw' }}>
+      <ModalHeader toggle={toggle}>
+        Event: {get(data, [target, 'event'], 'NA')}
+      </ModalHeader>
+      <ModalBody>
+        {data[target] ? <EventDetail event={data[target]}/> : null}
+      </ModalBody>
+      <ModalFooter>
+        <Button className="ml-1" outline color="secondary" id="view">
+          <Eye size={16}/> View
+        </Button>&nbsp;
+        <Button className="ml-1" outline color="secondary" id="tag">
+          <Tag size={16}/> Tag
+        </Button>
+      </ModalFooter>
+    </Modal>
   </div>
-}
-
-function getDiffURL (event) {
-  return `/api/timeline/diff?eid=${event._id}`
-}
-
-const EventDetail = ({ event }) => {
-  const { user } = useUser()
-  const { data, error } = fetchWrapper(user, getDiffURL(event))
-
-  if (error && window.notify) {
-    const options = {
-      place: 'tr',
-      message: 'Failed to fetch event details!',
-      type: 'danger',
-      autoDismiss: 7
-    }
-
-    window.notify(options)
-  }
-
-  if (data && !error) {
-    if (data.ok) {
-      return JSON.stringify(data.data, null, 2)
-      // switch (event.event) {
-      //   case 'restored':
-      //   case 'created':
-      //     return 'left: blank, right: node'
-      //
-      //   case 'deleted':
-      //     return 'left: node, right: blank'
-      //
-      //   default:
-      //     return JSON.stringify(event, null, 2)
-      // }
-    }
-    else {
-      return null
-    }
-  }
-  else {
-    return <Spinner/>
-  }
 }
