@@ -111,7 +111,7 @@ const TimelineModal = ({ data }) => {
 
   return <div className={'border border-secondary rounded'}>
     <div id={'timeline'} ref={timelineRef} className={'m-1'}/>
-    <Modal isOpen={modal} toggle={toggle} style={{ minWidth: '70vw' }}>
+    <Modal isOpen={modal} toggle={toggle} style={{ minWidth: '70vw' }} fade={false}>
       <ModalHeader toggle={toggle}>
         Event: {get(data, [target, 'event'], 'NA')}
       </ModalHeader>

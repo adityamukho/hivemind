@@ -3,24 +3,20 @@ import React, { useContext, useState } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next'
 import filterFactory, { textFilter, numberFilter } from 'react-bootstrap-table2-filter'
 import { Search } from 'react-feather'
-import { Button, Card, CardBody, CardText, Popover, PopoverBody, PopoverHeader } from 'reactstrap'
+import {
+  Button, Modal, ModalBody, ModalHeader
+} from 'reactstrap'
 import { getPath } from '../../../utils/cyHelpers'
 import GlobalContext from '../../GlobalContext'
 
 export default function search () {
   const { cyWrapper } = useContext(GlobalContext)
-  const [popoverOpen, setPopoverOpen] = useState(false)
   const [data, setData] = useState([])
-  const [offset, setOffset] = useState()
+  const [modal, setModal] = useState(false)
   const { cy, viewApi } = cyWrapper
 
   const toggle = () => {
     const { cy } = cyWrapper
-    const search = document.getElementById('search')
-    const cyContainer = document.getElementById('cy')
-    const boundingRect = search.getBoundingClientRect()
-    const mid = boundingRect.x + boundingRect.width / 2
-    const offset = cyContainer.getBoundingClientRect().x - mid
 
     setData(cy.nodes(':visible')
       .map(node => {
@@ -32,8 +28,8 @@ export default function search () {
 
         return item
       }))
-    setOffset(offset)
-    setPopoverOpen(!popoverOpen)
+
+    setModal(!modal)
   }
 
   const columns = [
@@ -72,38 +68,31 @@ export default function search () {
   }
 
   return <>
-    <Button className="ml-1" outline color="secondary" id="search">
+    <Button className="ml-1" outline color="secondary" id="search" onClick={toggle}>
       <Search size={16}/>
     </Button>
-    <Popover target="search" isOpen={popoverOpen} toggle={toggle}
-             boundariesElement={'search'} placement={'bottom-start'} offset={offset}>
-      <PopoverHeader>Search <small className="text-muted">(Jump to Node)</small></PopoverHeader>
-      <PopoverBody>
-        <Card
-          className="border-dark"
-          style={{ minWidth: '50vw', maxWidth: '90vw' }}
-        >
-          <CardBody>
-            <CardText tag="div" className="mw-100">
-              <BootstrapTable
-                bootstrap4
-                keyField="id"
-                data={data}
-                columns={columns}
-                hover
-                condensed
-                selectRow={selectRow}
-                filter={filterFactory()}
-                wrapperClasses="search"
-                defaultSorted={[
-                  { dataField: 'depth', order: 'asc' }
-                ]}
-                defaultSortDirection={'asc'}
-              />
-            </CardText>
-          </CardBody>
-        </Card>
-      </PopoverBody>
-    </Popover>
+    <Modal isOpen={modal} toggle={toggle} style={{ minWidth: '50vw', maxWidth: '90vw' }}
+           fade={false}>
+      <ModalHeader toggle={toggle}>
+        Search <small className="text-muted">(Jump to Node)</small>
+      </ModalHeader>
+      <ModalBody>
+        <BootstrapTable
+          bootstrap4
+          keyField="id"
+          data={data}
+          columns={columns}
+          hover
+          condensed
+          selectRow={selectRow}
+          filter={filterFactory()}
+          wrapperClasses="search"
+          defaultSorted={[
+            { dataField: 'depth', order: 'asc' }
+          ]}
+          defaultSortDirection={'asc'}
+        />
+      </ModalBody>
+    </Modal>
   </>
 }
