@@ -17,32 +17,6 @@ async function getReversedDiff (nid, eid, fctime, lctime) {
   return result.commands[idx]
 }
 
-async function getReversedDiffs (nids, eids, fctime, lctime) {
-  const until = lctime + 0.0001
-  const nKeys = {}
-
-  for (const nid of nids) {
-    const [coll, key] = nid.split('/')
-    if (!nKeys[coll]) {
-      nKeys[coll] = []
-    }
-    nKeys[coll].push(key)
-  }
-  const path = createNodeBracePath(nKeys)
-
-  const response = await rg.get('/event/diff',
-    { path, reverse: true, since: fctime, until })
-  const result = response.body
-  const commands = []
-
-  for (let i = 0; i < eids.length; ++i) {
-    const idx = findIndex(result[i].events, { _id: eids[i] })
-    commands.push(result[i].commands[idx])
-  }
-
-  return commands
-}
-
 const DiffAPI = async (req, res) => {
   const { token } = req.headers
 
@@ -76,11 +50,21 @@ const DiffAPI = async (req, res) => {
                 .reject(isNull)
                 .value()
               output.v2 = indexes.map(() => ({}))
-
               const filteredNids = nids.filter((nid, idx) => indexes.includes(idx))
-              const filteresEids = eids.filter((eid, idx) => indexes.includes(idx))
-              diff = await getReversedDiffs(filteredNids, filteresEids, fctime, lctime)
-              output.v1 = diff.map(d => patch(d, {}))
+
+              const nKeys = {}
+              for (const nid of filteredNids) {
+                const [coll, key] = nid.split('/')
+                if (!nKeys[coll]) {
+                  nKeys[coll] = []
+                }
+                nKeys[coll].push(key)
+              }
+              const path = createNodeBracePath(nKeys)
+
+              const timestamp = fctime - 0.0001
+              response = await rg.get('/history/show', { path, timestamp })
+              output.v1 = response.body
 
               break
 
