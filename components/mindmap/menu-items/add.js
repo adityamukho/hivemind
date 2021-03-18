@@ -56,13 +56,12 @@ const PopperCard = ({ el, poppers, setEls}) => {
   const handleSubmit = async (event) => {
     event.preventDefault()
     const rootId = el.cy().nodes().id()
+    const key = rootId.split('/')[1]
     setSpinnerDisplay('d-block')
     const { data: result, ok } = await fetcher(`/api/nodes?parentId=${el.id()}`, user.token, 'POST',
       JSON.stringify({ title }))
       .then(({ data, ok, status }) => {
         if (ok) {
-          const key = rootId.split('/')[1]
-
           return fetcher(`/api/mindmaps/${key}`, user.token)
         }
 
@@ -76,7 +75,7 @@ const PopperCard = ({ el, poppers, setEls}) => {
     if (ok) {
       const { elements } = result
       setEls(CytoscapeComponent.normalizeElements(elements))
-      mutate([`/api/timeline/events?key=${rootId}`, user.token])
+      mutate([`/api/timeline/events?key=${key}`, user.token])
 
       options.message = 'Added node!'
       options.type = 'success'

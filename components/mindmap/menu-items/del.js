@@ -46,14 +46,13 @@ const PopperCard = ({ el, poppers, setEls }) => {
   const handleSubmit = async (event) => {
     event.preventDefault()
     const rootId = el.cy().nodes().id()
+    const key = rootId.split('/')[1]
     setSpinnerDisplay('d-block')
 
     const data = cy2rg([pick(el.data(), 'id', '_rev', '_key')]).nodes[0]
     const { data: result, ok } = await fetcher('/api/nodes', user.token, 'DELETE', JSON.stringify(data))
       .then(({ data, ok, status }) => {
         if (ok) {
-          const key = rootId.split('/')[1]
-
           return fetcher(`/api/mindmaps/${key}`, user.token)
         }
 
@@ -67,7 +66,7 @@ const PopperCard = ({ el, poppers, setEls }) => {
     if (ok) {
       const { elements } = result
       setEls(CytoscapeComponent.normalizeElements(elements))
-      mutate([`/api/timeline/events?key=${rootId}`, user.token])
+      mutate([`/api/timeline/events?key=${key}`, user.token])
 
       options.message = 'Deleted node(s)!'
       options.type = 'success'
