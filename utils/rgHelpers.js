@@ -92,7 +92,7 @@ async function recordCompoundEvent (event, userId, nodeMetas) {
     }
   }
 
-  return Promise.resolve(null)
+  return null
 }
 
 module.exports = {

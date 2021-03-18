@@ -45,7 +45,6 @@ const Timeline = ({ data }) => {
     className: event.event,
     title: event.event,
     content: '',
-    // start: event.ctime * 1000
     start: event.lctime * 1000
   }))
   const margin = (items[items.length - 1].start - items[0].start) * 0.05

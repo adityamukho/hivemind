@@ -44,9 +44,10 @@ const NodesAPI = async (req, res) => {
             }
             else {
               message = response.body
-            }
 
-            // TODO: Purge the node if link couldn't be created.
+              await rg.delete('/history/purge', { path: `/n/${node._id}` },
+                { silent: true, deleteUserObjects: true })
+            }
           }
           else {
             message = response.body

@@ -59,9 +59,10 @@ const MindMapsAPI = async (req, res) => {
           }
           else {
             message = response.body
-          }
 
-          // TODO: Purge the mindmap if access couldn't be created.
+            await rg.delete('/history/purge', { path: `/n/${mindmap._id}` },
+              { silent: true, deleteUserObjects: true })
+          }
         }
         else {
           message = response.body
