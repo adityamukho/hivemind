@@ -1,31 +1,46 @@
-import { aql } from 'arangojs'
 import { hasReadAccess } from '../../../utils/auth/access'
 import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
-import { inverse, patch } from 'jiff'
-import { get, chain, isNull } from 'lodash'
+import { patch } from 'jiff'
+import { chain, isNull, findIndex } from 'lodash'
+import {createNodeBracePath} from '../../../utils/rgHelpers'
 
 const { db, rg } = require('../../../utils/arangoWrapper')
-
-const commands = db.collection(`${process.env.ARANGO_SVC_MOUNT_POINT}_commands`)
 const compoundEvents = db.collection(`compound_events`)
 
-async function getReversedDiff (eid) {
-  const command = await commands.firstExample({ _to: eid })
+async function getReversedDiff (nid, eid, fctime, lctime) {
+  const until = lctime + 0.0001
+  const response = await rg.get('/event/diff',
+    { path: `/n/${nid}`, reverse: true, since: fctime, until })
+  const result = response.body[0]
+  const idx = findIndex(result.events, { _id: eid })
 
-  return inverse(command.command)
+  return result.commands[idx]
 }
 
-async function getReversedDiffs (eids) {
-  const query = aql`
-    for e in ${commands}
-    filter e._to in ${eids}
-    
-    return e.command
-  `
-  const cursor = await db.query(query)
-  const cmds = await cursor.all()
+async function getReversedDiffs (nids, eids, fctime, lctime) {
+  const until = lctime + 0.0001
+  const nKeys = {}
 
-  return cmds.map(inverse)
+  for (const nid of nids) {
+    const [coll, key] = nid.split('/')
+    if (!nKeys[coll]) {
+      nKeys[coll] = []
+    }
+    nKeys[coll].push(key)
+  }
+  const path = createNodeBracePath(nKeys)
+
+  const response = await rg.get('/event/diff',
+    { path, reverse: true, since: fctime, until })
+  const result = response.body
+  const commands = []
+
+  for (let i = 0; i < eids.length; ++i) {
+    const idx = findIndex(result[i].events, { _id: eids[i] })
+    commands.push(result[i].commands[idx])
+  }
+
+  return commands
 }
 
 const DiffAPI = async (req, res) => {
@@ -39,7 +54,7 @@ const DiffAPI = async (req, res) => {
     const { eid } = req.query
 
     const cEvent = await compoundEvents.document(eid)
-    const { mid, event, lctime: timestamp, nids, eids } = cEvent
+    const { mid, event, fctime, lctime, nids, eids } = cEvent
     if (await hasReadAccess(mid, userId)) {
       switch (req.method) {
         case 'GET':
@@ -50,7 +65,7 @@ const DiffAPI = async (req, res) => {
             case 'restored':
               output.v1 = {}
               nid = nids.find(nid => nid.startsWith('nodes/')) || mid
-              response = await rg.get('/history/show', { path: `/n/${nid}`, timestamp })
+              response = await rg.get('/history/show', { path: `/n/${nid}`, timestamp: lctime })
               output.v2 = response.body[0]
 
               break
@@ -61,17 +76,20 @@ const DiffAPI = async (req, res) => {
                 .reject(isNull)
                 .value()
               output.v2 = indexes.map(() => ({}))
-              diff = await getReversedDiffs(eids.filter((eid, idx) => indexes.includes(idx)))
+
+              const filteredNids = nids.filter((nid, idx) => indexes.includes(idx))
+              const filteresEids = eids.filter((eid, idx) => indexes.includes(idx))
+              diff = await getReversedDiffs(filteredNids, filteresEids, fctime, lctime)
               output.v1 = diff.map(d => patch(d, {}))
 
               break
 
             case 'updated':
-              nid = get(nids, [0], mid)
-              response = await rg.get('/history/show', { path: `/n/${nid}`, timestamp })
+              nid = nids[0]
+              response = await rg.get('/history/show', { path: `/n/${nid}`, timestamp: lctime })
               output.v2 = response.body[0]
 
-              diff = await getReversedDiff(eids[0])
+              diff = await getReversedDiff(nid, eids[0], fctime, lctime)
               output.v1 = patch(diff, response.body[0])
           }
 

@@ -76,7 +76,9 @@ const PopperCard = ({ el, poppers }) => {
         summary,
         content
       })
-      mutate([`/api/timeline/events?key=${el.cy().nodes().id().split('/')[1]}`, user.token])
+      const rootId = el.cy().nodes().id()
+      const key = rootId.split('/')[1]
+      mutate([`/api/timeline/events?key=${key}`, user.token])
 
       options.message = 'Updated node!'
       options.type = 'success'
