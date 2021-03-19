@@ -1,48 +1,30 @@
-import { get } from 'lodash'
+import { findIndex, get } from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
-import { Eye, Tag } from 'react-feather'
-import {
-  Button, Modal, ModalBody, ModalFooter, ModalHeader, Spinner
-} from 'reactstrap'
+import { Rewind, Tag } from 'react-feather'
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Spinner } from 'reactstrap'
 import { Timeline as VisTimeline } from 'vis-timeline'
-import { useUser } from '../../utils/auth/useUser'
-import fetchWrapper from '../../utils/fetchWrapper'
 import EventDetail from './EventDetail'
 
-export default function timeline ({ mkey }) {
-  const { user } = useUser()
-  const { data, error } = fetchWrapper(user, `/api/timeline/events?key=${mkey}`)
-
-  if (error && window.notify) {
-    const options = {
-      place: 'tr',
-      message: 'Failed to fetch timeline!',
-      type: 'danger',
-      autoDismiss: 7
-    }
-
-    window.notify(options)
-  }
-
-  if (data && !error) {
-    return data.ok ? <Timeline data={data.data}/> : null
-  }
-  else {
-    return <Spinner/>
-  }
-}
-
-const Timeline = ({ data }) => {
+const Timeline = ({ data, timestamp, jump }) => {
   const timelineRef = useRef(null)
   const [modal, setModal] = useState(false)
   const [target, setTarget] = useState('timeline')
-  const [node, setNode] = useState(<Spinner/>);
+  const [node, setNode] = useState(<Spinner/>)
 
   const toggle = () => setModal(!modal)
+  const rewind = async (cEvent) => {
+    if (cEvent) {
+      const { lctime } = cEvent
+
+      if (lctime !== timestamp) {
+        jump(lctime)
+      }
+    }
+  }
 
   const items = data.map((event, idx) => ({
     id: idx,
-    className: event.event,
+    className: event.lctime === timestamp ? 'pinned' : event.event,
     title: event.event,
     content: '',
     start: event.lctime * 1000
@@ -74,6 +56,11 @@ const Timeline = ({ data }) => {
       items,
       options
     )
+
+    if (timestamp) {
+      const idx = findIndex(data, { lctime: timestamp })
+      setTimeout(() => timeline.focus(items[idx].id), 0)
+    }
 
     timeline.on('doubleClick', (properties) => {
       const { what, item, isCluster } = properties
@@ -112,16 +99,19 @@ const Timeline = ({ data }) => {
 
   return <div className={'border border-secondary rounded'}>
     <div id={'timeline'} ref={timelineRef} className={'m-1'}/>
-    <Modal isOpen={modal} toggle={toggle} fade={false} centered={true} size={'lg'} scrollable={true}>
+    <Modal isOpen={modal} toggle={toggle} fade={false} centered={true} size={'lg'}
+           scrollable={true}>
       <ModalHeader toggle={toggle}>
-        <b>{node}</b> | {get(data, [target, 'event'], 'NA')} {new Date(get(data, [target, 'ctime'], Date.now() * 1000) / 1000).toLocaleString()}
+        <b>{node}</b> | {get(data, [target, 'event'], 'NA')} {new Date(
+        get(data, [target, 'ctime'], Date.now() * 1000) / 1000).toLocaleString()}
       </ModalHeader>
       <ModalBody>
         {data[target] ? <EventDetail event={data[target]} setNode={setNode}/> : null}
       </ModalBody>
       <ModalFooter>
-        <Button className="ml-1" outline color="secondary" id="view">
-          <Eye size={16}/> View
+        <Button className="ml-1" outline color="secondary" id="view"
+                onClick={() => rewind(data[target])}>
+          <Rewind size={16}/> Rewind
         </Button>&nbsp;
         <Button className="ml-1" outline color="secondary" id="tag">
           <Tag size={16}/> Tag
@@ -130,3 +120,5 @@ const Timeline = ({ data }) => {
     </Modal>
   </div>
 }
+
+export default Timeline

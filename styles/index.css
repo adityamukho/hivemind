@@ -94,6 +94,23 @@
     background-color: red;
 }
 
+.vis-item.pinned {
+    background-color: gold;
+    border-color: darkred;
+    box-shadow: 0 0 10px gray;
+}
+.vis-item.vis-dot.pinned {
+    border-radius: 5px;
+    border-width: 5px;
+}
+.vis-item.vis-line.pinned {
+    border-width: 3px;
+}
+.vis-item.vis-box.pinned {
+    border-radius: 0;
+    border-width: 2px;
+}
+
 .vis-item:hover {
     cursor: pointer;
 }

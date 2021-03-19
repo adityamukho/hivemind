@@ -13,7 +13,6 @@ const MindMapsAPI = async (req, res) => {
     const claims = await verifyIdToken(token)
     const key = claims.uid
     const userId = `users/${key}`
-    const nodeMetas = []
 
     let mindmap, response, message
 
@@ -43,7 +42,6 @@ const MindMapsAPI = async (req, res) => {
 
         if (response.statusCode === 201) {
           mindmap = response.body
-          nodeMetas.push(mindmap)
 
           const access = {
             _from: `users/${key}`,
@@ -53,9 +51,8 @@ const MindMapsAPI = async (req, res) => {
           response = await rg.post('/document/access', access)
           if (response.statusCode === 201) {
             message = 'Mindmap created.'
-            nodeMetas.push(response.body)
 
-            await recordCompoundEvent('created', userId, nodeMetas)
+            await recordCompoundEvent('created', userId, [mindmap])
           }
           else {
             message = response.body

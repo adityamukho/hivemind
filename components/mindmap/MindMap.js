@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Row, Col } from 'reactstrap'
 import Timeline from './Timeline'
 
-const MindMap = ({ data, setTitle }) => {
+const MindMap = ({ data, edata, setTitle, timestamp, jump }) => {
   const [renderAuth, setRenderAuth] = useState(false)
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -22,7 +22,7 @@ const MindMap = ({ data, setTitle }) => {
       </Row>
       <Row className="my-1">
         <Col>
-          <Timeline mkey={data.meta._key}/>
+          <Timeline data={edata} timestamp={timestamp} jump={jump}/>
         </Col>
       </Row>
     </>

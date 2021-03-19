@@ -9,7 +9,7 @@ import { getOptions, shouldFit } from '../../utils/cyHelpers'
 import GlobalContext from '../GlobalContext'
 import { add, del, edit, view, hide, reveal } from './menu-items'
 import style from './style'
-import {defer} from 'lodash'
+import { defer } from 'lodash'
 
 Cytoscape.use(Popper)
 Cytoscape.use(Cxtmenu)
@@ -28,7 +28,7 @@ function buildMenu (poppers, setEls, access, viewApi) {
       reveal(menu, viewApi)
     }
 
-    if (['admin', 'write'].includes(access.access)) {
+    if (access && ['admin', 'write'].includes(access.access)) {
       add(menu, poppers, setEls)
       if (!node.data('isRoot')) {
         del(menu, poppers, setEls)
@@ -47,28 +47,49 @@ function configurePlugins (cyWrapper, poppers, setEls, access) {
 
   const viewOpts = {
     highlightStyles: [
-      { node: { 'border-color': '#0b9bcd',  'border-width': 3 }, edge: {'line-color': '#0b9bcd', 'source-arrow-color': '#0b9bcd', 'target-arrow-color': '#0b9bcd', 'width' : 3} },
-      { node: { 'border-color': '#04f06a',  'border-width': 3 }, edge: {'line-color': '#04f06a', 'source-arrow-color': '#04f06a', 'target-arrow-color': '#04f06a', 'width' : 3} },
+      {
+        node: { 'border-color': '#0b9bcd', 'border-width': 3 },
+        edge: {
+          'line-color': '#0b9bcd',
+          'source-arrow-color': '#0b9bcd',
+          'target-arrow-color': '#0b9bcd',
+          'width': 3
+        }
+      },
+      {
+        node: { 'border-color': '#04f06a', 'border-width': 3 },
+        edge: {
+          'line-color': '#04f06a',
+          'source-arrow-color': '#04f06a',
+          'target-arrow-color': '#04f06a',
+          'width': 3
+        }
+      }
     ],
     selectStyles: {
-      node: {'border-color': 'white', 'border-width': 3, 'background-color': 'lightgrey'},
-      edge: {'line-color': 'white', 'source-arrow-color': 'white', 'target-arrow-color': 'white', 'width' : 3}
+      node: { 'border-color': 'white', 'border-width': 3, 'background-color': 'lightgrey' },
+      edge: {
+        'line-color': 'white',
+        'source-arrow-color': 'white',
+        'target-arrow-color': 'white',
+        'width': 3
+      }
     },
     setVisibilityOnHide: false, // whether to set visibility on hide/show
     setDisplayOnHide: true, // whether to set display on hide/show
     zoomAnimationDuration: 500, //default duration for zoom animation speed
-    neighbor: function(node){
-      return node.successors();
+    neighbor: function (node) {
+      return node.successors()
     },
     neighborSelectTime: 500
   }
   cyWrapper.viewApi = cy.viewUtilities(viewOpts)
 
-
   const cxtMenu = {
     menuRadius: minRadius + 50, // the radius of the circular menu in pixels
     selector: 'node', // elements matching this Cytoscape.js selector will trigger cxtmenus
-    commands: buildMenu(poppers, setEls, access, cyWrapper.viewApi), // function( ele ){ return [ /*...*/ ] }, // a function
+    commands: buildMenu(poppers, setEls, access, cyWrapper.viewApi), // function( ele ){ return [
+                                                                     // /*...*/ ] }, // a function
     // that returns
     // commands or a promise of commands
     fillColor: 'rgba(0, 0, 0, 0.75)', // the background colour of the menu
@@ -160,6 +181,7 @@ const Canvas = ({ elements, access }) => {
   function initCy (cy) {
     setCy(cy)
     cyWrapper.cy = cy
+    cyWrapper.setEls = setEls
 
     cy.nodes().forEach(node => {
       node.scratch('style', node.style())
