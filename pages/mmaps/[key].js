@@ -6,7 +6,7 @@ import MindMap from '../../components/mindmap/MindMap'
 import { useUser } from '../../utils/auth/useUser'
 import fetchWrapper from '../../utils/fetchWrapper'
 import { Fit, ShowAll, Search } from '../../components/mindmap/action-items'
-import { SkipBack, Rewind, FastForward, SkipForward, Zap, Tag } from 'react-feather'
+import { SkipBack, Rewind, FastForward, SkipForward, Tag, Lock, Unlock } from 'react-feather'
 import { findIndex, last } from 'lodash'
 import { mutate } from 'swr'
 
@@ -57,7 +57,6 @@ const Page = () => {
   const cEvents = gotEventData && edata.data
   const prevDisabled = !gotEventData || timestamp === cEvents[0].lctime
   const nextDisabled = !gotEventData || timestamp === last(cEvents).lctime
-  const nowDisabled = !timestamp
 
   async function jump (to) {
     if (to === 'now') {
@@ -102,8 +101,8 @@ const Page = () => {
           <h3>
             {title}
             {
-              timestamp ? <small className={'text-muted'}> @ {(new Date(
-                timestamp * 1000)).toLocaleString()}</small> : null
+              timestamp ? <>&nbsp;<small className={'text-muted'}> @ {(new Date(
+                timestamp * 1000)).toLocaleString()}</small></> : null
             }
           </h3>
         </Col>
@@ -112,7 +111,7 @@ const Page = () => {
           <Fit/>
           <Search/>
           &nbsp;&nbsp;|&nbsp;
-          <Button className="ml-1" outline color="secondary" id="tag">
+          <Button className="ml-1" outline color="secondary" id="tag" disabled={true}>
             <Tag size={16}/>
           </Button>
           <Button className="ml-1" outline color="secondary" id="first" disabled={prevDisabled}
@@ -132,9 +131,9 @@ const Page = () => {
             <SkipForward size={16}/>
           </Button>
           &nbsp;&nbsp;|&nbsp;
-          <Button className="ml-1" outline color="danger" id="now" disabled={nowDisabled}
-                  onClick={() => jump('now')}>
-            <Zap size={16}/>
+          <Button className="ml-1" outline color={timestamp ? 'secondary' : 'danger'} id="now"
+                  onClick={() => jump(timestamp ? 'now' : 'last')}>
+            {timestamp ? <Lock size={16}/> : <Unlock size={16}/>}
           </Button>
         </Col>
       </Row>

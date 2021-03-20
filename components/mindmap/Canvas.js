@@ -9,7 +9,7 @@ import { getOptions, shouldFit } from '../../utils/cyHelpers'
 import GlobalContext from '../GlobalContext'
 import { add, del, edit, view, hide, reveal } from './menu-items'
 import style from './style'
-import { defer } from 'lodash'
+import { defer, findIndex } from 'lodash'
 
 Cytoscape.use(Popper)
 Cytoscape.use(Cxtmenu)
@@ -169,7 +169,7 @@ function setHandlers (cyWrapper) {
   })
 }
 
-const Canvas = ({ elements, access }) => {
+const Canvas = ({ elements, access, timestamp, events }) => {
   const [cy, setCy] = useState()
   const [els, setEls] = useState(CytoscapeComponent.normalizeElements(elements))
   const { cyWrapper, poppers } = useContext(GlobalContext)
@@ -192,10 +192,23 @@ const Canvas = ({ elements, access }) => {
     if (cy) {
       configurePlugins(cyWrapper, poppers, setEls, access)
       setHandlers(cyWrapper)
+
+      if (timestamp) {
+        const idx = findIndex(events, { lctime: timestamp })
+
+        if (events[idx].event !== 'deleted') {
+          const node = cy.$id(events[idx].nids[0] || events[idx].mid)
+          const { viewApi } = cyWrapper
+
+          viewApi.removeHighlights(cy.elements())
+          viewApi.highlight(node)
+        }
+      }
     }
   }, [cy])
 
-  return <div className="border border-secondary rounded w-100" id="cy-container">
+  return <div className={`border border-${timestamp ? 'secondary' : 'danger'} rounded w-100`}
+              id="cy-container">
     <div className="m-1" id="cy">
       <CytoscapeComponent
         cy={initCy}

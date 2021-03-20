@@ -1,18 +1,29 @@
 import { findIndex, get } from 'lodash'
-import React, { useEffect, useRef, useState } from 'react'
-import { Rewind, Tag } from 'react-feather'
+import React, { useEffect, useRef, useState, useContext } from 'react'
+import { MapPin, Tag, Search } from 'react-feather'
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Spinner } from 'reactstrap'
 import { Timeline as VisTimeline } from 'vis-timeline'
 import EventDetail from './EventDetail'
+import GlobalContext from '../GlobalContext'
+
+const bgColors = {
+  created: 'limegreen',
+  restored: 'yellow',
+  updated: 'deepskyblue',
+  deleted: 'red'
+}
 
 const Timeline = ({ data, timestamp, jump }) => {
   const timelineRef = useRef(null)
+  const { cyWrapper: { cy, viewApi } } = useContext(GlobalContext)
   const [modal, setModal] = useState(false)
   const [target, setTarget] = useState('timeline')
   const [node, setNode] = useState(<Spinner/>)
+  const [showJump, setShowJump] = useState('d-block')
+  const [showFind, setShowFind] = useState('d-none')
 
   const toggle = () => setModal(!modal)
-  const rewind = async (cEvent) => {
+  const jumpTo = async (cEvent) => {
     if (cEvent) {
       const { lctime } = cEvent
 
@@ -20,6 +31,19 @@ const Timeline = ({ data, timestamp, jump }) => {
         jump(lctime)
       }
     }
+
+    setModal(false)
+  }
+  const find = (cEvent) => {
+    if (cEvent && cEvent.event !== 'deleted') {
+      const node = cy.$id(cEvent.nids[0])
+
+      viewApi.zoomToSelected(node)
+      viewApi.removeHighlights(cy.elements())
+      viewApi.highlight(node)
+    }
+
+    setModal(false)
   }
 
   const items = data.map((event, idx) => ({
@@ -27,7 +51,8 @@ const Timeline = ({ data, timestamp, jump }) => {
     className: event.lctime === timestamp ? 'pinned' : event.event,
     title: event.event,
     content: '',
-    start: event.lctime * 1000
+    start: event.lctime * 1000,
+    style: `background-color: ${bgColors[event.event]};`
   }))
   const margin = (items[items.length - 1].start - items[0].start) * 0.05
   const options = {
@@ -46,7 +71,8 @@ const Timeline = ({ data, timestamp, jump }) => {
     max: items[items.length - 1].start + margin,
     min: items[0].start - margin,
     selectable: false,
-    dataAttributes: ['id']
+    dataAttributes: ['id'],
+    zoomMin: 60000
   }
 
   useEffect(() => {
@@ -86,6 +112,18 @@ const Timeline = ({ data, timestamp, jump }) => {
         setNode(<Spinner/>)
         setTarget(item)
         setModal(true)
+
+        if (data[item].lctime === timestamp) {
+          setShowJump('d-none')
+
+          if (data[item].event !== 'deleted') {
+            setShowFind('d-block')
+          }
+        }
+        else {
+          setShowJump('d-block')
+          setShowFind('d-none')
+        }
         console.log(data[item])
       }
       else {
@@ -103,17 +141,21 @@ const Timeline = ({ data, timestamp, jump }) => {
            scrollable={true}>
       <ModalHeader toggle={toggle}>
         <b>{node}</b> | {get(data, [target, 'event'], 'NA')} {new Date(
-        get(data, [target, 'ctime'], Date.now() * 1000) / 1000).toLocaleString()}
+        get(data, [target, 'lctime'], Date.now() / 1000) * 1000).toLocaleString()}
       </ModalHeader>
       <ModalBody>
         {data[target] ? <EventDetail event={data[target]} setNode={setNode}/> : null}
       </ModalBody>
       <ModalFooter>
-        <Button className="ml-1" outline color="secondary" id="view"
-                onClick={() => rewind(data[target])}>
-          <Rewind size={16}/> Rewind
+        <Button className={`ml-1 ${showJump}`} outline color="secondary" id="jump"
+                onClick={() => jumpTo(data[target])}>
+          <MapPin size={16}/> Jump
         </Button>&nbsp;
-        <Button className="ml-1" outline color="secondary" id="tag">
+        <Button className={`ml-1 ${showFind}`} outline color="secondary" id="find"
+                onClick={() => find(data[target])}>
+          <Search size={16}/> Find
+        </Button>&nbsp;
+        <Button className="ml-1" outline color="secondary" id="tag" disabled={true}>
           <Tag size={16}/> Tag
         </Button>
       </ModalFooter>

@@ -57,7 +57,7 @@ function insertSaveEvents (path, mid) {
               fctime: mindmapEvent.ctime,
               lctime: mindmapEvent.ctime,
               eids: [mindmapEvent._id],
-              nids: [],
+              nids: [mindmapEvent.meta.id],
               mid,
               event: 'created'
             })

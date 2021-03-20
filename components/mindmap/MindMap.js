@@ -17,7 +17,7 @@ const MindMap = ({ data, edata, setTitle, timestamp, jump }) => {
     return <>
       <Row className="my-1">
         <Col>
-          <Canvas {...data}/>
+          <Canvas {...data} timestamp={timestamp} events={edata}/>
         </Col>
       </Row>
       <Row className="my-1">

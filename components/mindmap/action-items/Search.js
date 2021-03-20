@@ -59,6 +59,7 @@ export default function search () {
     bgColor: '#00BFFF',
     onSelect: row => {
       const node = cy.$id(row.id)
+
       viewApi.zoomToSelected(node)
       viewApi.removeHighlights(cy.elements())
       viewApi.highlight(node)
