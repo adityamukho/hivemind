@@ -10,11 +10,11 @@ const MindMap = ({ data, edata, timestamp, jump }) =>
         <Canvas data={data} timestamp={timestamp} events={edata}/>
       </Col>
     </Row>
-    {/*<Row className="my-1">*/}
-    {/*  <Col>*/}
-    {/*    <Timeline data={edata} timestamp={timestamp} jump={jump}/>*/}
-    {/*  </Col>*/}
-    {/*</Row>*/}
+    <Row className="my-1">
+      <Col>
+        <Timeline data={edata} timestamp={timestamp} jump={jump}/>
+      </Col>
+    </Row>
   </>
 
 export default MindMap

@@ -41,7 +41,7 @@ export default function add (menu, poppers, setEls) {
   })
 }
 
-const PopperCard = ({ el, poppers, setEls}) => {
+const PopperCard = ({ el, poppers}) => {
   const { user } = useUser()
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
   const [title, setTitle] = useState('')
@@ -59,27 +59,20 @@ const PopperCard = ({ el, poppers, setEls}) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    setSpinnerDisplay('d-block')
+
     const rootId = el.cy().nodes().id()
     const key = rootId.split('/')[1]
-    setSpinnerDisplay('d-block')
-    const { data: result, ok } = await fetcher(`/api/nodes?parentId=${el.id()}`, user.token, 'POST',
+    const { ok } = await fetcher(`/api/nodes?parentId=${el.id()}`, user.token, 'POST',
       JSON.stringify({ title }))
-      .then(({ data, ok, status }) => {
-        if (ok) {
-          return fetcher(`/api/mindmaps/${key}`, user.token)
-        }
-
-        return { data, ok, status }
-      })
     const options = {
       place: 'tr',
       autoDismiss: 7
     }
 
     if (ok) {
-      const { elements } = result
-      setEls(CytoscapeComponent.normalizeElements(elements))
-      mutate([`/api/timeline/events?key=${key}`, user.token])
+      mutate([`/api/timeline/events?key=${key}`, user.token], null, true)
+      mutate([`/api/mindmaps/${key}?timestamp=`, user.token], null, true)
 
       options.message = 'Added node!'
       options.type = 'success'

@@ -112,7 +112,7 @@ const EventDetail = ({ event, setNode }) => {
     else {
       ReactDOM.render(<Spinner/>, container)
     }
-  }, [data, error, event])
+  }, [data, error, event, setNode])
 
   return <div id={'diff'} ref={diffRef}/>
 }

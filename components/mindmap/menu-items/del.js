@@ -42,35 +42,27 @@ export default function del(menu, poppers, setEls) {
   })
 }
 
-const PopperCard = ({ el, poppers, setEls }) => {
+const PopperCard = ({ el, poppers}) => {
   const data = el.data()
   const { user } = useUser()
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    const rootId = el.cy().nodes().id()
-    const key = rootId.split('/')[1]
     setSpinnerDisplay('d-block')
 
+    const rootId = el.cy().nodes().id()
+    const key = rootId.split('/')[1]
     const data = cy2rg([pick(el.data(), 'id', '_rev', '_key')]).nodes[0]
-    const { data: result, ok } = await fetcher('/api/nodes', user.token, 'DELETE', JSON.stringify(data))
-      .then(({ data, ok, status }) => {
-        if (ok) {
-          return fetcher(`/api/mindmaps/${key}`, user.token)
-        }
-
-        return { data, ok, status }
-      })
+    const { ok } = await fetcher('/api/nodes', user.token, 'DELETE', JSON.stringify(data))
     const options = {
       place: 'tr',
       autoDismiss: 7
     }
 
     if (ok) {
-      const { elements } = result
-      setEls(CytoscapeComponent.normalizeElements(elements))
-      mutate([`/api/timeline/events?key=${key}`, user.token])
+      mutate([`/api/timeline/events?key=${key}`, user.token], null, true)
+      mutate([`/api/mindmaps/${key}?timestamp=`, user.token], null, true)
 
       options.message = 'Deleted node(s)!'
       options.type = 'success'

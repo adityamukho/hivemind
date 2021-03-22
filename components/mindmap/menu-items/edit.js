@@ -56,29 +56,25 @@ const PopperCard = ({ el, poppers }) => {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setSpinnerDisplay('d-block')
-    const { data: result, ok } = await fetcher(`/api/${coll}`, user.token, 'PATCH', JSON.stringify({
+
+    const rootId = el.cy().nodes().id()
+    const key = rootId.split('/')[1]
+    const { ok } = await fetcher(`/api/${coll}`, user.token, 'PATCH', JSON.stringify({
       title,
       summary,
       content,
       _id: data.id,
       _rev: data._rev
     }))
-
     const options = {
       place: 'tr',
       autoDismiss: 7
     }
 
     if (ok) {
-      el.data({
-        _rev: result._rev,
-        title,
-        summary,
-        content
-      })
-      const rootId = el.cy().nodes().id()
-      const key = rootId.split('/')[1]
-      mutate([`/api/timeline/events?key=${key}`, user.token])
+
+      mutate([`/api/timeline/events?key=${key}`, user.token], null, true)
+      mutate([`/api/mindmaps/${key}?timestamp=`, user.token], null, true)
 
       options.message = 'Updated node!'
       options.type = 'success'

@@ -1,4 +1,4 @@
-import { findIndex, get } from 'lodash'
+import { findIndex, get, find } from 'lodash'
 import React, { useEffect, useRef, useState, useContext } from 'react'
 import { MapPin, Tag, Search } from 'react-feather'
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Spinner } from 'reactstrap'
@@ -21,22 +21,20 @@ const Timeline = ({ data, timestamp, jump }) => {
   const [node, setNode] = useState(<Spinner/>)
   const [showJump, setShowJump] = useState('d-block')
   const [showFind, setShowFind] = useState('d-none')
+  const [items, setItems] = useState([])
+  const [timeline, setTimeline] = useState(null)
 
   const toggle = () => setModal(!modal)
-  const jumpTo = async (cEvent) => {
-    if (cEvent) {
-      const { lctime } = cEvent
-
-      if (lctime !== timestamp) {
-        jump(lctime)
-      }
+  const jumpTo = async (lctime) => {
+    if (lctime !== timestamp) {
+      jump(lctime)
     }
 
     setModal(false)
   }
-  const find = (cEvent) => {
-    if (cEvent && cEvent.event !== 'deleted') {
-      const node = cy.$id(cEvent.nids[0])
+  const locate = (item) => {
+    if (item && item.event !== 'deleted') {
+      const node = cy.$id(item.nid)
 
       viewApi.zoomToSelected(node)
       viewApi.removeHighlights(cy.elements())
@@ -45,114 +43,150 @@ const Timeline = ({ data, timestamp, jump }) => {
 
     setModal(false)
   }
+  const onClick = properties => {
+    const { what, isCluster, item } = properties
 
-  const items = data.map((event, idx) => ({
-    id: idx,
-    className: event.lctime === timestamp ? 'pinned' : event.event,
-    title: event.event,
-    content: '',
-    start: event.lctime * 1000,
-    style: `background-color: ${bgColors[event.event]};`
-  }))
-  const margin = (items[items.length - 1].start - items[0].start) * 0.05
-  const options = {
-    width: '100%',
-    height: '120px',
-    type: 'box',
-    stack: false,
-    horizontalScroll: false,
-    verticalScroll: false,
-    cluster: {
-      titleTemplate: '{count}',
-      maxItems: 1,
-      showStipes: true,
-      fitOnDoubleClick: true
-    },
-    max: items[items.length - 1].start + margin,
-    min: items[0].start - margin,
-    selectable: false,
-    dataAttributes: ['id'],
-    zoomMin: 60000
+    if (what === 'item' && !isCluster) {
+      setNode(<Spinner/>)
+      setTarget(item)
+      setModal(true)
+
+      if (items[item].lctime === timestamp) {
+        setShowJump('d-none')
+
+        if (items[item].event !== 'deleted') {
+          setShowFind('d-block')
+        }
+      }
+      else {
+        setShowJump('d-block')
+        setShowFind('d-none')
+      }
+    }
+    else {
+      setModal(false)
+      setTarget('timeline')
+    }
+  }
+  const onDoubleClick = function (properties) {
+    const { what, item, isCluster } = properties
+
+    switch (what) {
+      case 'background':
+        this.fit()
+
+        break
+      case 'item':
+        if (!isCluster) {
+          this.focus(item)
+        }
+
+        break
+    }
   }
 
   useEffect(() => {
-    const container = timelineRef.current
-    const timeline = new VisTimeline(
-      container,
-      items,
-      options
-    )
+    if (get(data, 'ok')) {
+      const tempItems = data.data.map((event, idx) => ({
+        id: idx,
+        className: event.lctime === timestamp ? 'pinned' : '',
+        title: event.event,
+        content: '',
+        start: event.lctime * 1000,
+        style: `background-color: ${bgColors[event.event]};`,
+        lctime: event.lctime,
+        nid: event.nids[0] || event.mid,
+        event: event.event
+      }))
 
-    if (timestamp) {
-      const idx = findIndex(data, { lctime: timestamp })
-      setTimeout(() => timeline.focus(items[idx].id), 0)
+      setItems(tempItems)
     }
+  }, [data])
 
-    timeline.on('doubleClick', (properties) => {
-      const { what, item, isCluster } = properties
-
-      switch (what) {
-        case 'background':
-          timeline.fit()
-
-          break
-        case 'item':
-          if (!isCluster) {
-            timeline.focus(item)
-          }
-
-          break
+  useEffect(() => {
+    if (items.length) {
+      const container = timelineRef.current
+      const margin = (items[items.length - 1].start - items[0].start) * 0.05
+      const options = {
+        width: '100%',
+        height: '120px',
+        type: 'box',
+        stack: false,
+        horizontalScroll: false,
+        verticalScroll: false,
+        cluster: {
+          titleTemplate: '{count}',
+          maxItems: 1,
+          showStipes: true,
+          fitOnDoubleClick: true
+        },
+        max: items[items.length - 1].start + margin,
+        min: items[0].start - margin,
+        selectable: false,
+        dataAttributes: ['id'],
+        zoomMin: 60000
       }
-    })
+      const tempTimeline = new VisTimeline(container, items, options)
 
-    timeline.on('click', (properties => {
-      const { what, isCluster, item } = properties
+      tempTimeline.on('click', onClick)
+      tempTimeline.on('doubleClick', onDoubleClick)
+      tempTimeline.fit()
 
-      if (what === 'item' && !isCluster) {
-        setNode(<Spinner/>)
-        setTarget(item)
-        setModal(true)
+      setTimeline(tempTimeline)
 
-        if (data[item].lctime === timestamp) {
-          setShowJump('d-none')
+      return () => {
+        tempTimeline.destroy()
+      }
+    }
+  }, [items])
 
-          if (data[item].event !== 'deleted') {
-            setShowFind('d-block')
-          }
+  useEffect(() => {
+    if (timeline) {
+      if (timestamp) {
+        const idx = findIndex(items, { lctime: timestamp })
+        const prevPinnedItem = find(items, { className: 'pinned' })
+
+        if (prevPinnedItem) {
+          prevPinnedItem.className = ''
         }
-        else {
-          setShowJump('d-block')
-          setShowFind('d-none')
-        }
-        console.log(data[item])
+        items[idx].className = 'pinned'
+
+        setTimeout(() => {
+          timeline.setItems(items)
+          timeline.focus(idx)
+        }, 0)
       }
       else {
-        setModal(false)
-        setTarget('timeline')
+        timeline.fit()
       }
-    }))
+    }
+  }, [timeline, timestamp])
 
-    return () => timeline.destroy()
-  }, [data, timestamp, jump])
+  useEffect(() => () => {
+    if (timeline) {
+      timeline.destroy()
+    }
+  }, [])
 
   return <div className={'border border-secondary rounded'}>
     <div id={'timeline'} ref={timelineRef} className={'m-1'}/>
     <Modal isOpen={modal} toggle={toggle} fade={false} centered={true} size={'lg'}
            scrollable={true}>
       <ModalHeader toggle={toggle}>
-        <b>{node}</b> | {get(data, [target, 'event'], 'NA')} {new Date(
-        get(data, [target, 'lctime'], Date.now() / 1000) * 1000).toLocaleString()}
+        <b>{node}</b> | {get(items, [target, 'event'], 'NA')} {new Date(
+        get(items, [target, 'start'], Date.now())).toLocaleString()}
       </ModalHeader>
       <ModalBody>
-        {data[target] ? <EventDetail event={data[target]} setNode={setNode}/> : null}
+        {data && data.data[target] ? <EventDetail event={data.data[target]}
+                                                  setNode={setNode}/> : null}
       </ModalBody>
       <ModalFooter>
         <Button className={`ml-1 ${showJump}`} outline color="secondary" id="jump"
-                onClick={() => jumpTo(data[target])}>
+                onClick={() => jumpTo(items[target].lctime)}>
           <MapPin size={16}/> Jump
         </Button>&nbsp;
         <Button className={`ml-1 ${showFind}`} outline color="secondary" id="find"
-                onClick={() => find(data[target])}>
+                onClick={() => locate(items[target])}>
           <Search size={16}/> Find
         </Button>&nbsp;
         <Button className="ml-1" outline color="secondary" id="tag" disabled={true}>

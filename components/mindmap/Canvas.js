@@ -125,9 +125,9 @@ const Canvas = ({ data, timestamp, events }) => {
       }
 
       if (access && ['admin', 'write'].includes(access.access)) {
-        add(menu, poppers, setEls)
+        add(menu, poppers)
         if (!node.data('isRoot')) {
-          del(menu, poppers, setEls)
+          del(menu, poppers)
         }
         edit(menu, poppers)
       }

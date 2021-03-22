@@ -18,19 +18,23 @@ const Page = () => {
     (new URLSearchParams(location.search)).get('timestamp')))
   const { data, error } = fetchWrapper(user ? user : null,
     `/api/mindmaps/${key}?timestamp=${timestamp || ''}`)
-  const { data: edata, error: eerror } = fetchWrapper(user, `/api/timeline/events?key=${key}`)
+  const { data: edata, error: eerror } = fetchWrapper(user ? user : null, `/api/timeline/events?key=${key}`)
   const [title, setTitle] = useState(key)
 
   useEffect(() => {
     if (user) {
-      // console.log({ page: { user, timestamp } })
-      mutate([`/api/mindmaps/${key}?timestamp=${timestamp || ''}`, user.token], {}, true)
+      mutate([`/api/mindmaps/${key}?timestamp=${timestamp || ''}`, user.token], null, true)
     }
   }, [user, timestamp])
 
   useEffect(() => {
+    if (user) {
+      mutate([`/api/timeline/events?key=${key}`, user.token], null, true)
+    }
+  }, [user])
+
+  useEffect(() => {
     if (data && data.ok) {
-      // console.log({ page: { data } })
       setTitle(data.data.meta.name)
     }
   }, [data])
