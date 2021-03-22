@@ -43,47 +43,6 @@ const Timeline = ({ data, timestamp, jump }) => {
 
     setModal(false)
   }
-  const onClick = properties => {
-    const { what, isCluster, item } = properties
-
-    if (what === 'item' && !isCluster) {
-      setNode(<Spinner/>)
-      setTarget(item)
-      setModal(true)
-
-      if (items[item].lctime === timestamp) {
-        setShowJump('d-none')
-
-        if (items[item].event !== 'deleted') {
-          setShowFind('d-block')
-        }
-      }
-      else {
-        setShowJump('d-block')
-        setShowFind('d-none')
-      }
-    }
-    else {
-      setModal(false)
-      setTarget('timeline')
-    }
-  }
-  const onDoubleClick = function (properties) {
-    const { what, item, isCluster } = properties
-
-    switch (what) {
-      case 'background':
-        this.fit()
-
-        break
-      case 'item':
-        if (!isCluster) {
-          this.focus(item)
-        }
-
-        break
-    }
-  }
 
   useEffect(() => {
     if (get(data, 'ok')) {
@@ -128,8 +87,47 @@ const Timeline = ({ data, timestamp, jump }) => {
       }
       const tempTimeline = new VisTimeline(container, items, options)
 
-      tempTimeline.on('click', onClick)
-      tempTimeline.on('doubleClick', onDoubleClick)
+      tempTimeline.on('click', properties => {
+        const { what, isCluster, item } = properties
+
+        if (what === 'item' && !isCluster) {
+          setNode(<Spinner/>)
+          setTarget(item)
+          setModal(true)
+
+          if (items[item].className === 'pinned') {
+            setShowJump('d-none')
+
+            if (items[item].event !== 'deleted') {
+              setShowFind('d-block')
+            }
+          }
+          else {
+            setShowJump('d-block')
+            setShowFind('d-none')
+          }
+        }
+        else {
+          setModal(false)
+          setTarget('timeline')
+        }
+      })
+      tempTimeline.on('doubleClick', (properties) => {
+        const { what, item, isCluster } = properties
+
+        switch (what) {
+          case 'background':
+            this.fit()
+
+            break
+          case 'item':
+            if (!isCluster) {
+              this.focus(item)
+            }
+
+            break
+        }
+      })
       tempTimeline.fit()
 
       setTimeline(tempTimeline)
