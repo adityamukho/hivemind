@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router'
+import Error from 'next/error'
 import React, { useState, useEffect } from 'react'
 import { Button, Col, Row, Spinner } from 'reactstrap'
 import AuthPrompt from '../../components/auth/AuthPrompt'
@@ -11,21 +12,28 @@ import { findIndex, last } from 'lodash'
 import { mutate } from 'swr'
 
 const Page = () => {
-  const { key } = useRouter().query
   const { user } = useUser()
+  const { key } = useRouter().query
   const [timestamp, setTimestamp] = useState(typeof window === 'undefined' ? null : parseFloat(
     (new URLSearchParams(location.search)).get('timestamp')))
-  const { data, error, isValidating } = fetchWrapper(user && key ? user : null,
+  const { data, error } = fetchWrapper(user ? user : null,
     `/api/mindmaps/${key}?timestamp=${timestamp || ''}`)
   const { data: edata, error: eerror } = fetchWrapper(user, `/api/timeline/events?key=${key}`)
   const [title, setTitle] = useState(key)
 
-  // cDMnt, cDUpd, cWUmnt
   useEffect(() => {
-    if (user && key) {
+    if (user) {
+      // console.log({ page: { user, timestamp } })
       mutate([`/api/mindmaps/${key}?timestamp=${timestamp || ''}`, user.token], {}, true)
     }
-  }, [timestamp])
+  }, [user, timestamp])
+
+  useEffect(() => {
+    if (data && data.ok) {
+      // console.log({ page: { data } })
+      setTitle(data.data.meta.name)
+    }
+  }, [data])
 
   if ((typeof user === 'undefined')) {
     return <Spinner/>
@@ -139,13 +147,20 @@ const Page = () => {
       </Row>
     ]
 
-    if (data && !error && gotEventData) {
+    if (error && data) {
       output.push(
         <Row key='content'>
           <Col>
-            {data.ok ? <MindMap data={data.data} edata={edata.data} setTitle={setTitle}
-                                timestamp={timestamp} jump={jump}/> : isValidating ? <Spinner/> :
-              null}
+            <Error statusCode={data.status}/>
+          </Col>
+        </Row>
+      )
+    }
+    else if (eerror && edata) {
+      output.push(
+        <Row key='content'>
+          <Col>
+            <Error statusCode={edata.status}/>
           </Col>
         </Row>
       )
@@ -154,7 +169,7 @@ const Page = () => {
       output.push(
         <Row key='content'>
           <Col>
-            <Spinner/>
+            <MindMap data={data} edata={edata} timestamp={timestamp} jump={jump}/>
           </Col>
         </Row>
       )

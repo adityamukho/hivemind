@@ -133,7 +133,7 @@ const Timeline = ({ data, timestamp, jump }) => {
     }))
 
     return () => timeline.destroy()
-  }, [data.length])
+  }, [data, timestamp, jump])
 
   return <div className={'border border-secondary rounded'}>
     <div id={'timeline'} ref={timelineRef} className={'m-1'}/>

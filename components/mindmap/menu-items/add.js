@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react'
-import CytoscapeComponent from 'react-cytoscapejs'
 import ReactDOM from 'react-dom'
 import { Plus } from 'react-feather'
 import { Card, CardBody, CardText, CardTitle, Form, FormGroup, Input, Spinner } from 'reactstrap'
@@ -8,6 +7,11 @@ import { useUser } from '../../../utils/auth/useUser'
 import { removePopper, setPopper } from '../../../utils/cyHelpers'
 import { fetcher } from '../../../utils/fetchWrapper'
 import CloseButton from '../CloseButton'
+
+let CytoscapeComponent
+if (typeof window !== 'undefined') {
+  CytoscapeComponent = require('react-cytoscapejs')
+}
 
 export default function add (menu, poppers, setEls) {
   const add = document.createElement('span')
@@ -47,7 +51,7 @@ const PopperCard = ({ el, poppers, setEls}) => {
     if (inputRef.current) {
       inputRef.current.focus()
     }
-  }, [inputRef.current])
+  }, [])
 
   const handleChange = (event) => {
     setTitle(event.target.value)

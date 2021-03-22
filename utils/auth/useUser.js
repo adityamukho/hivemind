@@ -18,7 +18,6 @@ function getUser (cancelListeners) {
 const useUser = () => {
   // TODO: Probably Hacky! Find a better way to get a per-invocation array.
   const [cancelListeners] = useState([])
-
   const { data: user, error, mutate } = useSWR('user', () => getUser(cancelListeners))
   const router = useRouter()
 

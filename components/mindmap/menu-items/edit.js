@@ -51,7 +51,7 @@ const PopperCard = ({ el, poppers }) => {
     if (inputRef.current) {
       inputRef.current.focus()
     }
-  }, [inputRef.current])
+  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault()

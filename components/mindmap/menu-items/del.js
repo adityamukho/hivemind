@@ -1,6 +1,5 @@
 import { pick } from 'lodash'
 import React, { useState } from 'react'
-import CytoscapeComponent from 'react-cytoscapejs'
 import ReactDOM from 'react-dom'
 import { Trash2, XCircle } from 'react-feather'
 import { Button, Card, CardBody, CardText, CardTitle, Col, Form, FormGroup, Row, Spinner } from 'reactstrap'
@@ -9,6 +8,11 @@ import { useUser } from '../../../utils/auth/useUser'
 import { cy2rg, removePopper, setPopper } from '../../../utils/cyHelpers'
 import { fetcher } from '../../../utils/fetchWrapper'
 import CloseButton from '../CloseButton'
+
+let CytoscapeComponent
+if (typeof window !== 'undefined') {
+  CytoscapeComponent = require('react-cytoscapejs')
+}
 
 export default function del(menu, poppers, setEls) {
   const del = document.createElement('span')
