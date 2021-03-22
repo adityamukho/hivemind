@@ -38,9 +38,7 @@ const Canvas = ({ data, timestamp, events }) => {
   function setHandlers () {
     const { viewApi } = cyWrapper
 
-    cy.on('boxend', () => {
-      defer(() => viewApi.zoomToSelected(cy.$(':selected')))
-    })
+    cy.on('boxend', throttle(() => defer(() => viewApi.zoomToSelected(cy.$(':selected')))), 1000)
 
     cy.on('mouseover', 'node', () => {
       document.getElementById('cy').style.cursor = 'pointer'

@@ -1,4 +1,4 @@
-import { findIndex, get, find } from 'lodash'
+import { findIndex, get, find, defer } from 'lodash'
 import React, { useEffect, useRef, useState, useContext } from 'react'
 import { MapPin, Tag, Search } from 'react-feather'
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Spinner } from 'reactstrap'
@@ -149,10 +149,10 @@ const Timeline = ({ data, timestamp, jump }) => {
         }
         items[idx].className = 'pinned'
 
-        setTimeout(() => {
+        defer(() => {
           timeline.setItems(items)
           timeline.focus(idx)
-        }, 0)
+        })
       }
       else {
         timeline.fit()
