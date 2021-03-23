@@ -1,11 +1,29 @@
 import useSWR from 'swr'
 
-export const fetcher = async (url, token, method = 'GET', body) => {
-  const paceHandler = () => {
-    Pace.restart()
-  }
+let count = 0
 
-  Pace.on('hide', paceHandler)
+function incrCount() {
+  ++count
+
+  if (count === 1) {
+    const spinner = document.getElementById("loading");
+    spinner.classList.remove("invisible");
+    spinner.classList.add("visible");
+  }
+}
+
+function decrCount() {
+  --count
+
+  if (count === 0) {
+    const spinner = document.getElementById("loading");
+    spinner.classList.remove("visible");
+    spinner.classList.add("invisible");
+  }
+}
+
+export const fetcher = async (url, token, method = 'GET', body) => {
+  incrCount()
 
   const response = await fetch(url, {
     method,
@@ -15,7 +33,7 @@ export const fetcher = async (url, token, method = 'GET', body) => {
   })
 
   const result = { data: await response.json(), status: response.status, ok: response.ok }
-  Pace.off('hide', paceHandler)
+  decrCount()
 
   return result
 }

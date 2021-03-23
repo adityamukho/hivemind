@@ -4,7 +4,8 @@ import React, { useContext, useState, forwardRef, useCallback } from 'react'
 import { GitHub, HelpCircle } from 'react-feather'
 import NotificationAlert from 'react-notification-alert'
 import {
-  Col, Collapse, Container, Nav, Navbar, NavbarBrand, NavbarToggler, NavLink, Row
+  Col, Collapse, Container, Nav, Navbar, NavbarBrand, NavbarText, NavbarToggler, NavLink, Row,
+  Spinner
 } from 'reactstrap'
 import GlobalContext from '../GlobalContext'
 import MainNav from './nav/MainNav'
@@ -34,7 +35,8 @@ const Layout = ({ children }) => {
   return (
     <Container fluid>
       <Head>
-        <script type="text/javascript" src='/js/pace.min.js'/>
+        <script type="text/javascript" src='/js/pace.min.js'
+                data-pace-options='{ "ajax": { trackMethods: ["GET", "POST", "PATCH", "DELETE"]} }'/>
         <title>{pageVars.title}</title>
         <link rel="apple-touch-icon" sizes="57x57" href="/img/logo/apple-icon-57x57.png"/>
         <link rel="apple-touch-icon" sizes="60x60" href="/img/logo/apple-icon-60x60.png"/>
@@ -45,7 +47,8 @@ const Layout = ({ children }) => {
         <link rel="apple-touch-icon" sizes="144x144" href="/img/logo/apple-icon-144x144.png"/>
         <link rel="apple-touch-icon" sizes="152x152" href="/img/logo/apple-icon-152x152.png"/>
         <link rel="apple-touch-icon" sizes="180x180" href="/img/logo/apple-icon-180x180.png"/>
-        <link rel="icon" type="image/png" sizes="192x192" href="/img/logo/android-icon-192x192.png"/>
+        <link rel="icon" type="image/png" sizes="192x192"
+              href="/img/logo/android-icon-192x192.png"/>
         <link rel="icon" type="image/png" sizes="32x32" href="/img/logo/favicon-32x32.png"/>
         <link rel="icon" type="image/png" sizes="96x96" href="/img/logo/favicon-96x96.png"/>
         <link rel="icon" type="image/png" sizes="16x16" href="/img/logo/favicon-16x16.png"/>
@@ -64,6 +67,9 @@ const Layout = ({ children }) => {
         <Collapse isOpen={isOpen} navbar>
           <MainNav/>
           <Nav className="ml-auto" navbar>
+            <NavbarText>
+              <Spinner type="grow" color="dark" id={'loading'} className={'invisible mx-2'}/>
+            </NavbarText>
             <NavItemUser/>
             <Link href={'/help'} passHref>
               <NavLink><HelpCircle/></NavLink>
