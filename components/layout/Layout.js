@@ -35,8 +35,7 @@ const Layout = ({ children }) => {
   return (
     <Container fluid>
       <Head>
-        <script type="text/javascript" src='/js/pace.min.js'
-                data-pace-options='{ "ajax": { trackMethods: ["GET", "POST", "PATCH", "DELETE"]} }'/>
+        <script type="text/javascript" src='/js/pace.min.js'/>
         <title>{pageVars.title}</title>
         <link rel="apple-touch-icon" sizes="57x57" href="/img/logo/apple-icon-57x57.png"/>
         <link rel="apple-touch-icon" sizes="60x60" href="/img/logo/apple-icon-60x60.png"/>
