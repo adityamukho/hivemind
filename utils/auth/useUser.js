@@ -1,6 +1,6 @@
 import firebase from 'firebase/app'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import '../initFirebase'
 import mapUserData from './mapUserData'
 import useSWR from 'swr'
@@ -16,8 +16,7 @@ function getUser (cancelListeners) {
 }
 
 const useUser = () => {
-  // TODO: Probably Hacky! Find a better way to get a per-invocation array.
-  const [cancelListeners] = useState([])
+  const { current: cancelListeners } = useRef([])
   const { data: user, error, mutate } = useSWR('user', () => getUser(cancelListeners))
   const router = useRouter()
 
