@@ -4,7 +4,7 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import filterFactory, { textFilter, numberFilter } from 'react-bootstrap-table2-filter'
 import { Search } from 'react-feather'
 import {
-  Button, Modal, ModalBody, ModalHeader
+  Button, Modal, ModalBody, ModalHeader, Card, CardBody, CardText, Popover, PopoverBody, PopoverHeader, Tooltip
 } from 'reactstrap'
 import { getPath } from '../../../utils/cyHelpers'
 import GlobalContext from '../../GlobalContext'
@@ -14,6 +14,7 @@ export default function search () {
   const [data, setData] = useState([])
   const [modal, setModal] = useState(false)
   const { cy, viewApi } = cyWrapper
+  const [tooltipOpen, setTooltipOpen] = useState(false);
 
   const toggle = () => {
     const { cy } = cyWrapper
@@ -95,5 +96,37 @@ export default function search () {
         />
       </ModalBody>
     </Modal>
+    <Tooltip placement="top" target="search"  isOpen={tooltipOpen}
+        toggle={() => setTooltipOpen(!tooltipOpen)}>Search</Tooltip>
+    <Popover target="search" isOpen={popoverOpen} toggle={toggle}
+             boundariesElement={'search'} placement={'bottom-start'} offset={offset}>
+      <PopoverHeader>Search <small className="text-muted">(Jump to Node)</small></PopoverHeader>
+      <PopoverBody>
+        <Card
+          className="border-dark"
+          style={{ minWidth: '50vw', maxWidth: '90vw' }}
+        >
+          <CardBody>
+            <CardText tag="div" className="mw-100">
+              <BootstrapTable
+                bootstrap4
+                keyField="id"
+                data={data}
+                columns={columns}
+                hover
+                condensed
+                selectRow={selectRow}
+                filter={filterFactory()}
+                wrapperClasses="search"
+                defaultSorted={[
+                  { dataField: 'depth', order: 'asc' }
+                ]}
+                defaultSortDirection={'asc'}
+              />
+            </CardText>
+          </CardBody>
+        </Card>
+      </PopoverBody>
+    </Popover>
   </>
 }
