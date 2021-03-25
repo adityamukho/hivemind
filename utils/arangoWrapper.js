@@ -1,18 +1,13 @@
 const { Database } = require('arangojs')
-const {
-  ARANGO_PROTOCOL: protocol = "http",
-  ARANGO_HOST: host,
-  ARANGO_PORT: port,
-  ARANGO_DB: databaseName,
-  ARANGO_USER: username,
-  ARANGO_PASSWORD: password,
-} = process.env;
+
+const protocol = process.env.ARANGO_PROTOCOL || "http";
 const db = new Database({
-  url: `${protocol}://${host}:${port}/`,
+  url: `${protocol}://${process.env.ARANGO_HOST}:${process.env.ARANGO_PORT}`,
   arangoVersion: 30603,
-  databaseName,
-  auth: { username, password },
+  databaseName: process.env.ARANGO_DB,
+  auth: { username: process.env.ARANGO_USER, password: process.env.ARANGO_PASSWORD },
   precaptureStackTraces: true
 })
+
 exports.db = db
 exports.rg = db.route(process.env.ARANGO_SVC_MOUNT_POINT)

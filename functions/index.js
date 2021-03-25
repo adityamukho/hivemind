@@ -1,26 +1,20 @@
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-const { Database } = require("arangojs");
+const functions = require('firebase-functions')
+const admin = require('firebase-admin')
+const { Database } = require('arangojs')
 
-admin.initializeApp();
+admin.initializeApp()
 
-const { arango } = functions.config();
-const {
-  protocol = "http",
-  host,
-  port,
-  username,
-  password,
-  databaseName,
-} = arango;
+const { arango } = functions.config()
+const {protocol = "http"} = arango;
 const db = new Database({
-  url: `${protocol}://${host}:${port}`,
+  url: `${protocol}://${arango.host}:${arango.port}`,
   arangoVersion: 30603,
-  databaseName,
-  auth: { username, password },
-  precaptureStackTraces: true,
-});
-const rg = db.route(arango.svc.mount);
+  databaseName: arango.db,
+  auth: { username: arango.user, password: arango.password },
+  precaptureStackTraces: true
+})
+const rg = db.route(arango.svc.mount)
+
 
 exports.createArangoUser = functions.auth.user().onCreate((user) => {
   const arangoUser = user.toJSON()
