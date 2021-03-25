@@ -6,7 +6,7 @@ import AuthPrompt from '../../components/auth/AuthPrompt'
 import MindMap from '../../components/mindmap/MindMap'
 import { useUser } from '../../utils/auth/useUser'
 import fetchWrapper from '../../utils/fetchWrapper'
-import { Fit, ShowAll, Search Rename} from '../../components/mindmap/action-items'
+import { Fit, ShowAll, Search, Rename} from '../../components/mindmap/action-items'
 import { SkipBack, Rewind, FastForward, SkipForward, Tag, Lock, Unlock } from 'react-feather'
 import { findIndex, last } from 'lodash'
 import { mutate } from 'swr'
@@ -119,7 +119,7 @@ const Page = () => {
           </h3>
         </Col>
         <Col xs="auto" md={4} className={'text-right'}>
-          <Rename name={title} mindmapkey={key} nameChangedCallBack={setTitle}/></Col>
+          <Rename name={title} mindmapkey={key} nameChangedCallBack={setTitle}/>
           <ShowAll/>
           <Fit/>
           <Search/>
