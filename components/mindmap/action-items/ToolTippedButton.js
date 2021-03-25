@@ -20,4 +20,4 @@ const ToolTippedButton = ({ children, tooltip, ...props }) => {
   );
 };
 
-export default ToolTippedButton
+export default ToolTippedButton;
