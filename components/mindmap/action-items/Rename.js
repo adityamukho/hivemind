@@ -1,25 +1,23 @@
-import { pick } from "lodash";
-import React, { useEffect, useState } from "react";
-import { Edit } from "react-feather";
+import React, { useEffect, useState } from 'react';
+import { Edit } from 'react-feather';
 import {
   Button,
   Form,
   Input,
   FormGroup,
-  Tooltip,
   Card,
   CardBody,
   CardText,
   Popover,
   PopoverBody,
   PopoverHeader,
-} from "reactstrap";
-import { fetcher } from "../../../utils/fetchWrapper";
-import { useUser } from "../../../utils/auth/useUser";
+} from 'reactstrap';
+import { fetcher } from '../../../utils/fetchWrapper';
+import { useUser } from '../../../utils/auth/useUser';
+import ToolTippedButton from './ToolTippedButton';
 export default function Rename({ name, mindmapkey, nameChangedCallBack }) {
   const { user } = useUser();
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const [tooltipOpen, setTooltipOpen] = useState(false);
 
   let [nameState, setName] = useState(name);
   const handleSubmit = async (event) => {
@@ -27,10 +25,10 @@ export default function Rename({ name, mindmapkey, nameChangedCallBack }) {
     const result = await fetcher(
       `/api/mindmaps`,
       user.token,
-      "PATCH",
+      'PATCH',
       JSON.stringify({
         name: nameState,
-        _id: mindmapkey
+        _id: mindmapkey,
       })
     );
     if (nameChangedCallBack) {
@@ -44,23 +42,21 @@ export default function Rename({ name, mindmapkey, nameChangedCallBack }) {
 
   return (
     <>
-      <Button className="ml-1" outline color="secondary" id="rename">
-        <Edit size={16} />
-      </Button>
-      <Tooltip
-        placement="top"
-        target="rename"
-        isOpen={tooltipOpen}
-        toggle={() => setTooltipOpen(!tooltipOpen)}
+      <ToolTippedButton
+        tooltip="Rename"
+        className="ml-1"
+        outline
+        color="secondary"
+        id="rename"
       >
-        Rename
-      </Tooltip>
+        <Edit size={16} />
+      </ToolTippedButton>
       <Popover
         target="rename"
         isOpen={popoverOpen}
         toggle={() => setPopoverOpen(!popoverOpen)}
-        boundariesElement={"rename"}
-        placement={"bottom-start"}
+        boundariesElement={'rename'}
+        placement={'bottom-start'}
       >
         <PopoverHeader>Rename</PopoverHeader>
         <PopoverBody>

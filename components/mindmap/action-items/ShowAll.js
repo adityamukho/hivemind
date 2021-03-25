@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react'
 import { Eye } from 'react-feather'
-import { Button, Tooltip } from 'reactstrap'
 import { runLayout } from '../../../utils/cyHelpers'
 import GlobalContext from '../../GlobalContext'
+import ToolTippedButton from './ToolTippedButton'
 
 function handler (cyWrapper) {
   const {cy, viewApi} = cyWrapper
@@ -15,12 +15,9 @@ function handler (cyWrapper) {
 
 export default function showAll () {
   const { cyWrapper } = useContext(GlobalContext)
-  const [tooltipOpen, setTooltipOpen] = useState(false);
   return <>
-  <Tooltip placement="top" target="showall"  isOpen={tooltipOpen}
-        toggle={() => setTooltipOpen(!tooltipOpen)}>Show All</Tooltip>
-  <Button className="ml-1" id="showall" outline color="secondary" onClick={() => handler(cyWrapper)}>
+  <ToolTippedButton tooltip="Show All" className="ml-1" id="showall" outline color="secondary" onClick={() => handler(cyWrapper)}>
     <Eye size={16}/>
-  </Button>
+  </ToolTippedButton>
   </>
 };
