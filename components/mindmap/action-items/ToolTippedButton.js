@@ -1,16 +1,21 @@
-import React, { useState } from "react";
-import { Tooltip, Button } from "reactstrap";
-const ToolTippedButton = ({ children, tooltip, ...props }) => {
+import React, { useState } from 'react';
+import { Tooltip, Button } from 'reactstrap';
+const ToolTippedButton = ({
+  children,
+  tooltip,
+  placement = 'top',
+  ...props
+}) => {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   return (
     <>
-      <span id={"bw" + props.id}>
+      <span id={'bw' + props.id}>
         <Button {...props}>{children}</Button>
       </span>
 
       <Tooltip
-        placement="top"
-        target={"bw" + props.id}
+        placement={placement}
+        target={'bw' + props.id}
         isOpen={tooltipOpen}
         toggle={() => setTooltipOpen(!tooltipOpen)}
       >
