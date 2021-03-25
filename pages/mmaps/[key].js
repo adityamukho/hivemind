@@ -119,7 +119,7 @@ const Page = () => {
           </h3>
         </Col>
         <Col xs="auto" md={4} className={'text-right'}>
-          <Rename name={title} mindmapkey={key} nameChangedCallBack={setTitle}/>
+          <Rename name={title} mindmapkey={"mindmaps/"+key} nameChangedCallBack={setTitle}/>
           <ShowAll/>
           <Fit/>
           <Search/>

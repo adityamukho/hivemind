@@ -25,10 +25,13 @@ export default function Rename({ name, mindmapkey, nameChangedCallBack }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const result = await fetcher(
-      `/api/mindmaps/${mindmapkey}`,
+      `/api/mindmaps`,
       user.token,
-      "POST",
-      JSON.stringify({ name: nameState })
+      "PATCH",
+      JSON.stringify({
+        name: nameState,
+        _id: mindmapkey
+      })
     );
     if (nameChangedCallBack) {
       nameChangedCallBack(nameState);
