@@ -3,12 +3,19 @@ const { config } = require('dotenv')
 const { Database } = require('arangojs')
 
 config({ path: resolve(process.cwd(), '.env.local') })
-
+const {
+  ARANGO_PROTOCOL: protocol = "http",
+  ARANGO_HOST: host,
+  ARANGO_PORT: port,
+  ARANGO_DB: databaseName,
+  ARANGO_USER: username,
+  ARANGO_PASSWORD: password,
+} = process.env;
 const db = new Database({
-  url: `http://${process.env.ARANGO_HOST}:${process.env.ARANGO_PORT}`,
+  url: `${protocol}://${host}:${port}/`,
   arangoVersion: 30603,
-  databaseName: process.env.ARANGO_DB,
-  auth: { username: process.env.ARANGO_USER, password: process.env.ARANGO_PASSWORD.replaceAll('\\', '') },
+  databaseName,
+  auth: { username, password: password.replaceAll('\\', '') },
   precaptureStackTraces: true
 })
 
