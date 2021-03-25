@@ -86,7 +86,6 @@ const PopperCard = ({ el, poppers}) => {
       <CardTitle
         tag="h5"
         className="mw-100 mb-4"
-        style={{ minWidth: '50vw' }}
       >
         Delete {data.title}
         <CloseButton
