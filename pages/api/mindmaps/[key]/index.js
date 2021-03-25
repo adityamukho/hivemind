@@ -5,12 +5,6 @@ import { rg2cy } from '../../../../utils/cyHelpers'
 import { chain, get } from 'lodash'
 
 const { db, rg } = require('../../../../utils/arangoWrapper')
-const updateMindMap = async (database, mindmapKey, name) => {
-  return database.query({
-    query: `UPDATE @mindmapKey WITH { name: @name } IN mindmaps`,
-    bindVars: { name, mindmapKey }
-  });
-}
 
 const MindMapAPI = async (req, res) => {
   const { token } = req.headers
@@ -112,15 +106,8 @@ const MindMapAPI = async (req, res) => {
 
           return res.status(200).json(result)
         }
-      case 'POST':
-        const { name } = req.body
-        if (!name || 0 === name.length) {
-          return res.status(400).json({"message": "name is required"})
-        }
-        await updateMindMap(db, key, name)
-        return res.status(200).json({"message": "updated"})
       default:
-      return res.status(401).json({ message: 'Access Denied.' })
+      return res.status(405).json({ message: 'Method Not Allowed' })
     }
   }
   catch (error) {
