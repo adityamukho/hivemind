@@ -18,19 +18,20 @@ export default function Rename ({
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
   const [name, setName] = useState()
+  const [rev, setRev] = useState()
 
   const handleSubmit = async event => {
     event.preventDefault()
     setSpinnerDisplay('d-block')
 
-    const { data: result, ok } = await fetcher(
+    const { data: result, ok, status } = await fetcher(
       `/api/mindmaps`,
       user.token,
       'PATCH',
       JSON.stringify({
         name: name,
         _id: rootNode._id,
-        _rev: rootNode._rev
+        _rev: rev
       })
     )
     const options = {
@@ -39,11 +40,11 @@ export default function Rename ({
     }
 
     if (ok) {
+      setRev(result._rev)
       mutate([`/api/timeline/events?key=${rootNode._key}`, user.token], null, true)
 
       options.message = 'Renamed mindmap!'
       options.type = 'success'
-      setName('')
       setPopoverOpen(false)
 
       if (nameChangedCallBack) {
@@ -51,7 +52,7 @@ export default function Rename ({
       }
     }
     else {
-      options.message = `Failed to rename mindmap! - ${JSON.stringify(result)}`
+      options.message = `Failed to rename mindmap! - ${JSON.stringify(result ||status)}`
       options.type = 'danger'
     }
 
@@ -63,6 +64,7 @@ export default function Rename ({
 
   useEffect(() => {
     setName(rootNode.name)
+    setRev(rootNode._rev)
   }, [rootNode])
 
   return (
