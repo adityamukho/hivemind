@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { Edit3, Save } from 'react-feather'
 import {
-  Button, Card, CardBody, CardText, CardTitle, Form, FormGroup, Input, Label, Row, Spinner
+  Button, Card, CardBody, CardText, CardTitle, Col, Form, FormGroup, Input, Label, Row, Spinner
 } from 'reactstrap'
 import { mutate } from 'swr'
 import { useUser } from '../../../utils/auth/useUser'
@@ -59,21 +59,19 @@ const PopperCard = ({ el, poppers }) => {
 
     const rootId = el.cy().nodes().id()
     const key = rootId.split('/')[1]
-    const result = await fetcher(`/api/${coll}`, user.token, 'PATCH', JSON.stringify({
+    const { ok } = await fetcher(`/api/${coll}`, user.token, 'PATCH', JSON.stringify({
       title,
       summary,
       content,
       _id: data.id,
       _rev: data._rev
     }))
-    const { ok } = result
     const options = {
       place: 'tr',
       autoDismiss: 7
     }
 
     if (ok) {
-
       mutate([`/api/timeline/events?key=${key}`, user.token], null, true)
       mutate([`/api/mindmaps/${key}?timestamp=`, user.token], null, true)
 
@@ -100,6 +98,7 @@ const PopperCard = ({ el, poppers }) => {
       <CardTitle
         tag="h5"
         className="mw-100 mb-4"
+        style={{ minWidth: '50vw' }}
       >
         Edit {data.title}
         <CloseButton
@@ -126,8 +125,9 @@ const PopperCard = ({ el, poppers }) => {
                    onChange={getChangeHandler(setContent)}/>
           </FormGroup>
           <Row form>
-            <Button block={true} color="primary"><Save/> Save</Button>
-            <Spinner className={spinnerDisplay}/>
+            <Col xs={'auto'}><FormGroup><Button
+              color="primary"><Save/> Save</Button></FormGroup></Col>
+            <Col xs={'auto'}><FormGroup><Spinner className={spinnerDisplay}/></FormGroup></Col>
           </Row>
         </Form>
       </CardText>

@@ -36,9 +36,9 @@ const EventDetail = ({ event, setNode }) => {
       switch (event.event) {
         case 'updated':
           const baseText = JSON.stringify(
-            omitBy(pick(diff.v1, 'title', 'summary', 'content'), isEmpty), null, 2)
+            omitBy(pick(diff.v1, 'name', 'title', 'summary', 'content'), isEmpty), null, 2)
           const newText = JSON.stringify(
-            omitBy(pick(diff.v2, 'title', 'summary', 'content'), isEmpty), null, 2)
+            omitBy(pick(diff.v2, 'name', 'title', 'summary', 'content'), isEmpty), null, 2)
           contents = difflib.buildView({
             baseText,
             newText,

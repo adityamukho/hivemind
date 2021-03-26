@@ -1,5 +1,5 @@
 import { aql } from 'arangojs'
-import { chain, isNil } from 'lodash'
+import { chain, isNil, isEmpty } from 'lodash'
 import { hasWriteAccess } from '../../../utils/auth/access'
 import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
 import { recordCompoundEvent } from '../../../utils/rgHelpers'
@@ -68,9 +68,10 @@ const MindMapsAPI = async (req, res) => {
         return res.status(response.statusCode).json({ message })
 
       case 'PATCH':
-        if (req.body._id ===  undefined) {
-          return res.status(400).json({message: 'mindmap id is required'})
+        if (isEmpty(req.body._id)) {
+          return res.status(400).json({message: 'Mindmap id is required'})
         }
+
         if (await hasWriteAccess(req.body._id, userId)) {
           mindmap = chain(req.body)
             .pick('summary', 'content', '_rev', '_id', 'title', 'name')

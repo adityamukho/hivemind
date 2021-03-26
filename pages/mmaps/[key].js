@@ -1,4 +1,4 @@
-import { findIndex, last } from 'lodash'
+import { findIndex, get, last } from 'lodash'
 import Error from 'next/error'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
@@ -112,7 +112,7 @@ const Page = () => {
   if (user) {
     const output = [
       <Row key='title'>
-        <Col xs="auto" md={8}>
+        <Col xs="auto" md={7}>
           <h3>
             {title}
             {
@@ -121,8 +121,7 @@ const Page = () => {
             }
           </h3>
         </Col>
-        <Col xs="auto" md={4} className={'text-right'}>
-          <Rename name={title} mindmapkey={'mindmaps/' + key} nameChangedCallBack={setTitle}/>
+        <Col xs="auto" md={5} className={'text-right'}>
           <ShowAll/>
           <Fit/>
           <Search/>
@@ -133,7 +132,7 @@ const Page = () => {
             <Tag size={16}/>
           </ToolTippedButton>
           <ToolTippedButton className="ml-1" outline color="secondary" id="first"
-                            disabled={prevDisabled} tooltip="Jump to Start"
+                            disabled={prevDisabled} tooltip="First"
                             onClick={() => jump('first')}>
             <SkipBack size={16}/>
           </ToolTippedButton>
@@ -148,11 +147,13 @@ const Page = () => {
             <FastForward size={16}/>
           </ToolTippedButton>
           <ToolTippedButton className="ml-1" outline color="secondary" id="last"
-                            disabled={nextDisabled} tooltip="Jump to Last"
+                            disabled={nextDisabled} tooltip="Last"
                             onClick={() => jump('last')}>
             <SkipForward size={16}/>
           </ToolTippedButton>
           &nbsp;&nbsp;|&nbsp;
+          <Rename nameChangedCallBack={setTitle} disabled={!!timestamp}
+                  rootNode={get(data, ['data', 'meta'], {})}/>
           <ToolTippedButton className="ml-1" outline color={timestamp ? 'secondary' : 'danger'}
                             id="now" tooltip={timestamp ? 'UnLock' : 'Lock'}
                             onClick={() => jump(timestamp ? 'now' : 'last')}>
