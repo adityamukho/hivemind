@@ -1,15 +1,17 @@
-import { useRouter } from 'next/router'
+import { findIndex, last } from 'lodash'
 import Error from 'next/error'
-import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
+import { FastForward, Lock, Rewind, SkipBack, SkipForward, Tag, Unlock } from 'react-feather'
 import { Col, Row, Spinner } from 'reactstrap'
+import { mutate } from 'swr'
 import AuthPrompt from '../../components/auth/AuthPrompt'
+import {
+  Fit, Rename, Search, ShowAll, ToolTippedButton
+} from '../../components/mindmap/action-items'
 import MindMap from '../../components/mindmap/MindMap'
 import { useUser } from '../../utils/auth/useUser'
 import fetchWrapper from '../../utils/fetchWrapper'
-import { Fit, ShowAll, Search, Rename, ToolTippedButton } from '../../components/mindmap/action-items'
-import { SkipBack, Rewind, FastForward, SkipForward, Tag, Lock, Unlock } from 'react-feather'
-import { findIndex, last } from 'lodash'
-import { mutate } from 'swr'
 
 const Page = () => {
   const { user } = useUser()
@@ -18,7 +20,8 @@ const Page = () => {
     (new URLSearchParams(location.search)).get('timestamp')))
   const { data, error } = fetchWrapper(user ? user : null,
     `/api/mindmaps/${key}?timestamp=${timestamp || ''}`)
-  const { data: edata, error: eerror } = fetchWrapper(user ? user : null, `/api/timeline/events?key=${key}`)
+  const { data: edata, error: eerror } = fetchWrapper(user ? user : null,
+    `/api/timeline/events?key=${key}`)
   const [title, setTitle] = useState(key)
 
   useEffect(() => {
@@ -119,34 +122,40 @@ const Page = () => {
           </h3>
         </Col>
         <Col xs="auto" md={4} className={'text-right'}>
-          <Rename name={title} mindmapkey={"mindmaps/"+key} nameChangedCallBack={setTitle}/>
+          <Rename name={title} mindmapkey={'mindmaps/' + key} nameChangedCallBack={setTitle}/>
           <ShowAll/>
           <Fit/>
           <Search/>
           &nbsp;&nbsp;|&nbsp;
 
-          <ToolTippedButton className="ml-1" outline color="secondary" id="tag" disabled={true} tooltip="Tag" >
+          <ToolTippedButton className="ml-1" outline color="secondary" id="tag" disabled={true}
+                            tooltip="Tag">
             <Tag size={16}/>
           </ToolTippedButton>
-          <ToolTippedButton className="ml-1" outline color="secondary" id="first" disabled={prevDisabled} tooltip="Jump to Start"
-                  onClick={() => jump('first')}>
+          <ToolTippedButton className="ml-1" outline color="secondary" id="first"
+                            disabled={prevDisabled} tooltip="Jump to Start"
+                            onClick={() => jump('first')}>
             <SkipBack size={16}/>
           </ToolTippedButton>
-          <ToolTippedButton className="ml-1" outline color="secondary" id="prev" disabled={prevDisabled} tooltip="Previous"
-                  onClick={() => jump('prev')}>
+          <ToolTippedButton className="ml-1" outline color="secondary" id="prev"
+                            disabled={prevDisabled} tooltip="Previous"
+                            onClick={() => jump('prev')}>
             <Rewind size={16}/>
           </ToolTippedButton>
-          <ToolTippedButton className="ml-1" outline color="secondary" id="next" disabled={nextDisabled} tooltip="Next"
-                  onClick={() => jump('next')}>
+          <ToolTippedButton className="ml-1" outline color="secondary" id="next"
+                            disabled={nextDisabled} tooltip="Next"
+                            onClick={() => jump('next')}>
             <FastForward size={16}/>
           </ToolTippedButton>
-          <ToolTippedButton className="ml-1" outline color="secondary" id="last" disabled={nextDisabled} tooltip="Jump to Last"
-                  onClick={() => jump('last')}>
+          <ToolTippedButton className="ml-1" outline color="secondary" id="last"
+                            disabled={nextDisabled} tooltip="Jump to Last"
+                            onClick={() => jump('last')}>
             <SkipForward size={16}/>
           </ToolTippedButton>
           &nbsp;&nbsp;|&nbsp;
-          <ToolTippedButton className="ml-1" outline color={timestamp ? 'secondary' : 'danger'} id="now" tooltip={timestamp ? "UnLock": "Lock"}
-                  onClick={() => jump(timestamp ? 'now' : 'last')}>
+          <ToolTippedButton className="ml-1" outline color={timestamp ? 'secondary' : 'danger'}
+                            id="now" tooltip={timestamp ? 'UnLock' : 'Lock'}
+                            onClick={() => jump(timestamp ? 'now' : 'last')}>
             {timestamp ? <Lock size={16}/> : <Unlock size={16}/>}
           </ToolTippedButton>
         </Col>

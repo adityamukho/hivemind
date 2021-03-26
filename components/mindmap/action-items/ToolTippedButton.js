@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { Tooltip, Button } from 'reactstrap';
+import React, { useState } from 'react'
+import { Button, Tooltip } from 'reactstrap'
+
 const ToolTippedButton = ({
   children,
   tooltip,
   placement = 'top',
   ...props
 }) => {
-  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(false)
   return (
     <>
       <span id={'bw' + props.id}>
@@ -22,7 +23,7 @@ const ToolTippedButton = ({
         {tooltip}
       </Tooltip>
     </>
-  );
-};
+  )
+}
 
-export default ToolTippedButton;
+export default ToolTippedButton

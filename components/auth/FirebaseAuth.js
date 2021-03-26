@@ -1,7 +1,6 @@
 /* globals window */
-import React from 'react'
 import firebase from 'firebase/app'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import '../../utils/initFirebase'
 

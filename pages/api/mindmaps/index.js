@@ -1,8 +1,8 @@
 import { aql } from 'arangojs'
-import { recordCompoundEvent } from '../../../utils/rgHelpers'
-import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
-import { isNil, chain } from 'lodash'
+import { chain, isNil } from 'lodash'
 import { hasWriteAccess } from '../../../utils/auth/access'
+import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
+import { recordCompoundEvent } from '../../../utils/rgHelpers'
 
 const { db, rg } = require('../../../utils/arangoWrapper')
 

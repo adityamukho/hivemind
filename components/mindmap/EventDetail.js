@@ -1,10 +1,10 @@
 import difflib from 'jsdifflib'
+import { isEmpty, omitBy, pick } from 'lodash'
 import React, { useEffect, useRef } from 'react'
 import ReactDOM from 'react-dom'
 import { Spinner } from 'reactstrap'
 import { useUser } from '../../utils/auth/useUser'
 import fetchWrapper from '../../utils/fetchWrapper'
-import { pick, omitBy, isEmpty } from 'lodash'
 
 function getDiffURL (event) {
   return `/api/timeline/diff?eid=${event._id}`

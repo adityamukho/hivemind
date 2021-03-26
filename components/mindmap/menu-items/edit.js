@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { Edit3, Save } from 'react-feather'
 import {
-  Button, Card, CardBody, CardText, CardTitle, Col, Form, FormGroup, Input, Label, Row, Spinner
+  Button, Card, CardBody, CardText, CardTitle, Form, FormGroup, Input, Label, Row, Spinner
 } from 'reactstrap'
 import { mutate } from 'swr'
 import { useUser } from '../../../utils/auth/useUser'
@@ -66,7 +66,7 @@ const PopperCard = ({ el, poppers }) => {
       _id: data.id,
       _rev: data._rev
     }))
-    const { ok } = result;
+    const { ok } = result
     const options = {
       place: 'tr',
       autoDismiss: 7

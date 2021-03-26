@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Eye, ArrowDownRight } from 'react-feather'
+import { ArrowDownRight, Eye } from 'react-feather'
 import { getDependents, runLayout } from '../../../utils/cyHelpers'
 
 export default function view (menu, viewApi) {

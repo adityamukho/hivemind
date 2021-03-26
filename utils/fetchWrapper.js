@@ -2,23 +2,23 @@ import useSWR from 'swr'
 
 let count = 0
 
-function incrCount() {
+function incrCount () {
   ++count
 
   if (count === 1) {
-    const spinner = document.getElementById("loading");
-    spinner.classList.remove("invisible");
-    spinner.classList.add("visible");
+    const spinner = document.getElementById('loading')
+    spinner.classList.remove('invisible')
+    spinner.classList.add('visible')
   }
 }
 
-function decrCount() {
+function decrCount () {
   --count
 
   if (count === 0) {
-    const spinner = document.getElementById("loading");
-    spinner.classList.remove("visible");
-    spinner.classList.add("invisible");
+    const spinner = document.getElementById('loading')
+    spinner.classList.remove('visible')
+    spinner.classList.add('invisible')
   }
 }
 

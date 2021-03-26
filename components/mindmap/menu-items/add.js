@@ -41,7 +41,7 @@ export default function add (menu, poppers, setEls) {
   })
 }
 
-const PopperCard = ({ el, poppers}) => {
+const PopperCard = ({ el, poppers }) => {
   const { user } = useUser()
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
   const [title, setTitle] = useState('')
@@ -106,8 +106,10 @@ const PopperCard = ({ el, poppers}) => {
       <CardText tag="div" className="mw-100">
         <Form onSubmit={handleSubmit} inline>
           <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-            <Input type="text" name="title" id="title" placeholder="Type a title and hit ⏎" value={title}
-                   onChange={handleChange} required maxLength="50" autoComplete="off" innerRef={inputRef}/>
+            <Input type="text" name="title" id="title" placeholder="Type a title and hit ⏎"
+                   value={title}
+                   onChange={handleChange} required maxLength="50" autoComplete="off"
+                   innerRef={inputRef}/>
           </FormGroup>
           <FormGroup className={spinnerDisplay}><Spinner/></FormGroup>
         </Form>

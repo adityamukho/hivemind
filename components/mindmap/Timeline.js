@@ -1,10 +1,10 @@
-import { findIndex, get, find, defer } from 'lodash'
-import React, { useEffect, useRef, useState, useContext } from 'react'
-import { MapPin, Tag, Search } from 'react-feather'
+import { defer, find, findIndex, get } from 'lodash'
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import { MapPin, Search, Tag } from 'react-feather'
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Spinner } from 'reactstrap'
 import { Timeline as VisTimeline } from 'vis-timeline'
-import EventDetail from './EventDetail'
 import GlobalContext from '../GlobalContext'
+import EventDetail from './EventDetail'
 
 const bgColors = {
   created: 'limegreen',

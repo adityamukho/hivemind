@@ -1,44 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { Edit } from 'react-feather';
+import React, { useEffect, useState } from 'react'
+import { Edit } from 'react-feather'
 import {
-  Button,
-  Form,
-  Input,
-  FormGroup,
-  Card,
-  CardBody,
-  CardText,
-  Popover,
-  PopoverBody,
-  PopoverHeader,
-} from 'reactstrap';
-import { fetcher } from '../../../utils/fetchWrapper';
-import { useUser } from '../../../utils/auth/useUser';
-import ToolTippedButton from './ToolTippedButton';
-export default function Rename({ name, mindmapkey, nameChangedCallBack }) {
-  const { user } = useUser();
-  const [popoverOpen, setPopoverOpen] = useState(false);
+  Button, Card, CardBody, CardText, Form, FormGroup, Input, Popover, PopoverBody, PopoverHeader
+} from 'reactstrap'
+import { useUser } from '../../../utils/auth/useUser'
+import { fetcher } from '../../../utils/fetchWrapper'
+import ToolTippedButton from './ToolTippedButton'
 
-  let [nameState, setName] = useState(name);
+export default function Rename ({ name, mindmapkey, nameChangedCallBack }) {
+  const { user } = useUser()
+  const [popoverOpen, setPopoverOpen] = useState(false)
+
+  let [nameState, setName] = useState(name)
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    const result = await fetcher(
+    event.preventDefault()
+
+    await fetcher(
       `/api/mindmaps`,
       user.token,
       'PATCH',
       JSON.stringify({
         name: nameState,
-        _id: mindmapkey,
+        _id: mindmapkey
       })
-    );
+    )
+
     if (nameChangedCallBack) {
-      nameChangedCallBack(nameState);
+      nameChangedCallBack(nameState)
     }
-    setPopoverOpen(false);
-  };
+
+    setPopoverOpen(false)
+  }
   useEffect(() => {
-    setName(name);
-  }, [name]);
+    setName(name)
+  }, [name])
 
   return (
     <>
@@ -49,7 +44,7 @@ export default function Rename({ name, mindmapkey, nameChangedCallBack }) {
         color="secondary"
         id="rename"
       >
-        <Edit size={16} />
+        <Edit size={16}/>
       </ToolTippedButton>
       <Popover
         target="rename"
@@ -90,5 +85,5 @@ export default function Rename({ name, mindmapkey, nameChangedCallBack }) {
         </PopoverBody>
       </Popover>
     </>
-  );
+  )
 }

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import React from 'react'
-import { NavItem, NavLink, Nav, Spinner } from 'reactstrap'
+import { Nav, NavItem, NavLink, Spinner } from 'reactstrap'
 import { useUser } from '../../../utils/auth/useUser'
 
 const navItems = {

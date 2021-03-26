@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
 import { Spinner } from 'reactstrap'
-import { useUser } from '../utils/auth/useUser'
 import FirebaseAuth from '../components/auth/FirebaseAuth'
+import { useUser } from '../utils/auth/useUser'
 
 const Page = () => {
   const { user } = useUser()

@@ -1,8 +1,7 @@
-import { map } from 'lodash'
-import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
-import { hasWriteAccess, hasDeleteAccess } from '../../../utils/auth/access'
-import { pick } from 'lodash'
 import { aql } from 'arangojs'
+import { map, pick } from 'lodash'
+import { hasDeleteAccess, hasWriteAccess } from '../../../utils/auth/access'
+import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
 import { createNodeBracePath, recordCompoundEvent } from '../../../utils/rgHelpers'
 
 const { db, rg } = require('../../../utils/arangoWrapper')
@@ -155,7 +154,8 @@ const NodesAPI = async (req, res) => {
 
           if (failed) {
             return res.status(500).json({ message: 'Failed to delete nodes.' })
-          } else {
+          }
+          else {
             await recordCompoundEvent('deleted', userId, nodeMetas)
 
             return res.status(200).json({ message: 'Nodes deleted.' })

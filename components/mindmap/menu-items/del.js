@@ -2,7 +2,9 @@ import { pick } from 'lodash'
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 import { Trash2, XCircle } from 'react-feather'
-import { Button, Card, CardBody, CardText, CardTitle, Col, Form, FormGroup, Row, Spinner } from 'reactstrap'
+import {
+  Button, Card, CardBody, CardText, CardTitle, Col, Form, FormGroup, Row, Spinner
+} from 'reactstrap'
 import { mutate } from 'swr'
 import { useUser } from '../../../utils/auth/useUser'
 import { cy2rg, removePopper, setPopper } from '../../../utils/cyHelpers'

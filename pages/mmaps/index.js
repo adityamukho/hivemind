@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react'
 import { Plus } from 'react-feather'
-import { Button, Col, Form, FormGroup, Input, Popover, PopoverBody, PopoverHeader, Row, Spinner } from 'reactstrap'
+import {
+  Button, Col, Form, FormGroup, Input, Popover, PopoverBody, PopoverHeader, Row, Spinner
+} from 'reactstrap'
 import { mutate } from 'swr'
 import AuthPrompt from '../../components/auth/AuthPrompt'
 import MindMaps from '../../components/mindmap/MindMaps'
@@ -43,7 +45,8 @@ const Page = () => {
     const handleSubmit = async (event) => {
       event.preventDefault()
       setSpinnerDisplay('d-block')
-      const { data: result, ok } = await fetcher('/api/mindmaps', user.token, 'POST', JSON.stringify({ name }))
+      const { data: result, ok } = await fetcher('/api/mindmaps', user.token, 'POST',
+        JSON.stringify({ name }))
       const options = {
         place: 'tr',
         autoDismiss: 7
@@ -77,7 +80,8 @@ const Page = () => {
             <PopoverBody>
               <Form onSubmit={handleSubmit} inline>
                 <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                  <Input type="text" name="name" id="name" placeholder="Type a name and hit ⏎" value={name}
+                  <Input type="text" name="name" id="name" placeholder="Type a name and hit ⏎"
+                         value={name}
                          onChange={handleChange} required maxLength="20" autoComplete="off"
                          innerRef={inputRef}/>
                 </FormGroup>

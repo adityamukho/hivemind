@@ -7,7 +7,8 @@ const MindMaps = ({ data }) => {
     return <ListGroup>
       {data.map(entry =>
         <ListGroupItem key={entry.mindmap._key}>
-          <Link href='/mmaps/[id]' as={`/mmaps/${entry.mindmap._key}`}><a>{entry.mindmap.name}</a></Link>
+          <Link href='/mmaps/[id]'
+                as={`/mmaps/${entry.mindmap._key}`}><a>{entry.mindmap.name}</a></Link>
           &nbsp;
           <span className="text-muted float-right">
               <small>Access: {entry.access.access}</small>

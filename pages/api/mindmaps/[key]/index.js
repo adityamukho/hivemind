@@ -1,8 +1,8 @@
 import { aql } from 'arangojs'
+import { chain, get } from 'lodash'
 import { hasReadAccess } from '../../../../utils/auth/access'
 import { verifyIdToken } from '../../../../utils/auth/firebaseAdmin'
 import { rg2cy } from '../../../../utils/cyHelpers'
-import { chain, get } from 'lodash'
 
 const { db, rg } = require('../../../../utils/arangoWrapper')
 
@@ -106,8 +106,11 @@ const MindMapAPI = async (req, res) => {
 
           return res.status(200).json(result)
         }
+
+        return res.status(401).json({ message: 'Access Denied.' })
+
       default:
-      return res.status(405).json({ message: 'Method Not Allowed' })
+        return res.status(405).json({ message: 'Method Not Allowed' })
     }
   }
   catch (error) {

@@ -1,7 +1,7 @@
 import React from 'react'
-import { Row, Col } from 'reactstrap'
-import Timeline from './Timeline'
+import { Col, Row } from 'reactstrap'
 import Canvas from './Canvas'
+import Timeline from './Timeline'
 
 const MindMap = ({ data, edata, timestamp, jump }) =>
   <>

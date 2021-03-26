@@ -1,14 +1,12 @@
 import { pick } from 'lodash'
 import React, { useContext, useState } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next'
-import filterFactory, { textFilter, numberFilter } from 'react-bootstrap-table2-filter'
+import filterFactory, { numberFilter, textFilter } from 'react-bootstrap-table2-filter'
 import { Search } from 'react-feather'
-import {
-  Modal, ModalBody, ModalHeader
-} from 'reactstrap'
+import { Modal, ModalBody, ModalHeader } from 'reactstrap'
 import { getPath } from '../../../utils/cyHelpers'
 import GlobalContext from '../../GlobalContext'
-import ToolTippedButton from './ToolTippedButton';
+import ToolTippedButton from './ToolTippedButton'
 
 export default function search () {
   const { cyWrapper } = useContext(GlobalContext)
@@ -70,7 +68,8 @@ export default function search () {
   }
 
   return <>
-    <ToolTippedButton tooltip="Search" className="ml-1" outline color="secondary" id="search" onClick={toggle}>
+    <ToolTippedButton tooltip="Search" className="ml-1" outline color="secondary" id="search"
+                      onClick={toggle}>
       <Search size={16}/>
     </ToolTippedButton>
     <Modal isOpen={modal} toggle={toggle} style={{ minWidth: '50vw', maxWidth: '90vw' }}
@@ -96,6 +95,6 @@ export default function search () {
         />
       </ModalBody>
     </Modal>
-    
+
   </>
 }

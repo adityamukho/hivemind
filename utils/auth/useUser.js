@@ -1,9 +1,9 @@
 import firebase from 'firebase/app'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
+import useSWR from 'swr'
 import '../initFirebase'
 import mapUserData from './mapUserData'
-import useSWR from 'swr'
 
 function getUser (cancelListeners) {
   return new Promise(resolve => {

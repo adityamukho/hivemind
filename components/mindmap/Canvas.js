@@ -1,14 +1,14 @@
 import Cytoscape from 'cytoscape'
 import Cxtmenu from 'cytoscape-cxtmenu'
-import Popper from 'cytoscape-popper'
 import dagre from 'cytoscape-dagre'
+import Popper from 'cytoscape-popper'
 import viewUtilities from 'cytoscape-view-utilities'
+import { defer, findIndex, get, throttle } from 'lodash'
 import React, { useContext, useEffect, useState } from 'react'
 import { getOptions, shouldFit } from '../../utils/cyHelpers'
 import GlobalContext from '../GlobalContext'
-import { add, del, edit, view, hide, reveal } from './menu-items'
+import { add, del, edit, hide, reveal, view } from './menu-items'
 import style from './style'
-import { defer, findIndex, get, throttle } from 'lodash'
 
 let CytoscapeComponent = null
 if (typeof window !== 'undefined') {
@@ -201,9 +201,6 @@ const Canvas = ({ data, timestamp, events }) => {
       atMouse: false // draw menu at mouse position
     }
 
-    if (cyWrapper.menu) {
-      cyWrapper.menu.destroy()
-    }
     cyWrapper.menu = cy.cxtmenu(cxtMenu)
   }
 
@@ -212,6 +209,12 @@ const Canvas = ({ data, timestamp, events }) => {
       configurePlugins(data.data.access)
       setHandlers()
       setEls(CytoscapeComponent.normalizeElements(data.data.elements))
+    }
+
+    return () => {
+      if (cyWrapper.menu) {
+        cyWrapper.menu.destroy()
+      }
     }
   }, [cy, data, events])
 

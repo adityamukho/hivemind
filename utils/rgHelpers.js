@@ -36,7 +36,8 @@ function createNodeBracePath (nKeys) {
 async function recordCompoundEvent (event, userId, nodeMetas) {
   if (nodeMetas.length) {
     const svid = `${skeletonVertices}/${userId.replace('/', '.')}`
-    const vertexMeta = nodeMetas.find(meta => ['mindmaps', 'nodes'].includes(meta._id.split('/')[0]))
+    const vertexMeta = nodeMetas.find(
+      meta => ['mindmaps', 'nodes'].includes(meta._id.split('/')[0]))
     const evid = `${skeletonVertices}/${vertexMeta._id.replace('/', '.')}`
     const query = aql`
       for v, e in outbound shortest_path

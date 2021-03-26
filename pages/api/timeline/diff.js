@@ -1,8 +1,8 @@
+import { patch } from 'jiff'
+import { chain, findIndex, isNull } from 'lodash'
 import { hasReadAccess } from '../../../utils/auth/access'
 import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
-import { patch } from 'jiff'
-import { chain, isNull, findIndex } from 'lodash'
-import {createNodeBracePath} from '../../../utils/rgHelpers'
+import { createNodeBracePath } from '../../../utils/rgHelpers'
 
 const { db, rg } = require('../../../utils/arangoWrapper')
 const compoundEvents = db.collection(`compound_events`)
