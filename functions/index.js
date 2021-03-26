@@ -5,8 +5,9 @@ const { Database } = require('arangojs')
 admin.initializeApp()
 
 const { arango } = functions.config()
+const {protocol = "http"} = arango;
 const db = new Database({
-  url: `http://${arango.host}:${arango.port}`,
+  url: `${protocol}://${arango.host}:${arango.port}`,
   arangoVersion: 30603,
   databaseName: arango.db,
   auth: { username: arango.user, password: arango.password },

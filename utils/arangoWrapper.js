@@ -1,7 +1,8 @@
 const { Database } = require('arangojs')
 
+const protocol = process.env.ARANGO_PROTOCOL || "http";
 const db = new Database({
-  url: `http://${process.env.ARANGO_HOST}:${process.env.ARANGO_PORT}`,
+  url: `${protocol}://${process.env.ARANGO_HOST}:${process.env.ARANGO_PORT}`,
   arangoVersion: 30603,
   databaseName: process.env.ARANGO_DB,
   auth: { username: process.env.ARANGO_USER, password: process.env.ARANGO_PASSWORD },

@@ -42,7 +42,7 @@ const PopperCard = ({ el, poppers }) => {
 
   return <Card className="border-dark">
     <CardBody>
-      <CardTitle tag="h5" className="mw-100 mb-4" style={{ minWidth: '50vw' }}>
+      <CardTitle tag="h5" className="mw-100 mb-4">
         {data.title}&nbsp;
         <span>
           <small className="text-muted">({data.isRoot ? 'ROOT NODE' : path})</small>

@@ -1,18 +1,30 @@
-import React, { useContext } from 'react'
-import { Maximize } from 'react-feather'
-import { Button } from 'reactstrap'
-import { runLayout } from '../../../utils/cyHelpers'
-import GlobalContext from '../../GlobalContext'
-
-function handler (cyWrapper) {
-  const { cy } = cyWrapper
-  runLayout(cy)
+import React, { useContext, useState } from 'react';
+import { Maximize } from 'react-feather';
+import { runLayout } from '../../../utils/cyHelpers';
+import GlobalContext from '../../GlobalContext';
+import ToolTippedButton from './ToolTippedButton';
+function handler(cyWrapper) {
+  const { cy } = cyWrapper;
+  runLayout(cy);
 }
 
-export default function fit () {
-  const { cyWrapper } = useContext(GlobalContext)
+export default function fit() {
+  const { cyWrapper } = useContext(GlobalContext);
 
-  return <Button className="ml-1" outline color="secondary" onClick={() => handler(cyWrapper)}>
-    <Maximize size={16}/>
-  </Button>
-};
+  return (
+    <>
+      <ToolTippedButton
+        className="ml-1"
+        tooltip="Search"
+        id="fit"
+        outline
+        color="secondary"
+        placement="top"
+        tooltip="Fit On Screen"
+        onClick={() => handler(cyWrapper)}
+      >
+        <Maximize size={16} />
+      </ToolTippedButton>
+    </>
+  );
+}

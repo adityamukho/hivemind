@@ -59,13 +59,14 @@ const PopperCard = ({ el, poppers }) => {
 
     const rootId = el.cy().nodes().id()
     const key = rootId.split('/')[1]
-    const { ok } = await fetcher(`/api/${coll}`, user.token, 'PATCH', JSON.stringify({
+    const result = await fetcher(`/api/${coll}`, user.token, 'PATCH', JSON.stringify({
       title,
       summary,
       content,
       _id: data.id,
       _rev: data._rev
     }))
+    const { ok } = result;
     const options = {
       place: 'tr',
       autoDismiss: 7
@@ -99,7 +100,6 @@ const PopperCard = ({ el, poppers }) => {
       <CardTitle
         tag="h5"
         className="mw-100 mb-4"
-        style={{ minWidth: '50vw' }}
       >
         Edit {data.title}
         <CloseButton
@@ -126,8 +126,8 @@ const PopperCard = ({ el, poppers }) => {
                    onChange={getChangeHandler(setContent)}/>
           </FormGroup>
           <Row form>
-            <Col xs={'auto'}><FormGroup><Button color="primary"><Save/> Save</Button></FormGroup></Col>
-            <Col xs={'auto'}><FormGroup><Spinner className={spinnerDisplay}/></FormGroup></Col>
+            <Button block={true} color="primary"><Save/> Save</Button>
+            <Spinner className={spinnerDisplay}/>
           </Row>
         </Form>
       </CardText>

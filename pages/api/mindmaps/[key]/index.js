@@ -106,8 +106,8 @@ const MindMapAPI = async (req, res) => {
 
           return res.status(200).json(result)
         }
-
-        return res.status(401).json({ message: 'Access Denied.' })
+      default:
+      return res.status(405).json({ message: 'Method Not Allowed' })
     }
   }
   catch (error) {
