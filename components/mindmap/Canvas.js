@@ -3,9 +3,10 @@ import Cxtmenu from 'cytoscape-cxtmenu'
 import dagre from 'cytoscape-dagre'
 import Popper from 'cytoscape-popper'
 import viewUtilities from 'cytoscape-view-utilities'
-import { defer, findIndex, get, throttle } from 'lodash'
+import { defer, findIndex, get, intersectionBy, map, throttle, zipObject } from 'lodash'
 import React, { useContext, useEffect, useState } from 'react'
 import { getOptions, shouldFit } from '../../utils/cyHelpers'
+import usePrevious from '../../utils/usePrevious'
 import GlobalContext from '../GlobalContext'
 import { add, del, edit, hide, reveal, view } from './menu-items'
 import style from './style'
@@ -25,6 +26,7 @@ const Canvas = ({ data, timestamp, events }) => {
   const [els, setEls] = useState([])
   const [output, setOutput] = useState(null)
   const { cyWrapper, poppers } = useContext(GlobalContext)
+  const prevEls = usePrevious(els)
 
   function initCy (cy) {
     setCy(cy)
@@ -207,7 +209,7 @@ const Canvas = ({ data, timestamp, events }) => {
   useEffect(() => {
     if (cy && get(data, 'ok') && get(events, 'ok') && typeof window !== 'undefined') {
       configurePlugins(data.data.access)
-      setHandlers()
+      setHandlers() // events used here
       setEls(CytoscapeComponent.normalizeElements(data.data.elements))
     }
 
@@ -233,6 +235,18 @@ const Canvas = ({ data, timestamp, events }) => {
       />)
     }
   }, [els])
+
+  useEffect(() => {
+    if (cy) {
+      const commonEls = intersectionBy(prevEls, els, 'data.id')
+      const celMap = zipObject(map(commonEls, 'data.id'), commonEls)
+
+      cy.elements().filter(el => celMap[el.id()]).forEach(el => {
+        el.removeData('summary content lastUpdatedBy')
+        el.data(celMap[el.id()].data)
+      })
+    }
+  }, [cy, els])
 
   return <div className={`border border-${timestamp ? 'secondary' : 'danger'} rounded w-100`}
               id="cy-container">
