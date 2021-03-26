@@ -18,7 +18,7 @@ if (typeof window !== 'undefined') {
 
 export default function del(menu, poppers, setEls) {
   const del = document.createElement('span')
-  ReactDOM.render(<Trash2/>, del)
+  ReactDOM.render(<><Trash2/> Del</>, del)
   menu.push({
     fillColor: 'rgba(200, 0, 0, 0.75)',
     content: del.outerHTML,

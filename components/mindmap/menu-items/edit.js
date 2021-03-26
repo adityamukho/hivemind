@@ -12,7 +12,7 @@ import CloseButton from '../CloseButton'
 
 export default function edit (menu, poppers) {
   const edit = document.createElement('span')
-  ReactDOM.render(<Edit3/>, edit)
+  ReactDOM.render(<><Edit3/> Edit</>, edit)
   menu.push({
     fillColor: 'rgba(255, 165, 0, 0.75)',
     content: edit.outerHTML,
@@ -90,7 +90,6 @@ const PopperCard = ({ el, poppers }) => {
 
     removePopper(el.id(), `popper-${el.id()}`, poppers)
   }
-
   const getChangeHandler = setter => event => setter(event.target.value)
 
   return <Card className="border-dark">

@@ -15,7 +15,7 @@ if (typeof window !== 'undefined') {
 
 export default function add (menu, poppers, setEls) {
   const add = document.createElement('span')
-  ReactDOM.render(<Plus/>, add)
+  ReactDOM.render(<><Plus/> Child</>, add)
   menu.push({
     fillColor: 'rgba(0, 200, 0, 0.75)',
     content: add.outerHTML,

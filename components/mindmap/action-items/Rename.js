@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Edit, Save } from 'react-feather'
+import { Edit3, Save } from 'react-feather'
 import {
   Button, Card, CardBody, CardText, Form, FormGroup, Input, Popover, PopoverBody, PopoverHeader,
   Spinner
@@ -75,7 +75,7 @@ export default function Rename ({
         id="rename"
         disabled={disabled}
       >
-        <Edit size={16}/>
+        <Edit3 size={16}/>
       </ToolTippedButton>
       <Popover
         target="rename"

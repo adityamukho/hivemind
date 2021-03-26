@@ -5,7 +5,7 @@ import { getDependents } from '../../../utils/cyHelpers'
 
 export default function view (menu, viewApi) {
   const hide = document.createElement('span')
-  ReactDOM.render(<EyeOff/>, hide)
+  ReactDOM.render(<><EyeOff/> Hide</>, hide)
   menu.push({
     fillColor: 'rgba(0, 0, 0, 0.75)',
     content: hide.outerHTML,

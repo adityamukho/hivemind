@@ -7,7 +7,7 @@ import CloseButton from '../CloseButton'
 
 export default function view (menu, poppers) {
   const view = document.createElement('span')
-  ReactDOM.render(<Eye/>, view)
+  ReactDOM.render(<><Eye/> View</>, view)
   menu.push({
     fillColor: 'rgba(0, 0, 200, 0.75)',
     content: view.outerHTML,
