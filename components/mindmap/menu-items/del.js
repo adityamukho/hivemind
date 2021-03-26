@@ -16,7 +16,7 @@ if (typeof window !== 'undefined') {
   CytoscapeComponent = require('react-cytoscapejs')
 }
 
-export default function del(menu, poppers, setEls) {
+export default function del (menu, poppers, setEls) {
   const del = document.createElement('span')
   ReactDOM.render(<><Trash2/> Del</>, del)
   menu.push({
@@ -44,7 +44,7 @@ export default function del(menu, poppers, setEls) {
   })
 }
 
-const PopperCard = ({ el, poppers}) => {
+const PopperCard = ({ el, poppers }) => {
   const data = el.data()
   const { user } = useUser()
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
@@ -56,7 +56,8 @@ const PopperCard = ({ el, poppers}) => {
     const rootId = el.cy().nodes().id()
     const key = rootId.split('/')[1]
     const data = cy2rg([pick(el.data(), 'id', '_rev', '_key')]).nodes[0]
-    const { ok } = await fetcher('/api/nodes', user.token, 'DELETE', JSON.stringify(data))
+    const { ok, data: result, status } = await fetcher('/api/nodes', user.token, 'DELETE',
+      JSON.stringify(data))
     const options = {
       place: 'tr',
       autoDismiss: 7
@@ -70,7 +71,7 @@ const PopperCard = ({ el, poppers}) => {
       options.type = 'success'
     }
     else {
-      options.message = `Failed to delete node(s)! - ${JSON.stringify(result)}`
+      options.message = `Failed to delete node(s)! - ${JSON.stringify(result || status)}`
       options.type = 'danger'
     }
 
@@ -101,19 +102,20 @@ const PopperCard = ({ el, poppers}) => {
         <p>Are you sure? This will remove the selected node and ALL its descendants!</p>
         <Form onSubmit={handleSubmit} inline>
           <Row form>
-            <Col xs={"auto"}>
+            <Col xs={'auto'}>
               <FormGroup>
                 <Button color="danger" onClick={handleSubmit}><Trash2/> Delete</Button>
               </FormGroup>
             </Col>
-            <Col xs={"auto"}>
+            <Col xs={'auto'}>
               <FormGroup>
-                <Button color="secondary" onClick={() => removePopper(el.id(), `popper-${el.id()}`, poppers)}>
+                <Button color="secondary"
+                        onClick={() => removePopper(el.id(), `popper-${el.id()}`, poppers)}>
                   <XCircle/> Cancel
                 </Button>
               </FormGroup>
             </Col>
-            <Col xs={"auto"}><FormGroup><Spinner className={spinnerDisplay}/></FormGroup></Col>
+            <Col xs={'auto'}><FormGroup><Spinner className={spinnerDisplay}/></FormGroup></Col>
           </Row>
         </Form>
       </CardText>

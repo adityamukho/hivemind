@@ -59,13 +59,14 @@ const PopperCard = ({ el, poppers }) => {
 
     const rootId = el.cy().nodes().id()
     const key = rootId.split('/')[1]
-    const { ok } = await fetcher(`/api/${coll}`, user.token, 'PATCH', JSON.stringify({
-      title,
-      summary,
-      content,
-      _id: data.id,
-      _rev: data._rev
-    }))
+    const { ok, data: result, status } = await fetcher(`/api/${coll}`, user.token, 'PATCH',
+      JSON.stringify({
+        title,
+        summary,
+        content,
+        _id: data.id,
+        _rev: data._rev
+      }))
     const options = {
       place: 'tr',
       autoDismiss: 7
@@ -79,7 +80,7 @@ const PopperCard = ({ el, poppers }) => {
       options.type = 'success'
     }
     else {
-      options.message = `Failed to update node! - ${JSON.stringify(result)}`
+      options.message = `Failed to update node! - ${JSON.stringify(result || status)}`
       options.type = 'danger'
     }
 

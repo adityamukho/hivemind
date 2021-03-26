@@ -63,8 +63,8 @@ const PopperCard = ({ el, poppers }) => {
 
     const rootId = el.cy().nodes().id()
     const key = rootId.split('/')[1]
-    const { ok } = await fetcher(`/api/nodes?parentId=${el.id()}`, user.token, 'POST',
-      JSON.stringify({ title }))
+    const { ok, data: result, status } = await fetcher(`/api/nodes?parentId=${el.id()}`, user.token,
+      'POST', JSON.stringify({ title }))
     const options = {
       place: 'tr',
       autoDismiss: 7
@@ -78,7 +78,7 @@ const PopperCard = ({ el, poppers }) => {
       options.type = 'success'
     }
     else {
-      options.message = `Failed to add node! - ${JSON.stringify(result)}`
+      options.message = `Failed to add node! - ${JSON.stringify(result || status)}`
       options.type = 'danger'
     }
 
