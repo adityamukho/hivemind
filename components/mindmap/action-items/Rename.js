@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Edit3, Save } from 'react-feather'
 import {
   Button, Card, CardBody, CardText, Form, FormGroup, Input, Popover, PopoverBody, PopoverHeader,
@@ -19,6 +19,7 @@ export default function Rename ({
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
   const [name, setName] = useState()
   const [rev, setRev] = useState()
+  const inputRef = useRef(null)
 
   const handleSubmit = async event => {
     event.preventDefault()
@@ -67,6 +68,12 @@ export default function Rename ({
     setRev(rootNode._rev)
   }, [rootNode])
 
+  useEffect(() => {
+    if (popoverOpen && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [popoverOpen])
+
   return (
     <>
       <ToolTippedButton
@@ -101,6 +108,7 @@ export default function Rename ({
                       onChange={(e) => setName(e.target.value)}
                       autoComplete="off"
                       required
+                      innerRef={inputRef}
                     />
                     <Button
                       className="ml-1"
