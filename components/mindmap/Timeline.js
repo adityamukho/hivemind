@@ -117,12 +117,12 @@ const Timeline = ({ data, timestamp, jump }) => {
 
         switch (what) {
           case 'background':
-            this.fit()
+            tempTimeline.fit()
 
             break
           case 'item':
             if (!isCluster) {
-              this.focus(item)
+              tempTimeline.focus(item)
             }
 
             break

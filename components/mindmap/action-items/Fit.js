@@ -18,7 +18,7 @@ export default function fit () {
       outline
       color="secondary"
       placement="top"
-      tooltip="Fit On Screen"
+      tooltip="Fit On Canvas"
       onClick={() => handler(cyWrapper)}
     >
       <Maximize size={16}/>
