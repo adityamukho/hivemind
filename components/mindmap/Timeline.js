@@ -77,6 +77,10 @@ const Timeline = ({ data, timestamp, jump }) => {
         timeline.current.setItems(items)
       } else {
         const container = timelineRef.current
+        if (container.firstChild) {
+          container.removeChild(container.firstChild)
+        }
+
         const margin = (items[items.length - 1].start - items[0].start) * 0.05
         const options = {
           width: '100%',
@@ -160,7 +164,9 @@ const Timeline = ({ data, timestamp, jump }) => {
 
   return (
     <div className={'border border-secondary rounded'}>
-      <div id={'timeline'} ref={timelineRef} className={'m-1'} />
+      <div id={'timeline'} ref={timelineRef} className={'m-1'} >
+        <Spinner/>
+      </div>
       <Modal
         isOpen={modal}
         toggle={toggle}
