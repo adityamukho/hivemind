@@ -1,3 +1,4 @@
+import ToolTippedButton from "./ToolTippedButton";
 import { findIndex, get } from 'lodash'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { MapPin, Search, Tag } from 'react-feather'
@@ -205,15 +206,16 @@ const Timeline = ({ data, timestamp, jump }) => {
             <Search size={16} /> Find
           </Button>
           &nbsp;
-          <Button
+          <ToolTippedButton
             className="ml-1"
             outline
             color="secondary"
             id="tag"
             disabled={true}
+            tooltip={'Coming Soon'}
           >
             <Tag size={16} /> Tag
-          </Button>
+          </ToolTippedButton>
         </ModalFooter>
       </Modal>
     </div>

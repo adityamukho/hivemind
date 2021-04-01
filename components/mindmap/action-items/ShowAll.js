@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { Eye } from 'react-feather'
 import { runLayout } from '../../../utils/cyHelpers'
 import GlobalContext from '../../GlobalContext'
-import ToolTippedButton from './ToolTippedButton'
+import ToolTippedButton from '../ToolTippedButton'
 
 function handler (cyWrapper) {
   const { cy, viewApi } = cyWrapper

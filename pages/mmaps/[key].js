@@ -19,9 +19,9 @@ import {
   Rename,
   Search,
   ShowAll,
-  ToolTippedButton,
 } from '../../components/mindmap/action-items'
 import MindMap from '../../components/mindmap/MindMap'
+import ToolTippedButton from '../../components/mindmap/ToolTippedButton'
 import { useUser } from '../../utils/auth/useUser'
 import useFetch from '../../utils/useFetch'
 
@@ -167,7 +167,7 @@ const Page = () => {
             color="secondary"
             id="tag"
             disabled={true}
-            tooltip="Tag"
+            tooltip="Tag (Coming Soon)"
           >
             <Tag size={16} />
           </ToolTippedButton>

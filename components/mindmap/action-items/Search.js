@@ -9,7 +9,7 @@ import { Search as SearchIcon } from 'react-feather'
 import { Modal, ModalBody, ModalHeader } from 'reactstrap'
 import { getPath } from '../../../utils/cyHelpers'
 import GlobalContext from '../../GlobalContext'
-import ToolTippedButton from './ToolTippedButton'
+import ToolTippedButton from '../ToolTippedButton'
 
 export default function Search() {
   const { cyWrapper } = useContext(GlobalContext)
