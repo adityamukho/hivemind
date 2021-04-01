@@ -2,6 +2,8 @@ import Link from 'next/link'
 import React from 'react'
 import BootstrapTable from 'react-bootstrap-table-next'
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter'
+import paginationFactory from 'react-bootstrap-table2-paginator'
+import { Edit3, Eye, Key } from 'react-feather'
 // import { Trash2 } from 'react-feather'
 
 // function getOps(entry) {
@@ -17,6 +19,8 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter'
 //
 //   return output
 // }
+
+const pagination = paginationFactory()
 
 const MindMaps = ({ data }) => {
   if (data.length) {
@@ -37,6 +41,36 @@ const MindMaps = ({ data }) => {
         text: 'Access',
         sort: true,
         filter: textFilter(),
+        formatter: (cell) => {
+          let output
+          switch (cell) {
+            case 'admin':
+              output = (
+                <span className={'text-success'}>
+                  <Key /> {cell}
+                </span>
+              )
+              break
+
+            case 'write':
+              output = (
+                <span className={'text-primary'}>
+                  <Edit3 /> {cell}
+                </span>
+              )
+              break
+
+            case 'read':
+              output = (
+                <span className={'text-secondary'}>
+                  <Eye /> {cell}
+                </span>
+              )
+              break
+          }
+
+          return output
+        },
       },
       // {
       //   dataField: 'ops',
@@ -65,6 +99,7 @@ const MindMaps = ({ data }) => {
         filter={filterFactory()}
         defaultSorted={[{ dataField: 'title', order: 'asc' }]}
         defaultSortDirection={'asc'}
+        pagination={pagination}
       />
     )
   }
