@@ -3,9 +3,15 @@ import ReactDOM from 'react-dom'
 import { ArrowDownRight, Eye } from 'react-feather'
 import { getDependents, runLayout } from '../../../utils/cyHelpers'
 
-export default function view (menu, viewApi) {
+export default function view(menu, viewApi) {
   const reveal = document.createElement('span')
-  ReactDOM.render(<><Eye/><ArrowDownRight/> Reveal</>, reveal)
+  ReactDOM.render(
+    <>
+      <Eye />
+      <ArrowDownRight /> Reveal
+    </>,
+    reveal
+  )
   menu.push({
     fillColor: 'rgba(255, 255, 255, 0.75)',
     content: reveal.outerHTML,
@@ -16,6 +22,6 @@ export default function view (menu, viewApi) {
       el.scratch('showReveal', false)
       runLayout(el.cy())
     },
-    enabled: true
+    enabled: true,
   })
 }

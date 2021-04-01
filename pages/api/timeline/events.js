@@ -13,9 +13,11 @@ const EventsAPI = async (req, res) => {
     const userId = `users/${ukey}`
     const { key } = req.query
 
+    let mid
+
     switch (req.method) {
       case 'GET':
-        const mid = `mindmaps/${key}`
+        mid = `mindmaps/${key}`
 
         if (await hasReadAccess(mid, userId)) {
           const query = aql`
@@ -28,13 +30,11 @@ const EventsAPI = async (req, res) => {
           const cursor = await db.query(query)
 
           return res.status(200).json(await cursor.all())
-        }
-        else {
+        } else {
           return res.status(401).json({ message: 'Access Denied.' })
         }
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error.message, error.stack)
 
     return res.status(401).json({ message: 'Access Denied.' })

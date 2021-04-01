@@ -12,10 +12,15 @@ const Page = () => {
     if (user) {
       router.replace('/')
     }
-  }, [user])
+  }, [user, router])
 
-  return (typeof user === 'undefined') ? <Spinner/> :
-    (user ? <p>Redirecting...</p> : <FirebaseAuth/>)
+  return typeof user === 'undefined' ? (
+    <Spinner />
+  ) : user ? (
+    <p>Redirecting...</p>
+  ) : (
+    <FirebaseAuth />
+  )
 }
 
 export default Page

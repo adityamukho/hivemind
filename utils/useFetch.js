@@ -2,7 +2,7 @@ import useSWR from 'swr'
 
 let count = 0
 
-function incrCount () {
+function incrCount() {
   ++count
 
   if (count === 1) {
@@ -12,7 +12,7 @@ function incrCount () {
   }
 }
 
-function decrCount () {
+function decrCount() {
   --count
 
   if (count === 0) {
@@ -29,18 +29,20 @@ export const fetcher = async (url, token, method = 'GET', body) => {
     method,
     headers: new Headers({ 'Content-Type': 'application/json', token }),
     credentials: 'same-origin',
-    body
+    body,
   })
 
-  const result = { data: await response.json(), status: response.status, ok: response.ok }
+  const result = {
+    data: await response.json(),
+    status: response.status,
+    ok: response.ok,
+  }
   decrCount()
 
   return result
 }
 
-const fetchWrapper = (user, url) => useSWR(
-  user ? [url, user.token] : null,
-  fetcher
-)
+const useFetch = (user, url) =>
+  useSWR(user ? [url, user.token] : null, fetcher)
 
-export default fetchWrapper
+export default useFetch

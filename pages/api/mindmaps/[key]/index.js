@@ -20,22 +20,25 @@ const MindMapAPI = async (req, res) => {
 
     switch (req.method) {
       case 'GET':
-        if (timestamp && await hasReadAccess(id, userId)) {
-          const response = await rg.post('/history/traverse', {
-            edges: { access: 'outbound', links: 'outbound' }
-          }, {
-            timestamp,
-            svid: id,
-            minDepth: 0,
-            maxDepth: Number.MAX_SAFE_INTEGER,
-            uniqueVertices: 'global',
-            returnPaths: false
-          })
+        if (timestamp && (await hasReadAccess(id, userId))) {
+          const response = await rg.post(
+            '/history/traverse',
+            {
+              edges: { access: 'outbound', links: 'outbound' },
+            },
+            {
+              timestamp,
+              svid: id,
+              minDepth: 0,
+              maxDepth: Number.MAX_SAFE_INTEGER,
+              uniqueVertices: 'global',
+              returnPaths: false,
+            }
+          )
 
           mindmap = response.body
           edgeStartIdx = 0
-        }
-        else {
+        } else {
           query = aql`
             for v, e, p in 1..${Number.MAX_SAFE_INTEGER}
             any ${userId}
@@ -57,7 +60,8 @@ const MindMapAPI = async (req, res) => {
         if (get(mindmap, ['vertices', 'length'])) {
           const meta = mindmap.vertices[0]
           const access = mindmap.edges[0]
-          const vertices = [], edges = []
+          const vertices = [],
+            edges = []
 
           for (let i = 0; i < mindmap.vertices.length; i++) {
             vertices.push(mindmap.vertices[i])
@@ -67,7 +71,7 @@ const MindMapAPI = async (req, res) => {
           }
 
           const userIds = chain(vertices)
-            .flatMap(v => [v.createdBy, v.lastUpdatedBy])
+            .flatMap((v) => [v.createdBy, v.lastUpdatedBy])
             .compact()
             .uniq()
             .value()
@@ -83,7 +87,7 @@ const MindMapAPI = async (req, res) => {
           for (const v of vertices) {
             for (const field of ['createdBy', 'lastUpdatedBy']) {
               if (v[field]) {
-                const user = users.find(u => u._id === v[field])
+                const user = users.find((u) => u._id === v[field])
                 v[field] = user.displayName || user.email
               }
             }
@@ -95,13 +99,13 @@ const MindMapAPI = async (req, res) => {
             elements: rg2cy([
               {
                 type: 'vertex',
-                nodes: vertices
+                nodes: vertices,
               },
               {
                 type: 'edge',
-                nodes: edges
-              }
-            ])
+                nodes: edges,
+              },
+            ]),
           }
 
           return res.status(200).json(result)
@@ -112,8 +116,7 @@ const MindMapAPI = async (req, res) => {
       default:
         return res.status(405).json({ message: 'Method Not Allowed' })
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error.message, error.stack)
     return res.status(401).json({ message: 'Access Denied.' })
   }

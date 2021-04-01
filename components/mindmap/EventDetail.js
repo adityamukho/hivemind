@@ -4,15 +4,15 @@ import React, { useEffect, useRef } from 'react'
 import ReactDOM from 'react-dom'
 import { Spinner } from 'reactstrap'
 import { useUser } from '../../utils/auth/useUser'
-import fetchWrapper from '../../utils/fetchWrapper'
+import useFetch from 'utils/useFetch'
 
-function getDiffURL (event) {
+function getDiffURL(event) {
   return `/api/timeline/diff?eid=${event._id}`
 }
 
 const EventDetail = ({ event, setNode }) => {
   const { user } = useUser()
-  const { data, error } = fetchWrapper(user, getDiffURL(event))
+  const { data, error } = useFetch(user, getDiffURL(event))
   const diffRef = useRef(null)
 
   if (error && window.notify) {
@@ -20,7 +20,7 @@ const EventDetail = ({ event, setNode }) => {
       place: 'tr',
       message: 'Failed to fetch event details!',
       type: 'danger',
-      autoDismiss: 7
+      autoDismiss: 7,
     }
 
     window.notify(options)
@@ -31,26 +31,37 @@ const EventDetail = ({ event, setNode }) => {
 
     if (!error && data && data.ok) {
       const diff = data.data
-      let contents, node
+      let contents, node, baseText, newText
 
       switch (event.event) {
         case 'updated':
-          const baseText = JSON.stringify(
-            omitBy(pick(diff.v1, 'name', 'title', 'summary', 'content'), isEmpty), null, 2)
-          const newText = JSON.stringify(
-            omitBy(pick(diff.v2, 'name', 'title', 'summary', 'content'), isEmpty), null, 2)
+          baseText = JSON.stringify(
+            omitBy(
+              pick(diff.v1, 'name', 'title', 'summary', 'content'),
+              isEmpty
+            ),
+            null,
+            2
+          )
+          newText = JSON.stringify(
+            omitBy(
+              pick(diff.v2, 'name', 'title', 'summary', 'content'),
+              isEmpty
+            ),
+            null,
+            2
+          )
           contents = difflib.buildView({
             baseText,
             newText,
             baseTextName: 'Previous Version',
             newTextName: 'This Version',
-            inline: false
+            inline: false,
           })
 
           if (diff.v1.title !== diff.v2.title) {
             node = `${diff.v1.title} : ${diff.v2.title}`
-          }
-          else {
+          } else {
             node = diff.v1.title
           }
 
@@ -67,7 +78,7 @@ const EventDetail = ({ event, setNode }) => {
         case 'deleted':
           node = `[${diff.v1.length} item(s)]`
           contents = document.createElement('div')
-          diff.v1.forEach(d => {
+          diff.v1.forEach((d) => {
             const rows = document.createElement('div')
             rows.classNames = ['row']
 
@@ -104,17 +115,15 @@ const EventDetail = ({ event, setNode }) => {
 
       if (container.firstChild) {
         container.replaceChild(contents, container.firstChild)
-      }
-      else {
+      } else {
         container.appendChild(contents)
       }
-    }
-    else {
-      ReactDOM.render(<Spinner/>, container)
+    } else {
+      ReactDOM.render(<Spinner />, container)
     }
   }, [data, error, event, setNode])
 
-  return <div id={'diff'} ref={diffRef}/>
+  return <div id={'diff'} ref={diffRef} />
 }
 
 export default EventDetail

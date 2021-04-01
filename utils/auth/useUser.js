@@ -5,11 +5,15 @@ import useSWR from 'swr'
 import '../initFirebase'
 import mapUserData from './mapUserData'
 
-function getUser (cancelListeners) {
-  return new Promise(resolve => {
-    const cancelAuthListener = firebase.auth()
-      .onAuthStateChanged(user => user ? mapUserData(user).then(
-        userData => resolve(userData)) : resolve(null))
+function getUser(cancelListeners) {
+  return new Promise((resolve) => {
+    const cancelAuthListener = firebase
+      .auth()
+      .onAuthStateChanged((user) =>
+        user
+          ? mapUserData(user).then((userData) => resolve(userData))
+          : resolve(null)
+      )
 
     cancelListeners.push(cancelAuthListener)
   })
@@ -17,7 +21,9 @@ function getUser (cancelListeners) {
 
 const useUser = () => {
   const { current: cancelListeners } = useRef([])
-  const { data: user, error, mutate } = useSWR('user', () => getUser(cancelListeners))
+  const { data: user, error, mutate } = useSWR('user', () =>
+    getUser(cancelListeners)
+  )
   const router = useRouter()
 
   if (error && window.notify) {
@@ -25,7 +31,7 @@ const useUser = () => {
       place: 'tr',
       message: 'Failed to authenticate user!',
       type: 'danger',
-      autoDismiss: 7
+      autoDismiss: 7,
     }
 
     window.notify(options)
@@ -45,14 +51,15 @@ const useUser = () => {
   }
 
   useEffect(() => {
-    const cancelIdTokenListener = firebase.auth()
-      .onIdTokenChanged(user => mutate(mapUserData(user), false))
+    const cancelIdTokenListener = firebase
+      .auth()
+      .onIdTokenChanged((user) => mutate(mapUserData(user), false))
     cancelListeners.push(cancelIdTokenListener)
 
     return () => {
-      cancelListeners.forEach(cancelListener => cancelListener())
+      cancelListeners.forEach((cancelListener) => cancelListener())
     }
-  }, [])
+  }, [cancelListeners, mutate])
 
   return { user, logout }
 }

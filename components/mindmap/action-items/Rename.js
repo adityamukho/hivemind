@@ -1,18 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Edit3, Save } from 'react-feather'
 import {
-  Button, Card, CardBody, CardText, Form, FormGroup, Input, Popover, PopoverBody, PopoverHeader,
-  Spinner
+  Button,
+  Card,
+  CardBody,
+  CardText,
+  Form,
+  FormGroup,
+  Input,
+  Popover,
+  PopoverBody,
+  PopoverHeader,
+  Spinner,
 } from 'reactstrap'
 import { mutate } from 'swr'
 import { useUser } from '../../../utils/auth/useUser'
-import { fetcher } from '../../../utils/fetchWrapper'
+import { fetcher } from 'utils/useFetch'
 import ToolTippedButton from './ToolTippedButton'
 
-export default function Rename ({
+export default function Rename({
   rootNode,
   nameChangedCallBack,
-  disabled = false
+  disabled = false,
 }) {
   const { user } = useUser()
   const [popoverOpen, setPopoverOpen] = useState(false)
@@ -21,7 +30,7 @@ export default function Rename ({
   const [rev, setRev] = useState()
   const inputRef = useRef(null)
 
-  const handleSubmit = async event => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     setSpinnerDisplay('d-block')
 
@@ -32,17 +41,21 @@ export default function Rename ({
       JSON.stringify({
         name: name,
         _id: rootNode._id,
-        _rev: rev
+        _rev: rev,
       })
     )
     const options = {
       place: 'tr',
-      autoDismiss: 7
+      autoDismiss: 7,
     }
 
     if (ok) {
       setRev(result._rev)
-      mutate([`/api/timeline/events?key=${rootNode._key}`, user.token], null, true)
+      mutate(
+        [`/api/timeline/events?key=${rootNode._key}`, user.token],
+        null,
+        true
+      )
 
       options.message = 'Renamed mindmap!'
       options.type = 'success'
@@ -51,9 +64,10 @@ export default function Rename ({
       if (nameChangedCallBack) {
         nameChangedCallBack(name)
       }
-    }
-    else {
-      options.message = `Failed to rename mindmap! - ${JSON.stringify(result ||status)}`
+    } else {
+      options.message = `Failed to rename mindmap! - ${JSON.stringify(
+        result || status
+      )}`
       options.type = 'danger'
     }
 
@@ -84,7 +98,7 @@ export default function Rename ({
         id="rename"
         disabled={disabled}
       >
-        <Edit3 size={16}/>
+        <Edit3 size={16} />
       </ToolTippedButton>
       <Popover
         target="rename"
@@ -93,7 +107,9 @@ export default function Rename ({
         boundariesElement={'rename'}
         placement={'bottom-end'}
       >
-        <PopoverHeader>Rename <small>{rootNode.name}</small></PopoverHeader>
+        <PopoverHeader>
+          Rename <small>{rootNode.name}</small>
+        </PopoverHeader>
         <PopoverBody>
           <Card>
             <CardBody>
@@ -116,10 +132,12 @@ export default function Rename ({
                       color="primary"
                       id="save"
                     >
-                      <Save/> Save
+                      <Save /> Save
                     </Button>
                   </FormGroup>
-                  <FormGroup className={spinnerDisplay}><Spinner/></FormGroup>
+                  <FormGroup className={spinnerDisplay}>
+                    <Spinner />
+                  </FormGroup>
                 </Form>
               </CardText>
             </CardBody>

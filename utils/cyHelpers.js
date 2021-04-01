@@ -3,16 +3,16 @@ import ReactDOM from 'react-dom'
 
 const RG2CY_TYPE_MAP = {
   vertex: 'nodes',
-  edge: 'edges'
+  edge: 'edges',
 }
 const RG2CY_FIELD_MAP = {
   _id: 'id',
   _from: 'source',
-  _to: 'target'
+  _to: 'target',
 }
 const CY2RG_FIELD_MAP = invert(RG2CY_FIELD_MAP)
 
-export function rg2cy (data) {
+export function rg2cy(data) {
   const result = {}
 
   for (const el of data) {
@@ -30,7 +30,7 @@ export function rg2cy (data) {
   return result
 }
 
-export function cy2rg (data) {
+export function cy2rg(data) {
   const result = {}
 
   for (const el of data) {
@@ -50,7 +50,7 @@ export function cy2rg (data) {
   return result
 }
 
-export function removePopper (popperKey, divKey, poppers) {
+export function removePopper(popperKey, divKey, poppers) {
   const el = document.getElementById(divKey)
   ReactDOM.unmountComponentAtNode(el)
 
@@ -68,11 +68,11 @@ export function removePopper (popperKey, divKey, poppers) {
   }
 }
 
-export function setPopper (id, popper, poppers) {
+export function setPopper(id, popper, poppers) {
   poppers[id] = popper
 }
 
-export function getOptions (fit) {
+export function getOptions(fit) {
   // noinspection JSUnusedGlobalSymbols
   return {
     name: 'dagre',
@@ -82,23 +82,29 @@ export function getOptions (fit) {
     rankSep: 100, // the separation between each rank in the layout
     rankDir: undefined, // 'TB' for top to bottom flow, 'LR' for left to right,
     ranker: undefined, // Type of algorithm to assign a rank to each node in the input graph.
-                       // Possible values: 'network-simplex', 'tight-tree' or 'longest-path'
-    minLen: function () { return 1 }, // number of ranks to keep between the source and target of
-                                      // the edge
-    edgeWeight: function () { return 1 }, // higher weight edges are generally made shorter and
-                                          // straighter than
+    // Possible values: 'network-simplex', 'tight-tree' or 'longest-path'
+    minLen: function () {
+      return 1
+    }, // number of ranks to keep between the source and target of
+    // the edge
+    edgeWeight: function () {
+      return 1
+    }, // higher weight edges are generally made shorter and
+    // straighter than
     // lower weight edges
 
     // general layout options
     fit: fit, // whether to fit to viewport
     padding: 10, // fit padding
     spacingFactor: undefined, // Applies a multiplicative factor (>0) to expand or compress the
-                              // overall area that the nodes take up
+    // overall area that the nodes take up
     nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the
-                                        // space used by a node
+    // space used by a node
     animate: true, // whether to transition the node positions
-    animateFilter: function () { return true }, // whether to animate specific nodes when animation
-                                                // is on;
+    animateFilter: function () {
+      return true
+    }, // whether to animate specific nodes when animation
+    // is on;
     // non-animated nodes immediately go to their final positions
     animationDuration: 500, // duration of animation in ms if enabled
     animationEasing: 'ease', // easing of animation if enabled
@@ -114,36 +120,39 @@ export function getOptions (fit) {
       return pos
     }, // a function that applies a transform to the final node position
     ready: function () {}, // on layoutready
-    stop: function () {} // on layoutstop
+    stop: function () {}, // on layoutstop
   }
 }
 
-export function getDependents (el) {
+export function getDependents(el) {
   return el.union(el.successors()).union(el.incomers('edge'))
 }
 
-export function runLayout (cy) {
+export function runLayout(cy) {
   const nodes = cy.nodes(':visible')
   const fit = shouldFit(nodes)
   cy.layout(getOptions(fit)).run()
 }
 
-export function shouldFit (nodes) {
+export function shouldFit(nodes) {
   return nodes.length > 1
 }
 
-export function getPath (el) {
+export function getPath(el) {
   let path = el.scratch('path')
 
   if (!path) {
     const els = el.cy().elements()
     const root = els[0]
 
-    path = els.aStar({
-      root: root,
-      goal: el,
-      directed: true
-    }).path.nodes().map(node => node.data().title)
+    path = els
+      .aStar({
+        root: root,
+        goal: el,
+        directed: true,
+      })
+      .path.nodes()
+      .map((node) => node.data().title)
 
     el.scratch('path', path)
   }

@@ -2,7 +2,10 @@ import { aql } from 'arangojs'
 import { map, pick } from 'lodash'
 import { hasDeleteAccess, hasWriteAccess } from '../../../utils/auth/access'
 import { verifyIdToken } from '../../../utils/auth/firebaseAdmin'
-import { createNodeBracePath, recordCompoundEvent } from '../../../utils/rgHelpers'
+import {
+  createNodeBracePath,
+  recordCompoundEvent,
+} from '../../../utils/rgHelpers'
 
 const { db, rg } = require('../../../utils/arangoWrapper')
 
@@ -15,11 +18,11 @@ const NodesAPI = async (req, res) => {
     const userId = `users/${key}`
     const nodeMetas = []
 
-    let node, response, message
+    let node, response, message, parentId, title
     switch (req.method) {
       case 'POST':
-        const { parentId } = req.query
-        const { title } = req.body
+        parentId = req.query.parentId
+        title = req.body.title
 
         if (await hasWriteAccess(parentId, userId)) {
           node = { title, createdBy: userId }
@@ -32,7 +35,7 @@ const NodesAPI = async (req, res) => {
             const link = {
               _from: parentId,
               _to: node._id,
-              createdBy: userId
+              createdBy: userId,
             }
             response = await rg.post('/document/links', link)
             if (response.statusCode === 201) {
@@ -40,21 +43,21 @@ const NodesAPI = async (req, res) => {
               nodeMetas.push(response.body)
 
               await recordCompoundEvent('created', userId, nodeMetas)
-            }
-            else {
+            } else {
               message = response.body
 
-              await rg.delete('/history/purge', { path: `/n/${node._id}` },
-                { silent: true, deleteUserObjects: true })
+              await rg.delete(
+                '/history/purge',
+                { path: `/n/${node._id}` },
+                { silent: true, deleteUserObjects: true }
+              )
             }
-          }
-          else {
+          } else {
             message = response.body
           }
 
           return res.status(response.statusCode).json({ message })
-        }
-        else {
+        } else {
           return res.status(401).json({ message: 'Access Denied.' })
         }
 
@@ -63,17 +66,15 @@ const NodesAPI = async (req, res) => {
           node = pick(req.body, 'title', 'summary', 'content', '_rev', '_id')
           node.lastUpdatedBy = userId
 
-          response = await rg.patch('/document/nodes', node,
-            {
-              keepNull: false,
-              ignoreRevs: false
-            })
+          response = await rg.patch('/document/nodes', node, {
+            keepNull: false,
+            ignoreRevs: false,
+          })
 
           await recordCompoundEvent('updated', userId, [response.body])
 
           return res.status(response.statusCode).json(response.body)
-        }
-        else {
+        } else {
           return res.status(401).json({ message: 'Access Denied.' })
         }
 
@@ -137,13 +138,12 @@ const NodesAPI = async (req, res) => {
             nKeys[coll].push(...map(nodes, '_key'))
 
             response = await rg.delete(`/document/${coll}`, nodes, {
-              ignoreRevs: false
+              ignoreRevs: false,
             })
 
             if (response.statusCode === 200) {
               nodeMetas.push(...response.body)
-            }
-            else {
+            } else {
               const path = createNodeBracePath(nKeys)
               await rg.post('/document/_restore', { path }, { silent: true })
               failed = true
@@ -154,19 +154,16 @@ const NodesAPI = async (req, res) => {
 
           if (failed) {
             return res.status(500).json({ message: 'Failed to delete nodes.' })
-          }
-          else {
+          } else {
             await recordCompoundEvent('deleted', userId, nodeMetas)
 
             return res.status(200).json({ message: 'Nodes deleted.' })
           }
-        }
-        else {
+        } else {
           return res.status(401).json({ message: 'Access Denied.' })
         }
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error.message, error.stack)
     return res.status(401).json({ message: 'Access Denied.' })
   }

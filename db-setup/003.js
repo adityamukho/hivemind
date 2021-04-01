@@ -5,17 +5,25 @@ const { createNodeBracePath } = require('../utils/rgHelpers')
 
 const compoundEvents = db.collection('compound_events')
 const skeletonGraph = `${process.env.ARANGO_SVC_MOUNT_POINT}_skeleton`
-const skeletonVertices = db.collection(`${process.env.ARANGO_SVC_MOUNT_POINT}_skeleton_vertices`)
+const skeletonVertices = db.collection(
+  `${process.env.ARANGO_SVC_MOUNT_POINT}_skeleton_vertices`
+)
 
-function insertSaveEvents (path, mid) {
-  return rg.post('/event/log', { path, postFilter: '(["created", "updated"]).includes(event)' },
-    { groupBy: 'event', groupSort: 'asc' })
-    .then(response => {
+function insertSaveEvents(path, mid) {
+  return rg
+    .post(
+      '/event/log',
+      { path, postFilter: '(["created", "updated"]).includes(event)' },
+      { groupBy: 'event', groupSort: 'asc' }
+    )
+    .then((response) => {
       const eventGroups = response.body
       const saves = []
       for (const eventGroup of eventGroups) {
         const { event, events } = eventGroup
         const cEvents = []
+
+        let nodeEvents, linkEvents, groupedEvents, mindmapEvent
 
         switch (event) {
           case 'updated':
@@ -26,7 +34,7 @@ function insertSaveEvents (path, mid) {
                 eids: [ev._id],
                 nids: [ev.meta.id],
                 mid,
-                event: 'updated'
+                event: 'updated',
               }
 
               cEvents.push(cEvent)
@@ -34,9 +42,9 @@ function insertSaveEvents (path, mid) {
 
             break
           case 'created':
-            const nodeEvents = filter(events, { collection: 'nodes' })
-            const linkEvents = filter(events, { collection: 'links' })
-            const groupedEvents = zip(nodeEvents, linkEvents)
+            nodeEvents = filter(events, { collection: 'nodes' })
+            linkEvents = filter(events, { collection: 'links' })
+            groupedEvents = zip(nodeEvents, linkEvents)
 
             for (const eGroup of groupedEvents) {
               const ctimes = chain(eGroup).map('ctime').sortBy().value()
@@ -46,20 +54,20 @@ function insertSaveEvents (path, mid) {
                 eids: map(eGroup, '_id'),
                 nids: map(eGroup, 'meta.id'),
                 mid,
-                event: 'created'
+                event: 'created',
               }
 
               cEvents.push(cEvent)
             }
 
-            const mindmapEvent = find(events, { collection: 'mindmaps' })
+            mindmapEvent = find(events, { collection: 'mindmaps' })
             cEvents.push({
               fctime: mindmapEvent.ctime,
               lctime: mindmapEvent.ctime,
               eids: [mindmapEvent._id],
               nids: [mindmapEvent.meta.id],
               mid,
-              event: 'created'
+              event: 'created',
             })
 
             break
@@ -69,27 +77,42 @@ function insertSaveEvents (path, mid) {
         }
 
         if (cEvents.length) {
-          saves.push(compoundEvents.saveAll(cEvents)
-            .then(result => console.log(
-              `Inserted ${result.length} compound events for event: ${event}, mid: ${mid}`)))
+          saves.push(
+            compoundEvents
+              .saveAll(cEvents)
+              .then((result) =>
+                console.log(
+                  `Inserted ${result.length} compound events for event: ${event}, mid: ${mid}`
+                )
+              )
+          )
         }
       }
 
       return saves
     })
-    .then(saves => Promise.all(saves))
+    .then((saves) => Promise.all(saves))
 }
 
-function insertDeleteEvents (path, mid) {
-  return rg.post('/event/log', { path, postFilter: 'events[0].event === "deleted"' },
-    { groupBy: 'node', groupLimit: 1 })
-    .then(response => {
+function insertDeleteEvents(path, mid) {
+  return rg
+    .post(
+      '/event/log',
+      { path, postFilter: 'events[0].event === "deleted"' },
+      { groupBy: 'node', groupLimit: 1 }
+    )
+    .then((response) => {
       const eventGroups = response.body
-      const flatEvents = chain(eventGroups).map('events').flatten().sortBy('ctime').value()
+      const flatEvents = chain(eventGroups)
+        .map('events')
+        .flatten()
+        .sortBy('ctime')
+        .value()
 
-      function delSubTree () {
-        const nodeEvents = flatEvents.filter(
-          event => ['mindmaps', 'nodes'].includes(event.collection))
+      function delSubTree() {
+        const nodeEvents = flatEvents.filter((event) =>
+          ['mindmaps', 'nodes'].includes(event.collection)
+        )
         const root = nodeEvents[0]
         const svid = `${skeletonVertices.name}/${root.collection}.${root.meta.key}`
         const query = aql`
@@ -114,11 +137,12 @@ function insertDeleteEvents (path, mid) {
             
             return append(children, incoming)
           `
-        return db.query(query)
-          .then(cursor => cursor.next())
-          .then(nodeMetas => {
+        return db
+          .query(query)
+          .then((cursor) => cursor.next())
+          .then((nodeMetas) => {
             const events = chain(flatEvents)
-              .remove(ev => find(nodeMetas, { id: ev.meta.id }))
+              .remove((ev) => find(nodeMetas, { id: ev.meta.id }))
               .sortBy('ctime')
               .value()
             const ctimes = map(events, 'ctime')
@@ -128,11 +152,16 @@ function insertDeleteEvents (path, mid) {
               eids: map(events, '_id'),
               nids: map(events, 'meta.id'),
               mid,
-              event: 'deleted'
+              event: 'deleted',
             }
 
-            const save1 = compoundEvents.save(cEvent).then(() => console.log(
-              `Inserted 1 compound events for event: deleted, mid: ${mid}`))
+            const save1 = compoundEvents
+              .save(cEvent)
+              .then(() =>
+                console.log(
+                  `Inserted 1 compound events for event: deleted, mid: ${mid}`
+                )
+              )
             const save2 = flatEvents.length ? delSubTree() : Promise.resolve()
 
             return Promise.all([save1, save2])
@@ -143,7 +172,8 @@ function insertDeleteEvents (path, mid) {
     })
 }
 
-module.exports = compoundEvents.truncate()
+module.exports = compoundEvents
+  .truncate()
   .then(() => {
     console.log(`Truncated ${compoundEvents.name}.`)
 
@@ -181,8 +211,8 @@ module.exports = compoundEvents.truncate()
 
     return db.query(query)
   })
-  .then(cursor => cursor.all())
-  .then(result => {
+  .then((cursor) => cursor.all())
+  .then((result) => {
     const ops = []
 
     for (const meta of result) {
@@ -198,5 +228,5 @@ module.exports = compoundEvents.truncate()
 
     return ops
   })
-  .then(ops => Promise.all(ops))
+  .then((ops) => Promise.all(ops))
   .then(() => console.log('Finished generating compound events.\n'))

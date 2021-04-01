@@ -5,7 +5,7 @@ const { db } = require('../arangoWrapper')
 const skeletonGraph = `${process.env.ARANGO_SVC_MOUNT_POINT}_skeleton`
 const skeletonVertices = `${process.env.ARANGO_SVC_MOUNT_POINT}_skeleton_vertices`
 
-async function hasPath (nid, userId, roles) {
+async function hasPath(nid, userId, roles) {
   const query = aql`
     for v, e in outbound shortest_path
     ${userId} to ${nid}
@@ -20,7 +20,7 @@ async function hasPath (nid, userId, roles) {
   return cursor.hasNext
 }
 
-async function hasHistoricPath (nid, userId, roles) {
+async function hasHistoricPath(nid, userId, roles) {
   const svid = `${skeletonVertices}/${userId.replace('/', '.')}`
   const evid = `${skeletonVertices}/${nid.replace('/', '.')}`
   const query = aql`
@@ -42,7 +42,7 @@ async function hasHistoricPath (nid, userId, roles) {
   return false
 }
 
-export async function hasWriteAccess (nid, userId) {
+export async function hasWriteAccess(nid, userId) {
   const [coll] = nid.split('/')
   const roles = []
 
@@ -57,7 +57,7 @@ export async function hasWriteAccess (nid, userId) {
   return await hasPath(nid, userId, roles)
 }
 
-export async function hasDeleteAccess (nid, userId) {
+export async function hasDeleteAccess(nid, userId) {
   const [coll] = nid.split('/')
   const roles = []
 
@@ -76,7 +76,7 @@ export async function hasDeleteAccess (nid, userId) {
   return await hasPath(nid, userId, roles)
 }
 
-export async function hasReadAccess (nid, userId) {
+export async function hasReadAccess(nid, userId) {
   const [coll] = nid.split('/')
   const roles = []
 

@@ -12,9 +12,15 @@ const Page = () => {
     if (user) {
       router.replace('/mmaps')
     }
-  }, [user])
+  }, [user, router])
 
-  return (typeof user === 'undefined') ? <Spinner/> : (user ? <p>Redirecting...</p> : <AuthPrompt/>)
+  return typeof user === 'undefined' ? (
+    <Spinner />
+  ) : user ? (
+    <p>Redirecting...</p>
+  ) : (
+    <AuthPrompt />
+  )
 }
 
 export default Page

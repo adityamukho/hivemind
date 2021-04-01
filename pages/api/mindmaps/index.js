@@ -14,29 +14,29 @@ const MindMapsAPI = async (req, res) => {
     const key = claims.uid
     const userId = `users/${key}`
 
-    let mindmap, response, message
+    let mindmap, response, message, query, cursor, mindmaps, name
 
     switch (req.method) {
       case 'GET':
-        const query = aql`
+        query = aql`
           for v, e in 1
           outbound ${userId}
           graph 'mindmaps'
           
           return { mindmap: v, access: e }
         `
-        const cursor = await db.query(query)
-        const mindmaps = await cursor.all()
+        cursor = await db.query(query)
+        mindmaps = await cursor.all()
 
         return res.status(200).json(mindmaps)
 
       case 'POST':
-        const { name } = req.body
+        name = req.body.name
         mindmap = {
           name,
           isRoot: true,
           title: name,
-          createdBy: userId
+          createdBy: userId,
         }
         response = await rg.post('/document/mindmaps', mindmap)
 
@@ -46,22 +46,23 @@ const MindMapsAPI = async (req, res) => {
           const access = {
             _from: `users/${key}`,
             _to: mindmap._id,
-            access: 'admin'
+            access: 'admin',
           }
           response = await rg.post('/document/access', access)
           if (response.statusCode === 201) {
             message = 'Mindmap created.'
 
             await recordCompoundEvent('created', userId, [mindmap])
-          }
-          else {
+          } else {
             message = response.body
 
-            await rg.delete('/history/purge', { path: `/n/${mindmap._id}` },
-              { silent: true, deleteUserObjects: true })
+            await rg.delete(
+              '/history/purge',
+              { path: `/n/${mindmap._id}` },
+              { silent: true, deleteUserObjects: true }
+            )
           }
-        }
-        else {
+        } else {
           message = response.body
         }
 
@@ -69,7 +70,7 @@ const MindMapsAPI = async (req, res) => {
 
       case 'PATCH':
         if (isEmpty(req.body._id)) {
-          return res.status(400).json({message: 'Mindmap id is required'})
+          return res.status(400).json({ message: 'Mindmap id is required' })
         }
 
         if (await hasWriteAccess(req.body._id, userId)) {
@@ -79,22 +80,19 @@ const MindMapsAPI = async (req, res) => {
             .value()
           mindmap.lastUpdatedBy = userId
 
-          response = await rg.patch('/document/mindmaps', mindmap,
-            {
-              keepNull: false,
-              ignoreRevs: false
-            })
+          response = await rg.patch('/document/mindmaps', mindmap, {
+            keepNull: false,
+            ignoreRevs: false,
+          })
 
           await recordCompoundEvent('updated', userId, [response.body])
 
           return res.status(response.statusCode).json(response.body)
-        }
-        else {
+        } else {
           return res.status(401).json({ message: 'Access Denied.' })
         }
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error.message, error.stack)
     return res.status(401).json({ message: 'Access Denied.' })
   }

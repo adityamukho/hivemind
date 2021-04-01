@@ -13,12 +13,21 @@ function handler (cyWrapper) {
   runLayout(cy)
 }
 
-export default function showAll () {
+export default function ShowAll () {
   const { cyWrapper } = useContext(GlobalContext)
-  return <>
-    <ToolTippedButton tooltip="Show All" className="ml-1" id="showall" outline color="secondary"
-                      onClick={() => handler(cyWrapper)}>
-      <Eye size={16}/>
-    </ToolTippedButton>
-  </>
-};
+
+  return (
+    <>
+      <ToolTippedButton
+        tooltip="Show All"
+        className="ml-1"
+        id="showall"
+        outline
+        color="secondary"
+        onClick={() => handler(cyWrapper)}
+      >
+        <Eye size={16} />
+      </ToolTippedButton>
+    </>
+  )
+}

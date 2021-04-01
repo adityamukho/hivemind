@@ -1,4 +1,3 @@
-/* globals window */
 import firebase from 'firebase/app'
 import React, { useEffect, useState } from 'react'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
@@ -11,20 +10,20 @@ const firebaseAuthConfig = {
   signInOptions: [
     {
       provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-      requireDisplayName: true
+      requireDisplayName: true,
     },
     {
       provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
       customParameters: {
         // Forces account selection even when one account
         // is available.
-        prompt: 'select_account'
-      }
+        prompt: 'select_account',
+      },
     },
-    firebase.auth.GithubAuthProvider.PROVIDER_ID
+    firebase.auth.GithubAuthProvider.PROVIDER_ID,
   ],
   signInSuccessUrl: '/',
-  credentialHelper: 'none'
+  credentialHelper: 'none',
 }
 
 const FirebaseAuth = () => {

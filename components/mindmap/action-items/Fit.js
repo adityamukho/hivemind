@@ -4,15 +4,16 @@ import { runLayout } from '../../../utils/cyHelpers'
 import GlobalContext from '../../GlobalContext'
 import ToolTippedButton from './ToolTippedButton'
 
-function handler (cyWrapper) {
+function handler(cyWrapper) {
   const { cy } = cyWrapper
   runLayout(cy)
 }
 
-export default function fit () {
+export default function Fit() {
   const { cyWrapper } = useContext(GlobalContext)
 
-  return <ToolTippedButton
+  return (
+    <ToolTippedButton
       className="ml-1"
       id="fit"
       outline
@@ -21,6 +22,7 @@ export default function fit () {
       tooltip="Fit On Canvas"
       onClick={() => handler(cyWrapper)}
     >
-      <Maximize size={16}/>
+      <Maximize size={16} />
     </ToolTippedButton>
+  )
 }
