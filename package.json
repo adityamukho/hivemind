@@ -5,7 +5,20 @@
     "debug": "NODE_OPTIONS='--inspect' next dev",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "format": "prettier --write .",
+    "lint": "eslint . --ext js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.@(js)": [
+      "yarn lint",
+      "yarn format"
+    ]
   },
   "dependencies": {
     "@egjs/hammerjs": "^2.0.17",
@@ -43,6 +56,15 @@
     "vis-util": "^5.0.2"
   },
   "devDependencies": {
-    "dotenv": "^8.2.0"
+    "@babel/core": "^7.13.14",
+    "@babel/eslint-parser": "^7.13.14",
+    "@next/eslint-plugin-next": "^10.1.2",
+    "dotenv": "^8.2.0",
+    "eslint": "^7.23.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-react": "^7.23.1",
+    "husky": "^6.0.0",
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.2.1"
   }
 }
