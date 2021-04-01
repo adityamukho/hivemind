@@ -226,7 +226,7 @@ const Page = () => {
             outline
             color={timestamp ? 'secondary' : 'danger'}
             id="now"
-            tooltip={timestamp ? 'UnLock' : 'Lock'}
+            tooltip={timestamp ? 'Click to unlock' : 'Click to lock'}
             onClick={() => jump(timestamp ? 'now' : 'last')}
           >
             {timestamp ? <Lock size={16} /> : <Unlock size={16} />}
