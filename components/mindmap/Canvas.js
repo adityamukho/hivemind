@@ -30,40 +30,85 @@ if (typeof window !== 'undefined') {
 }
 
 const Canvas = ({ data, timestamp, events }) => {
-  const [cy, setCy] = useState()
-  const [els, setEls] = useState([])
-  const [output, setOutput] = useState(null)
   const { cyWrapper, poppers } = useContext(GlobalContext)
+  const [output, setOutput] = useState(null)
+  const [els, setEls] = useState([])
   const prevEls = usePrevious(els)
 
   useEffect(() => {
-    function buildMenu(access) {
-      const { viewApi } = cyWrapper
+    if (cyWrapper.cy && prevEls !== els) {
+      const commonEls = intersectionBy(prevEls, els, 'data.id')
+      const celMap = zipObject(map(commonEls, 'data.id'), commonEls)
 
-      return function (node) {
-        const menu = []
+      cyWrapper.cy
+        .elements()
+        .filter((el) => celMap[el.id()])
+        .forEach((el) => {
+          el.removeData('summary content lastUpdatedBy')
+          el.data(celMap[el.id()].data)
+        })
+    }
+  }, [cyWrapper.cy, els, prevEls])
 
-        view(menu, poppers)
-        if (!node.data('isRoot')) {
-          hide(menu, viewApi)
-        }
-        if (node.scratch('showReveal')) {
-          reveal(menu, viewApi)
-        }
+  useEffect(() => {
+    if (get(data, 'ok') && typeof window !== 'undefined') {
+      setEls(CytoscapeComponent.normalizeElements(data.data.elements))
+    }
+  }, [data])
 
-        if (access && ['admin', 'write'].includes(access.access)) {
-          add(menu, poppers)
-          if (!node.data('isRoot')) {
-            del(menu, poppers)
-          }
-          edit(menu, poppers)
-        }
+  useEffect(() => {
+    function initCy(cyInternal) {
+      cyWrapper.cy = cyInternal
 
-        return menu
-      }
+      cyInternal.nodes().forEach((node) => {
+        node.scratch('style', node.style())
+      })
     }
 
+    const nodes = els.filter((el) => !el.data.id.startsWith('links'))
+    const fit = shouldFit(nodes)
+    const options = getOptions(fit)
+
+    setOutput(
+      <CytoscapeComponent
+        cy={initCy}
+        style={{ width: '100%', height: '100%' }}
+        stylesheet={style}
+        layout={options}
+        elements={els}
+      />
+    )
+  }, [cyWrapper, els])
+
+  useEffect(() => {
     function configurePlugins(access) {
+      function buildMenu() {
+        const { viewApi } = cyWrapper
+
+        return function (node) {
+          const menu = []
+
+          view(menu, poppers)
+          if (!node.data('isRoot')) {
+            hide(menu, viewApi)
+          }
+          if (node.scratch('showReveal')) {
+            reveal(menu, viewApi)
+          }
+
+          if (access && ['admin', 'write'].includes(access.access)) {
+            add(menu, poppers)
+            if (!node.data('isRoot')) {
+              del(menu, poppers)
+            }
+            edit(menu, poppers)
+          }
+
+          return menu
+        }
+      }
+
+      const { cy } = cyWrapper
       const minRadius = Math.min(cy.width(), cy.height()) / 8
 
       const viewOpts = {
@@ -113,7 +158,7 @@ const Canvas = ({ data, timestamp, events }) => {
       const cxtMenu = {
         menuRadius: minRadius + 50, // the radius of the circular menu in pixels
         selector: 'node', // elements matching this Cytoscape.js selector will trigger cxtmenus
-        commands: buildMenu(access), // function( ele ){ return [
+        commands: buildMenu(), // function( ele ){ return [
         // /*...*/ ] }, // a function
         // that returns
         // commands or a promise of commands
@@ -133,12 +178,11 @@ const Canvas = ({ data, timestamp, events }) => {
         // zIndex: 9999, // the z-index of the ui div
         atMouse: false, // draw menu at mouse position
       }
-
       cyWrapper.menu = cy.cxtmenu(cxtMenu)
     }
 
     function setHandlers() {
-      const { viewApi } = cyWrapper
+      const { viewApi, cy } = cyWrapper
 
       cy.on(
         'boxend',
@@ -218,15 +262,9 @@ const Canvas = ({ data, timestamp, events }) => {
       })
     }
 
-    if (
-      cy &&
-      get(data, 'ok') &&
-      get(events, 'ok') &&
-      typeof window !== 'undefined'
-    ) {
+    if (cyWrapper.cy && get(data, 'ok') && get(events, 'ok')) {
       configurePlugins(data.data.access)
-      setHandlers() // events used here
-      setEls(CytoscapeComponent.normalizeElements(data.data.elements))
+      setHandlers()
     }
 
     return () => {
@@ -234,48 +272,7 @@ const Canvas = ({ data, timestamp, events }) => {
         cyWrapper.menu.destroy()
       }
     }
-  }, [cy, data, events, cyWrapper.menu, cyWrapper, timestamp, poppers])
-
-  useEffect(() => {
-    function initCy(cy) {
-      setCy(cy)
-      cyWrapper.cy = cy
-
-      cy.nodes().forEach((node) => {
-        node.scratch('style', node.style())
-      })
-    }
-
-    if (typeof window !== 'undefined') {
-      const nodes = els.filter((el) => !el.data.id.startsWith('links'))
-      const fit = shouldFit(nodes)
-      const options = getOptions(fit)
-
-      setOutput(
-        <CytoscapeComponent
-          cy={initCy}
-          style={{ width: '100%', height: '100%' }}
-          stylesheet={style}
-          layout={options}
-          elements={els}
-        />
-      )
-    }
-  }, [els, cyWrapper])
-
-  useEffect(() => {
-    if (cy) {
-      const commonEls = intersectionBy(prevEls, els, 'data.id')
-      const celMap = zipObject(map(commonEls, 'data.id'), commonEls)
-
-      cy.elements()
-        .filter((el) => celMap[el.id()])
-        .forEach((el) => {
-          el.removeData('summary content lastUpdatedBy')
-          el.data(celMap[el.id()].data)
-        })
-    }
-  }, [cy, els, prevEls])
+  }, [data, events, cyWrapper.menu, cyWrapper, timestamp, poppers, els])
 
   return (
     <div

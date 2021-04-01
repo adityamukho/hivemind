@@ -23,7 +23,7 @@ import {
 } from '../../components/mindmap/action-items'
 import MindMap from '../../components/mindmap/MindMap'
 import { useUser } from '../../utils/auth/useUser'
-import useFetch from 'utils/useFetch'
+import useFetch from '../../utils/useFetch'
 
 const Page = () => {
   const { user } = useUser()

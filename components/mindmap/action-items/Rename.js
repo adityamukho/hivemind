@@ -15,7 +15,7 @@ import {
 } from 'reactstrap'
 import { mutate } from 'swr'
 import { useUser } from '../../../utils/auth/useUser'
-import { fetcher } from 'utils/useFetch'
+import { fetcher } from '../../../utils/useFetch'
 import ToolTippedButton from './ToolTippedButton'
 
 export default function Rename({

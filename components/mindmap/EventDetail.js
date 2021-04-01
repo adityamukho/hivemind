@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react'
 import ReactDOM from 'react-dom'
 import { Spinner } from 'reactstrap'
 import { useUser } from '../../utils/auth/useUser'
-import useFetch from 'utils/useFetch'
+import useFetch from '../../utils/useFetch'
 
 function getDiffURL(event) {
   return `/api/timeline/diff?eid=${event._id}`

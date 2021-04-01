@@ -1,4 +1,4 @@
-import { defer, find, findIndex, get } from 'lodash'
+import { findIndex, get } from 'lodash'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { MapPin, Search, Tag } from 'react-feather'
 import {
@@ -21,7 +21,8 @@ const bgColors = {
 }
 
 const Timeline = ({ data, timestamp, jump }) => {
-  const timelineRef = useRef(null)
+  const timelineRef = useRef()
+  const timeline = useRef()
   const {
     cyWrapper: { cy, viewApi },
   } = useContext(GlobalContext)
@@ -31,7 +32,6 @@ const Timeline = ({ data, timestamp, jump }) => {
   const [showJump, setShowJump] = useState('d-block')
   const [showFind, setShowFind] = useState('d-none')
   const [items, setItems] = useState([])
-  const [timeline, setTimeline] = useState(null)
 
   const toggle = () => setModal(!modal)
   const jumpTo = async (lctime) => {
@@ -55,48 +55,53 @@ const Timeline = ({ data, timestamp, jump }) => {
 
   useEffect(() => {
     if (get(data, 'ok')) {
-      const tempItems = data.data.map((event, idx) => ({
-        id: idx,
-        className: event.lctime === timestamp ? 'pinned' : '',
-        title: event.event,
-        content: '',
-        start: event.lctime * 1000,
-        style: `background-color: ${bgColors[event.event]};`,
-        lctime: event.lctime,
-        nid: event.nids[0] || event.mid,
-        event: event.event,
-      }))
-
-      setItems(tempItems)
+      setItems(
+        data.data.map((event, idx) => ({
+          id: idx,
+          className: event.lctime === timestamp ? 'pinned' : '',
+          title: event.event,
+          content: '',
+          start: event.lctime * 1000,
+          style: `background-color: ${bgColors[event.event]};`,
+          lctime: event.lctime,
+          nid: event.nids[0] || event.mid,
+          event: event.event,
+        }))
+      )
     }
   }, [data, timestamp])
 
   useEffect(() => {
     if (items.length) {
-      const container = timelineRef.current
-      const margin = (items[items.length - 1].start - items[0].start) * 0.05
-      const options = {
-        width: '100%',
-        height: '120px',
-        type: 'box',
-        stack: false,
-        horizontalScroll: false,
-        verticalScroll: false,
-        cluster: {
-          titleTemplate: '{count}',
-          maxItems: 1,
-          showStipes: true,
-          fitOnDoubleClick: true,
-        },
-        max: items[items.length - 1].start + margin,
-        min: items[0].start - margin,
-        selectable: false,
-        dataAttributes: ['id'],
-        zoomMin: 60000,
-      }
-      const tempTimeline = new VisTimeline(container, items, options)
+      if (timeline.current) {
+        timeline.current.setItems(items)
+      } else {
+        const container = timelineRef.current
+        const margin = (items[items.length - 1].start - items[0].start) * 0.05
+        const options = {
+          width: '100%',
+          height: '120px',
+          type: 'box',
+          stack: false,
+          horizontalScroll: false,
+          verticalScroll: false,
+          cluster: {
+            titleTemplate: '{count}',
+            maxItems: 1,
+            showStipes: true,
+            fitOnDoubleClick: true,
+          },
+          max: items[items.length - 1].start + margin,
+          min: items[0].start - margin,
+          selectable: false,
+          dataAttributes: ['id'],
+          zoomMin: 60000,
+        }
 
-      tempTimeline.on('click', (properties) => {
+        timeline.current = new VisTimeline(container, items, options)
+      }
+
+      timeline.current.on('click', (properties) => {
         const { what, isCluster, item } = properties
 
         if (what === 'item' && !isCluster) {
@@ -119,60 +124,38 @@ const Timeline = ({ data, timestamp, jump }) => {
           setTarget('timeline')
         }
       })
-      tempTimeline.on('doubleClick', (properties) => {
+      timeline.current.on('doubleClick', (properties) => {
         const { what, item, isCluster } = properties
 
         switch (what) {
           case 'background':
-            tempTimeline.fit()
+            timeline.fit()
 
             break
           case 'item':
             if (!isCluster) {
-              tempTimeline.focus(item)
+              timeline.focus(item)
             }
 
             break
         }
       })
-      tempTimeline.fit()
 
-      setTimeline(tempTimeline)
-
-      return () => {
-        tempTimeline.destroy()
-      }
-    }
-  }, [items])
-
-  useEffect(() => {
-    if (timeline) {
       if (timestamp) {
         const idx = findIndex(items, { lctime: timestamp })
-        const prevPinnedItem = find(items, { className: 'pinned' })
-
-        if (prevPinnedItem) {
-          prevPinnedItem.className = ''
-        }
-        items[idx].className = 'pinned'
-
-        defer(() => {
-          timeline.setItems(items)
-          timeline.focus(idx)
-        })
+        timeline.current.focus(idx)
       } else {
-        timeline.fit()
+        timeline.current.fit()
       }
     }
-  }, [timeline, timestamp, items])
+  }, [items, timestamp])
 
   useEffect(
     () => () => {
-      if (timeline) {
-        timeline.destroy()
-      }
+      timeline.current.destroy()
+      timeline.current = null
     },
-    [timeline]
+    []
   )
 
   return (

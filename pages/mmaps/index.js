@@ -16,7 +16,7 @@ import { mutate } from 'swr'
 import AuthPrompt from '../../components/auth/AuthPrompt'
 import MindMaps from '../../components/mindmap/MindMaps'
 import { useUser } from '../../utils/auth/useUser'
-import useFetch, { fetcher } from 'utils/useFetch'
+import useFetch, { fetcher } from '../../utils/useFetch'
 
 const Page = () => {
   const { user } = useUser()

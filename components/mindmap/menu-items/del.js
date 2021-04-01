@@ -17,7 +17,7 @@ import {
 import { mutate } from 'swr'
 import { useUser } from '../../../utils/auth/useUser'
 import { cy2rg, removePopper, setPopper } from '../../../utils/cyHelpers'
-import { fetcher } from 'utils/useFetch'
+import { fetcher } from '../../../utils/useFetch'
 import CloseButton from '../CloseButton'
 
 export default function del(menu, poppers, setEls) {
