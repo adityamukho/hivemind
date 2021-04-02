@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import React, { forwardRef, useCallback, useContext, useState } from 'react'
-import { HelpCircle } from 'react-feather'
+import { GitHub, HelpCircle } from "react-feather";
 import NotificationAlert from 'react-notification-alert'
 import {
   Col,
@@ -153,6 +153,9 @@ const Layout = ({ children }) => {
                 <HelpCircle />
               </NavLink>
             </Link>
+            <NavLink href='https://github.com/adityamukho/hivemind' target='_blank'>
+              <GitHub/>
+            </NavLink>
             <NavItemLogin />
           </Nav>
         </Collapse>
