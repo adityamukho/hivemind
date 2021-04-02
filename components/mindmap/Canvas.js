@@ -234,7 +234,7 @@ const Canvas = ({ data, timestamp, events }) => {
             const { viewApi } = cyWrapper
 
             viewApi.removeHighlights(cy.elements())
-            if (event.event !== 'deleted') {
+            if (event && event.event !== 'deleted') {
               const nid = event.nids[0]
               const node = cy.$id(nid)
 

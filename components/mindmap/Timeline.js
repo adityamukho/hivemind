@@ -1,5 +1,5 @@
 import ToolTippedButton from "./ToolTippedButton";
-import { findIndex, get } from 'lodash'
+import { defer, findIndex, get } from 'lodash'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { MapPin, Search, Tag } from 'react-feather'
 import {
@@ -146,12 +146,14 @@ const Timeline = ({ data, timestamp, jump }) => {
         }
       })
 
-      if (timestamp) {
-        const idx = findIndex(items, { lctime: timestamp })
-        timeline.current.focus(idx)
-      } else {
-        timeline.current.fit()
-      }
+      defer(() => { // To ensure focus/fit on first load.
+        if (timestamp) {
+          const idx = findIndex(items, { lctime: timestamp })
+          timeline.current.focus(idx)
+        } else {
+          timeline.current.fit()
+        }
+      })
     }
   }, [items, timestamp])
 

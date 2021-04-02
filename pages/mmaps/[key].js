@@ -27,12 +27,13 @@ import useFetch from '../../utils/useFetch'
 
 const Page = () => {
   const { user } = useUser()
-  const { key } = useRouter().query
+  const router = useRouter()
   const [timestamp, setTimestamp] = useState(
     typeof window === 'undefined'
       ? null
       : parseFloat(new URLSearchParams(location.search).get('timestamp'))
   )
+  const { key } = router.query
   const { data, error } = useFetch(
     user ? user : null,
     `/api/mindmaps/${key}?timestamp=${timestamp || ''}`
@@ -64,6 +65,24 @@ const Page = () => {
       setTitle(data.data.meta.name)
     }
   }, [data])
+
+  useEffect(() => {
+    const handleRouteChange = (url) => {
+      const fullURL = new URL(url, location.origin)
+      const toTs = fullURL.searchParams.get('timestamp')
+      const toTsF = parseFloat(toTs) || null
+
+      if ((!toTsF && timestamp) || toTsF !== timestamp) {
+        setTimestamp(toTsF)
+      }
+    }
+
+    router.events.on('routeChangeComplete', handleRouteChange)
+
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router.events, timestamp])
 
   if (typeof user === 'undefined') {
     return <Spinner />
@@ -98,7 +117,7 @@ const Page = () => {
 
   async function jump(to) {
     if (to === 'now') {
-      history.replaceState({}, document.title, `/mmaps/${key}`)
+      await router.push('/mmaps/[key]', `/mmaps/${key}`, { shallow: true })
       setTimestamp(null)
     } else if (gotEventData) {
       let toTS, idx
@@ -130,10 +149,13 @@ const Page = () => {
           toTS = to
       }
 
-      history.replaceState(
-        {},
-        document.title,
-        `/mmaps/${key}?timestamp=${toTS}`
+      await router.push(
+        '/mmaps/[key]',
+        {
+          pathname: `/mmaps/${key}`,
+          query: { timestamp: toTS },
+        },
+        { shallow: true }
       )
       setTimestamp(toTS)
     }
