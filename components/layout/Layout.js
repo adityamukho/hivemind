@@ -1,17 +1,27 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import React, { forwardRef, useCallback, useContext, useState } from 'react'
-import { GitHub, HelpCircle } from "react-feather";
+import {
+  GitHub,
+  HelpCircle,
+  Info,
+  MessageCircle,
+} from 'react-feather'
 import NotificationAlert from 'react-notification-alert'
 import {
   Col,
   Collapse,
   Container,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
   Nav,
   Navbar,
   NavbarBrand,
   NavbarText,
   NavbarToggler,
+  NavItem,
   NavLink,
   Row,
   Spinner,
@@ -27,6 +37,7 @@ const ForwardedNavbarBrand = forwardRef((props, ref) => (
 
 const Layout = ({ children }) => {
   const [isOpen, setOpen] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
   const { pageVars } = useContext(GlobalContext)
   const notifyRef = useCallback((node) => {
     if (typeof window !== 'undefined') {
@@ -38,14 +49,18 @@ const Layout = ({ children }) => {
     }
   }, [])
 
-  function toggle() {
+  function toggleCollapse() {
     setOpen(!isOpen)
+  }
+
+  function toggleDropdown() {
+    setDropdownOpen(!dropdownOpen)
   }
 
   return (
     <Container fluid>
       <Head>
-        <script type="text/javascript" src="/js/pace.min.js" async/>
+        <script type="text/javascript" src="/js/pace.min.js" async />
         <title>{pageVars.title}</title>
         <link
           rel="apple-touch-icon"
@@ -135,27 +150,65 @@ const Layout = ({ children }) => {
             &nbsp;
           </ForwardedNavbarBrand>
         </Link>
-        <NavbarToggler onClick={toggle} />
+        <NavbarToggler onClick={toggleCollapse} />
         <Collapse isOpen={isOpen} navbar>
           <MainNav />
           <Nav className="ml-auto" navbar>
-            <NavbarText>
-              <Spinner
-                type="grow"
-                color="dark"
-                id={'loading'}
-                className={'invisible mx-2'}
-              />
-            </NavbarText>
+            <NavItem>
+              <NavbarText>
+                <Spinner
+                  type="grow"
+                  color="dark"
+                  id={'loading'}
+                  className={'invisible mx-2'}
+                />
+              </NavbarText>
+            </NavItem>
             <NavItemUser />
-            <Link href={'/help'} passHref>
-              <NavLink>
-                <HelpCircle />
+            <Dropdown
+              nav
+              inNavbar
+              isOpen={dropdownOpen}
+              toggle={toggleDropdown}
+            >
+              <DropdownToggle nav caret>
+                <HelpCircle /> Help
+              </DropdownToggle>
+              <DropdownMenu right>
+                <DropdownItem>
+                  <Link href={'/help'} passHref>
+                    <NavLink>
+                      <Info /> User Guide
+                    </NavLink>
+                  </Link>
+                </DropdownItem>
+                <DropdownItem divider />
+                <DropdownItem>
+                  <NavLink
+                    href={'https://github.com/adityamukho/hivemind/discussions'}
+                    target="_blank"
+                  >
+                    <MessageCircle /> Ask a Question (Hivemind)
+                  </NavLink>
+                </DropdownItem>
+                <DropdownItem>
+                  <NavLink
+                    href={'https://gitter.im/recallgraph/community'}
+                    target="_blank"
+                  >
+                    <MessageCircle /> Ask a Question (RecallGraph)
+                  </NavLink>
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+            <NavItem>
+              <NavLink
+                href="https://github.com/adityamukho/hivemind"
+                target="_blank"
+              >
+                <GitHub />
               </NavLink>
-            </Link>
-            <NavLink href='https://github.com/adityamukho/hivemind' target='_blank'>
-              <GitHub/>
-            </NavLink>
+            </NavItem>
             <NavItemLogin />
           </Nav>
         </Collapse>

@@ -1,16 +1,21 @@
 import React from 'react'
-import { NavbarText, Spinner } from 'reactstrap'
+import { NavbarText, NavItem, Spinner } from "reactstrap";
 import { useUser } from '../../../utils/auth/useUser'
 
 const NavItemUser = () => {
   const { user } = useUser()
 
   return typeof user === 'undefined' ? (
-    <NavbarText>
-      <Spinner size={'sm'} />
-    </NavbarText>
+    <NavItem>
+      <NavbarText>
+        <Spinner size={'sm'} />
+      </NavbarText>
+    </NavItem>
   ) : user ? (
-    <NavbarText>{user.email}</NavbarText>
+    <NavItem>
+      <NavbarText>{user.email}</NavbarText>
+    </NavItem>
+
   ) : null
 }
 
