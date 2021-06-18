@@ -34,7 +34,7 @@
     "firebase": "^7.15.5",
     "firebase-admin": "9.6.0",
     "jiff": "^0.7.3",
-    "jquery": "1.9.1",
+    "jquery": "3.5.0",
     "jsdifflib": "^1.1.0",
     "keycharm": "^0.3.1",
     "lodash": "^4.17.21",
