@@ -1,15 +1,43 @@
 import firebase from 'firebase/app'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import useSWR from 'swr'
 import '../initFirebase'
-import { mapUserData } from './mapUserData'
-import { getUserFromCookie, removeUserCookie, setUserCookie } from './userCookies'
+import mapUserData from './mapUserData'
+
+function getUser(cancelListeners) {
+  return new Promise((resolve) => {
+    const cancelAuthListener = firebase
+      .auth()
+      .onAuthStateChanged((user) =>
+        user
+          ? mapUserData(user).then((userData) => resolve(userData))
+          : resolve(null)
+      )
+
+    cancelListeners.push(cancelAuthListener)
+  })
+}
 
 const useUser = () => {
-  const [user, setUser] = useState()
+  const { current: cancelListeners } = useRef([])
+  const { data: user, error, mutate } = useSWR('user', () =>
+    getUser(cancelListeners)
+  )
   const router = useRouter()
 
-  const logout = async () => {
+  if (error && window.notify) {
+    const options = {
+      place: 'tr',
+      message: 'Failed to authenticate user!',
+      type: 'danger',
+      autoDismiss: 7,
+    }
+
+    window.notify(options)
+  }
+
+  const logout = () => {
     return firebase
       .auth()
       .signOut()
@@ -23,32 +51,15 @@ const useUser = () => {
   }
 
   useEffect(() => {
-    // Firebase updates the id token every hour, this
-    // makes sure the react state and the cookie are
-    // both kept up to date
-    const cancelAuthListener = firebase.auth().onIdTokenChanged((user) => {
-      if (user) {
-        const userData = mapUserData(user)
-        setUserCookie(userData)
-        setUser(userData)
-      }
-      else {
-        removeUserCookie()
-        setUser()
-      }
-    })
-
-    const userFromCookie = getUserFromCookie()
-    if (userFromCookie) {
-      setUser(userFromCookie)
-      return
-    }
+    const cancelIdTokenListener = firebase
+      .auth()
+      .onIdTokenChanged((user) => mutate(mapUserData(user), false))
+    cancelListeners.push(cancelIdTokenListener)
 
     return () => {
-      cancelAuthListener()
+      cancelListeners.forEach((cancelListener) => cancelListener())
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [cancelListeners, mutate])
 
   return { user, logout }
 }

@@ -1,8 +1,10 @@
-export const mapUserData = (user) => {
-  const { uid, email, xa } = user
-  return {
-    id: uid,
-    email,
-    token: xa,
-  }
-}
+const mapUserData = async (user) =>
+  user
+    ? {
+        id: user.uid,
+        email: user.email,
+        token: await user.getIdToken(),
+      }
+    : null
+
+export default mapUserData

@@ -9,7 +9,7 @@ const closeButton = ({ popperKey, divKey, poppers }) => (
     className="btn btn-outline-dark float-right align-bottom ml-1"
     onClick={() => removePopper(popperKey, divKey, poppers)}
   >
-    <X/>
+    <X />
   </CardLink>
 )
 

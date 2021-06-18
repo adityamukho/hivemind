@@ -1,9 +1,6 @@
-/* globals window */
 import firebase from 'firebase/app'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
-import { mapUserData } from '../../utils/auth/mapUserData'
-import { setUserCookie } from '../../utils/auth/userCookies'
 import '../../utils/initFirebase'
 
 const firebaseAuthConfig = {
@@ -13,26 +10,20 @@ const firebaseAuthConfig = {
   signInOptions: [
     {
       provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-      requireDisplayName: false
+      requireDisplayName: true,
     },
     {
       provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
       customParameters: {
         // Forces account selection even when one account
         // is available.
-        prompt: 'select_account'
-      }
+        prompt: 'select_account',
+      },
     },
-    firebase.auth.GithubAuthProvider.PROVIDER_ID
+    firebase.auth.GithubAuthProvider.PROVIDER_ID,
   ],
   signInSuccessUrl: '/',
   credentialHelper: 'none',
-  callbacks: {
-    signInSuccessWithAuthResult: async ({ user }) => {
-      const userData = mapUserData(user)
-      setUserCookie(userData)
-    }
-  }
 }
 
 const FirebaseAuth = () => {

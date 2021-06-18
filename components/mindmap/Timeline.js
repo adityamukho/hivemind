@@ -1,83 +1,227 @@
-import React, { useEffect, useRef } from 'react'
-import { Spinner } from 'reactstrap'
+import ToolTippedButton from "./ToolTippedButton";
+import { defer, findIndex, get } from 'lodash'
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import { MapPin, Search, Tag } from 'react-feather'
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Spinner,
+} from 'reactstrap'
 import { Timeline as VisTimeline } from 'vis-timeline'
-import { useUser } from '../../utils/auth/useUser'
-import fetchWrapper from '../../utils/fetchWrapper'
+import GlobalContext from '../GlobalContext'
+import EventDetail from './EventDetail'
 
-export default function timeline ({ mkey }) {
-  const { user } = useUser()
-  const { data, error } = fetchWrapper(user ? user : null, `/api/mindmaps/${mkey}/timeline`)
-
-  if (error && window.notify) {
-    const options = {
-      place: 'tr',
-      message: 'Failed to fetch timeline!',
-      type: 'danger',
-      autoDismiss: 7
-    }
-
-    window.notify(options)
-  }
-
-  if (data && !error) {
-    return data.ok ? <Timeline data={data.data}/> : null
-  }
-  else {
-    return <Spinner/>
-  }
+const bgColors = {
+  created: 'limegreen',
+  restored: 'yellow',
+  updated: 'deepskyblue',
+  deleted: 'red',
 }
 
-const Timeline = ({ data }) => {
-  const timelineRef = useRef(null)
-  const items = data.map((event, idx) => ({
-    id: idx,
-    className: event.event,
-    title: event.event,
-    content: '',
-    start: event.ctime * 1000
-  }))
-  const margin = (items[items.length - 1].start - items[0].start) * 0.05
-  const options = {
-    width: '100%',
-    height: '120px',
-    type: 'box',
-    stack: false,
-    horizontalScroll: false,
-    verticalScroll: false,
-    cluster: {
-      titleTemplate: '{count}',
-      maxItems: 1,
-      clusterCriteria: () => true,
-      showStipes: true,
-      fitOnDoubleClick: true
-    },
-    max: items[items.length - 1].start + margin,
-    min: items[0].start - margin
+const Timeline = ({ data, timestamp, jump }) => {
+  const timelineRef = useRef()
+  const timeline = useRef()
+  const {
+    cyWrapper: { cy, viewApi },
+  } = useContext(GlobalContext)
+  const [modal, setModal] = useState(false)
+  const [target, setTarget] = useState('timeline')
+  const [node, setNode] = useState(<Spinner />)
+  const [showJump, setShowJump] = useState('d-block')
+  const [showFind, setShowFind] = useState('d-none')
+  const [items, setItems] = useState([])
+
+  const toggle = () => setModal(!modal)
+  const jumpTo = async (lctime) => {
+    if (lctime !== timestamp) {
+      jump(lctime)
+    }
+
+    setModal(false)
+  }
+  const locate = (item) => {
+    if (item && item.event !== 'deleted') {
+      const node = cy.$id(item.nid)
+
+      viewApi.zoomToSelected(node)
+      viewApi.removeHighlights(cy.elements())
+      viewApi.highlight(node)
+    }
+
+    setModal(false)
   }
 
   useEffect(() => {
-    const container = timelineRef.current
-    const timeline = new VisTimeline(
-      container,
-      items,
-      options
-    )
+    if (get(data, 'ok')) {
+      setItems(
+        data.data.map((event, idx) => ({
+          id: idx,
+          className: event.lctime === timestamp ? 'pinned' : '',
+          title: event.event,
+          content: '',
+          start: event.lctime * 1000,
+          style: `background-color: ${bgColors[event.event]};`,
+          lctime: event.lctime,
+          nid: event.nids[0] || event.mid,
+          event: event.event,
+        }))
+      )
+    }
+  }, [data, timestamp])
 
-    timeline.on('doubleClick', (properties) => {
-      const { item, isCluster } = properties
+  useEffect(() => {
+    if (items.length) {
+      if (timeline.current) {
+        timeline.current.setItems(items)
+      } else {
+        const container = timelineRef.current
+        if (container.firstChild) {
+          container.removeChild(container.firstChild)
+        }
 
-      if (item === null) {
-        timeline.fit()
+        const margin = (items[items.length - 1].start - items[0].start) * 0.05
+        const options = {
+          width: '100%',
+          height: '120px',
+          type: 'box',
+          stack: false,
+          horizontalScroll: false,
+          verticalScroll: false,
+          cluster: {
+            titleTemplate: '{count}',
+            maxItems: 1,
+            showStipes: true,
+            fitOnDoubleClick: true,
+          },
+          max: items[items.length - 1].start + margin,
+          min: items[0].start - margin,
+          selectable: false,
+          dataAttributes: ['id'],
+          zoomMin: 60000,
+        }
+
+        timeline.current = new VisTimeline(container, items, options)
       }
-      else if (!isCluster) {
-        timeline.focus(item)
-      }
-    })
 
-    return () => timeline.destroy()
-  }, [data.length])
+      timeline.current.on('click', (properties) => {
+        const { what, isCluster, item } = properties
 
-  return <div className={'border border-secondary rounded'}>
-    <div id={'timeline'} ref={timelineRef} className={'m-1'}/>
-  </div>
+        if (what === 'item' && !isCluster) {
+          setNode(<Spinner />)
+          setTarget(item)
+          setModal(true)
+
+          if (items[item].className === 'pinned') {
+            setShowJump('d-none')
+
+            if (items[item].event !== 'deleted') {
+              setShowFind('d-block')
+            }
+          } else {
+            setShowJump('d-block')
+            setShowFind('d-none')
+          }
+        } else {
+          setModal(false)
+          setTarget('timeline')
+        }
+      })
+      timeline.current.on('doubleClick', (properties) => {
+        const { what, item, isCluster } = properties
+
+        switch (what) {
+          case 'background':
+            timeline.current.fit()
+
+            break
+          case 'item':
+            if (!isCluster) {
+              timeline.current.focus(item)
+            }
+
+            break
+        }
+      })
+
+      defer(() => { // To ensure focus/fit on first load.
+        if (timestamp) {
+          const idx = findIndex(items, { lctime: timestamp })
+          timeline.current.focus(idx)
+        } else {
+          timeline.current.fit()
+        }
+      })
+    }
+  }, [items, timestamp])
+
+  useEffect(
+    () => () => {
+      timeline.current.destroy()
+      timeline.current = null
+    },
+    []
+  )
+
+  return (
+    <div className={'border border-secondary rounded'}>
+      <div id={'timeline'} ref={timelineRef} className={'m-1'} >
+        <Spinner/>
+      </div>
+      <Modal
+        isOpen={modal}
+        toggle={toggle}
+        fade={false}
+        centered={true}
+        size={'lg'}
+        scrollable={true}
+      >
+        <ModalHeader toggle={toggle}>
+          <b>{node}</b> | {get(items, [target, 'event'], 'NA')}{' '}
+          {new Date(get(items, [target, 'start'], Date.now())).toLocaleString()}
+        </ModalHeader>
+        <ModalBody>
+          {data && data.data[target] ? (
+            <EventDetail event={data.data[target]} setNode={setNode} />
+          ) : null}
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            className={`ml-1 ${showJump}`}
+            outline
+            color="secondary"
+            id="jump"
+            onClick={() => jumpTo(items[target].lctime)}
+          >
+            <MapPin size={16} /> Jump
+          </Button>
+          &nbsp;
+          <Button
+            className={`ml-1 ${showFind}`}
+            outline
+            color="secondary"
+            id="find"
+            onClick={() => locate(items[target])}
+          >
+            <Search size={16} /> Find
+          </Button>
+          &nbsp;
+          <ToolTippedButton
+            className="ml-1"
+            outline
+            color="secondary"
+            id="tag"
+            disabled={true}
+            tooltip={'Coming Soon'}
+          >
+            <Tag size={16} /> Tag
+          </ToolTippedButton>
+        </ModalFooter>
+      </Modal>
+    </div>
+  )
 }
+
+export default Timeline

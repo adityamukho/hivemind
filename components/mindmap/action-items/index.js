@@ -1,5 +1,6 @@
-import ShowAll from './ShowAll'
-import Search from './Search'
 import Fit from './Fit'
+import Rename from './Rename'
+import Search from './Search'
+import ShowAll from './ShowAll'
 
-export { ShowAll, Search, Fit }
+export { ShowAll, Search, Fit, Rename }

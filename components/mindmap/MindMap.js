@@ -1,34 +1,21 @@
-import React, { useEffect, useState } from 'react'
-import { Row, Col } from 'reactstrap'
+import React from 'react'
+import { Col, Row } from 'reactstrap'
+import Canvas from './Canvas'
 import Timeline from './Timeline'
 
-const MindMap = ({ data, setTitle }) => {
-  const [renderAuth, setRenderAuth] = useState(false)
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setRenderAuth(true)
-      setTitle(data.meta.name)
-    }
-  }, [data.meta.name])
-
-  if (renderAuth) {
-    const { default: Canvas } = require('./Canvas')
-
-    return <>
-      <Row className="my-1">
-        <Col>
-          <Canvas {...data}/>
-        </Col>
-      </Row>
-      <Row className="my-1">
-        <Col>
-          <Timeline mkey={data.meta._key}/>
-        </Col>
-      </Row>
-    </>
-  }
-
-  return null
-}
+const MindMap = ({ data, edata, timestamp, jump }) => (
+  <>
+    <Row className="my-1">
+      <Col>
+        <Canvas data={data} timestamp={timestamp} events={edata} />
+      </Col>
+    </Row>
+    <Row className="my-1">
+      <Col>
+        <Timeline data={edata} timestamp={timestamp} jump={jump} />
+      </Col>
+    </Row>
+  </>
+)
 
 export default MindMap

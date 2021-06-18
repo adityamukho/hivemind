@@ -1,7 +1,8 @@
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
-import { useUser } from '../utils/auth/useUser'
+import { Spinner } from 'reactstrap'
 import FirebaseAuth from '../components/auth/FirebaseAuth'
+import { useUser } from '../utils/auth/useUser'
 
 const Page = () => {
   const { user } = useUser()
@@ -11,9 +12,15 @@ const Page = () => {
     if (user) {
       router.replace('/')
     }
-  }, [user])
+  }, [user, router])
 
-  return user ? <p>Redirecting...</p> : <FirebaseAuth/>
+  return typeof user === 'undefined' ? (
+    <Spinner />
+  ) : user ? (
+    <p>Redirecting...</p>
+  ) : (
+    <FirebaseAuth />
+  )
 }
 
 export default Page
