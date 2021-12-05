@@ -63,7 +63,7 @@ const NodesAPI = async (req, res) => {
 
       case 'PATCH':
         if (await hasWriteAccess(req.body._id, userId)) {
-          node = pick(req.body, 'title', 'summary', 'content', '_rev', '_id')
+          node = pick(req.body, 'title', 'summary', 'content', 'audio', '_rev', '_id')
           node.lastUpdatedBy = userId
 
           response = await rg.patch('/document/nodes', node, {
