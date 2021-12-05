@@ -63,6 +63,7 @@ const PopperCard = ({ el, poppers }) => {
   const [title, setTitle] = useState(data.title)
   const [summary, setSummary] = useState(data.summary || '')
   const [content, setContent] = useState(data.content || '')
+  const [audio, setAudio] = useState(data.audio || '')
   const [spinnerDisplay, setSpinnerDisplay] = useState('d-none')
   const inputRef = useRef(null)
 
@@ -86,6 +87,7 @@ const PopperCard = ({ el, poppers }) => {
         title,
         summary,
         content,
+        audio,
         _id: data.id,
         _rev: data._rev,
       })
@@ -168,6 +170,18 @@ const PopperCard = ({ el, poppers }) => {
                 id="content"
                 value={content}
                 onChange={getChangeHandler(setContent)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="audio">Audio (URL)</Label>
+              <Input
+                type="url"
+                name="audio"
+                id="audio"
+                value={audio}
+                maxLength="2,048"
+                autoComplete="off"
+                onChange={getChangeHandler(setAudio)}
               />
             </FormGroup>
             <Row form>
