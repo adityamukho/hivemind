@@ -107,7 +107,7 @@ const PopperCard = ({ el, poppers }) => {
               </Row>
               <Row>
                 <audio controls>
-                <source src="{data.audio}">
+                <source src="{data.audio}"/>
                 </audio>
               </Row>
             </>
