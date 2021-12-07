@@ -37,7 +37,7 @@ const EventDetail = ({ event, setNode }) => {
         case 'updated':
           baseText = JSON.stringify(
             omitBy(
-              pick(diff.v1, 'name', 'title', 'summary', 'content'),
+              pick(diff.v1, 'name', 'title', 'summary', 'content', 'audio'),
               isEmpty
             ),
             null,
@@ -45,7 +45,7 @@ const EventDetail = ({ event, setNode }) => {
           )
           newText = JSON.stringify(
             omitBy(
-              pick(diff.v2, 'name', 'title', 'summary', 'content'),
+              pick(diff.v2, 'name', 'title', 'summary', 'content', 'audio'),
               isEmpty
             ),
             null,
@@ -99,6 +99,13 @@ const EventDetail = ({ event, setNode }) => {
               content.classNames = ['row']
               content.innerHTML = `<b>Content:</b> ${d.content}`
               rows.appendChild(content)
+            }
+            
+            if (d.audio) {
+              const audio = document.createElement('div')
+              audio.classNames = ['row']
+              audio.innerHTML = `<b>Audio:</b> ${d.audio}`
+              rows.appendChild(audio)
             }
 
             contents.appendChild(rows)
