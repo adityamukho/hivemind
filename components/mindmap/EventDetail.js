@@ -102,10 +102,10 @@ const EventDetail = ({ event, setNode }) => {
             }
             
             if (d.audio) {
-              const content = document.createElement('div')
+              const audio = document.createElement('div')
               audio.classNames = ['row']
-              audio.innerHTML = `<b>Audio:</b> ${d.content}`
-              rows.appendChild(content)
+              audio.innerHTML = `<b>Audio:</b> ${d.audio}`
+              rows.appendChild(audio)
             }
 
             contents.appendChild(rows)
