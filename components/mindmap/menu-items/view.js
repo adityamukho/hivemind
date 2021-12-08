@@ -100,6 +100,18 @@ const PopperCard = ({ el, poppers }) => {
               <Row>{data.content}</Row>
             </>
           ) : null}
+          {data.audio ? (
+            <>
+              <Row>
+                <h5>Audio</h5>
+              </Row>
+              <Row>
+                <audio controls>
+                <source src="{data.audio}"/>
+                </audio>
+              </Row>
+            </>
+          ) : null}
         </CardText>
       </CardBody>
     </Card>

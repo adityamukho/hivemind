@@ -44,7 +44,7 @@ const Canvas = ({ data, timestamp, events }) => {
         .elements()
         .filter((el) => celMap[el.id()])
         .forEach((el) => {
-          el.removeData('summary content lastUpdatedBy')
+          el.removeData('summary content audio lastUpdatedBy')
           el.data(celMap[el.id()].data)
         })
     }
