@@ -179,7 +179,7 @@ const PopperCard = ({ el, poppers }) => {
                 name="audio"
                 id="audio"
                 value={audio}
-                maxLength="2,048"
+                maxLength="2048"
                 autoComplete="off"
                 onChange={getChangeHandler(setAudio)}
               />
