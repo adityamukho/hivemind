@@ -6,10 +6,6 @@ Hivemind is intended to let users collaboratively create and edit shared mind ma
 
 Hivemind will also let users tag specific versions of their work for easy future reference, and allow them to share their maps with other users (with admin/read-write/read-only access) or publicly (via link, read-only).
 
-## Live Demo
-
-https://hivemind.vercel.app/
-
 ## Explanatory Video
 
 https://youtu.be/bjZC0nFcoRw
